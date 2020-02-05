@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+
+{% block page-title %}
+<title>{{ puzzle.name }}</title>
+{% endblock %}
+
+{% block top-left-actions %}
+{% if team and not hunt_is_closed %}
+<a href="{% url 'solve' puzzle.slug %}" class="btn">Call in an answer</a>
+{% if not puzzle.is_meta and num_free_answers_remaining > 0 and puzzle_answer is None %}
+<a href="{% url 'free-answer' puzzle.slug %}" class="btn">Use free answer</a>
+{% endif %}
+{% endif %}
+{% if can_view_hints %}
+<a href="{% url 'hints' puzzle.slug %}" class="btn">{% if can_ask_for_hints and puzzle_answer is None %}Ask for a hint{% else %}View hints{% endif %}</a>
+{% endif %}
+{% if hunt_is_closed or not team and hunt_is_over %}
+<a href="{% url 'post-hunt-solve' puzzle.slug %}" class="btn">Check your answer spoiler-free</a>
+{% endif %}
+{% if hunt_is_over or is_superuser %}
+<a href="{% url 'solution' puzzle.slug %}" class="btn">View solution</a>
+<a href="{% url 'stats' puzzle.slug %}" class="btn">Stats</a>
+{% endif %}
+{% if is_superuser %}
+<a href="{% url 'survey' puzzle.slug %}" class="btn">Survey responses</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    {% block puzzle-title %}
+    {{ puzzle.name }}
+    {% if puzzle_answer %}
+    <div class="solved-title-marker">Solved! Answer: <span class="solved-title-answer">{{ puzzle_answer }}</span></div>
+    {% endif %}
+    {% endblock %}
+</h1>
+
+<main>
+    {% captureas puzzle_body_content %}{% spaceless %}
+        {% block puzzle-body %}
+        This puzzle doesn&rsquo;t seem to exist yet.
+        Searched for a puzzle template named `{{ template_name }}`
+        {% endblock %}
+    {% endspaceless %}{% endcaptureas %}
+    {{ puzzle_body_content }}
+</main>
+
+{% endblock %}

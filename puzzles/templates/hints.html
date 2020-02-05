@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block page-title %}
+<title>Hints: {{ puzzle.name }}</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+{% endblock %}
+
+{% block content %}
+
+<style>
+label {
+    text-align: left;
+}
+
+.nr, .obs {
+    color: #999;
+}
+</style>
+
+<h1>Hints for {{ puzzle.name }}</h1>
+
+<main>
+    {% if puzzle_answer != None %}
+    <p style="margin-bottom: 4rem">You have already solved this puzzle!</p>
+    {% elif hunt_is_over %}
+    <p>Sorry, hints are closed.</p>
+    {% elif num_hints_remaining > 0 or num_free_answers_remaining > 0 %}
+    <h4>Request a hint</h4>
+
+    <form method="post" class="call-in-answer-panel">
+        <p>
+            {% if num_hints_remaining > 0 %}
+            You have <b>
+            {{ num_hints_remaining }}
+            hint{{ num_hints_remaining|pluralize }}
+            {% include 'icon-hint.svg' %}
+            </b> that you may use to ask for a hint on any puzzle.
+            {% if num_free_answers_remaining > 0 %}
+            You may also use free answers
+            {% include 'icon-answer.svg' %}
+            as hints if you run out of hints.
+            {% endif %}
+            {% else %}
+            You have no hints
+            {% include 'icon-hint.svg' %}
+            remaining, but you do have <b>
+            {{ num_free_answers_remaining }}
+            free answer{{ num_free_answers_remaining|pluralize }}
+            {% include 'icon-answer.svg' %}
+            </b> that you may <i>convert to hints</i> to request a hint.
+            {% endif %}
+        </p>
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+        <div class="row">{{ field.label_tag }}</div>
+        <div class="row">{{ field }} {{ field.errors }}</div>
+        {% endfor %}
+        <div class="row">
+            <button class="btn" type="submit">Submit</button>
+        </div>
+    </form>
+
+    {% else %}
+    <p style="margin-bottom: 4rem">You have no hints available.</p>
+    {% endif %}
+
+    {% if hints %}
+    <h4>Previously requested hints</h4>
+    {% for hint in hints %}
+    <div class="row" style="margin-bottom: 3rem">
+        <div class="eight columns">
+            <p><b>Q:</b> {{ hint.hint_question }}</p>
+            {% if hint.status == 'NR' %}
+            <p class="nr">No response yet.</p>
+            {% elif hint.status == 'ANS' %}
+            <p><b>A: </b>{{ hint.response }}</p>
+            {% elif hint.status == 'AMB' %}
+            <p><b>A: </b>We could not answer your hint. Your use of the hint was refunded.</p>
+            <p><b>Clarification: </b>{{ hint.response }}</p>
+            {% elif hint.status == 'OBS' %}
+            <p class="obs">Looks like you solved this puzzle before we could send you a response, nice! Your use of the hint was refunded.</p>
+            {% endif %}
+        </div>
+        <div class="four columns" style="text-align: right">
+            Asked {{ hint.submitted_datetime }}
+        </div>
+    </div>
+    {% endfor %}
+    {% elif puzzle_answer == None and not hunt_is_over %}
+    <p>You have not asked for any hints on this puzzle yet.</p>
+    {% endif %}
+</main>
+
+{% endblock %}

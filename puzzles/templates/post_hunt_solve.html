@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block page-title %}
+<title>Call in: {{ puzzle.name }}</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+{% endblock %}
+
+{% block content %}
+
+<h1>Check your answer for {{ puzzle.name }}</h1>
+
+<main>
+    {% if is_correct %}
+    <div class="solved-panel">
+        <h4>Solved!</h4>
+        <p>The answer was <b>{{ puzzle.normalized_answer }}</b>.</p>
+    </div>
+    {% endif %}
+
+    {% if is_wrong %}
+    <div class="unsolved-panel">
+        <h4>Incorrect!</h4>
+    </div>
+    {% endif %}
+
+    <form class="call-in-answer-panel">
+        {% for field in form %}
+        <div class="row">
+            <div class="four columns">
+                {{ field.label_tag }}
+            </div>
+            <div class="four columns">
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            <div class="four columns">
+                <button class="btn" type="submit">Submit</button>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+</main>
+
+{% endblock %}

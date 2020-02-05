@@ -1,0 +1,11 @@
+from .base import *
+
+DEBUG = True
+
+IS_TEST = False
+
+DOMAIN = 'FIXME'
+
+ALLOWED_HOSTS = ['FIXME']
+
+EMAIL_SUBJECT_PREFIX = '[\u2708\u2708\u2708STAGING\u2708\u2708\u2708] '

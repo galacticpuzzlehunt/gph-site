@@ -1,0 +1,571 @@
+body {
+    font-family: sans-serif;
+    font-variant-ligatures: none;
+    line-height: 2.6rem;
+    font-size: 1.75rem;
+    overflow-wrap: break-word;
+    position: relative;
+}
+
+@media print {
+    nav, .shortcuts, #shortcuts {
+        display: none;
+    }
+}
+
+@media screen {
+    html {
+        background-color: #f9f8f5;
+        color: #0c0906;
+        background-image: linear-gradient(#3a3c3f, #3a3c3f);
+        background-size: 100% 40px;
+        background-repeat: no-repeat;
+    }
+
+    body {
+        margin: 0 auto 60px;
+        width: 80%;
+        width: 80vw;
+        max-width: 960px;
+    }
+}
+
+p {
+    margin-bottom: 2rem;
+}
+
+li {
+    list-style-position: outside;
+    list-style-type: disc;
+    margin-left: 1.5em;
+}
+
+textarea {
+    width: 100%;
+    min-height: 24ch;
+    font-family: monospace, monospace;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+}
+
+h1 {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+h2 {
+    margin: 4rem 0;
+}
+
+main {
+    padding: 20px 30px;
+    position: relative;
+}
+
+hr {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+a, .btn {
+    color: #2f4f89;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0 20px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 0;
+    border: none;
+    font-family: inherit;
+    text-transform: none;
+    letter-spacing: 0;
+
+    height: 30px;
+    line-height: 30px;
+    font-size: 1.5rem;
+}
+
+form .btn {
+    height: 38px;
+    line-height: 38px;
+    font-size: 1.75rem;
+}
+
+input[type=text], input[type=password], input[type=email] {
+    width: 100%;
+    color: #0c0906;
+    border-radius: 0;
+}
+
+@media (min-width: 961px) {
+    label {
+        text-align: right;
+        height: 2em;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+}
+
+@media print {
+    main {
+        border-top: 1px solid #3a3c3f;
+    }
+
+    .btn {
+        border: 1px solid currentColor;
+    }
+}
+
+@media screen {
+    main {
+        display: table;
+        min-width: 100%;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        color: #32528a;
+    }
+
+    h2, h3, h4 {
+        color: #a94050;
+    }
+
+    a {
+        transition: color 0.3s;
+    }
+
+    a:hover,
+    a:focus {
+        color: #439ac8;
+    }
+
+    .btn {
+        transition: background-color 0.3s;
+        color: #f9f8f5;
+        background-color: #2f4f89;
+    }
+
+    .btn:hover,
+    .btn:focus {
+        color: #f9f8f5;
+        background-color: #439ac8;
+    }
+
+    nav {
+        overflow: hidden;
+    }
+
+    .top-tabs {
+        text-align: center;
+        font-size: 2rem;
+        margin: 5px 0 1.5rem;
+        line-height: 1.5;
+    }
+
+    .top-tabs a {
+        text-decoration: none;
+        color: #f9f8f5;
+        padding: 0 8px;
+        padding: 0 1vw;
+    }
+
+    .top-tabs a:hover,
+    .top-tabs a:focus {
+        color: #94c8e3;
+    }
+
+    .top-tabs .selected-tab {
+        font-weight: bold;
+    }
+
+    .top-tabs .selected-tab:before {
+        content: "[";
+    }
+
+    .top-tabs .selected-tab:after {
+        content: "]";
+    }
+
+    .top-left-actions {
+        float: left;
+    }
+
+    .top-right-actions {
+        float: right;
+        min-height: 36px;
+        margin-bottom: 1.5rem;
+    }
+
+    .top-left-actions, .top-right-actions {
+        line-height: 36px;
+        word-spacing: 8px;
+    }
+
+    .top-left-actions > *, .top-right-actions > * {
+        word-spacing: initial;
+    }
+
+    .cookie-count {
+        white-space: nowrap;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .cookie-label {
+        font-size: 24px;
+        vertical-align: middle;
+    }
+
+    .shortcuts {
+        border: 4px double #3a3c3f;
+        background-color: white;
+        position: absolute;
+        padding: 1rem;
+        right: 60px;
+        min-width: auto;
+        z-index: 800;
+        display: none;
+    }
+
+    .shortcuts form {
+        margin: 0;
+    }
+
+    #shortcuts {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    [for=shortcuts] {
+        display: inline;
+        cursor: pointer;
+    }
+
+    [for=shortcuts]:after {
+        content: "\25BC";
+    }
+
+    :checked ~ nav [for=shortcuts]:after {
+        content: "\25B2";
+    }
+
+    :checked ~ .shortcuts {
+        display: block;
+    }
+}
+
+@media screen and (max-width: 960px) {
+    html {
+        background-image: none;
+        font-size: calc((960px - 100vw) / 80 + 10px);
+    }
+
+    body {
+        width: calc(480px + 30vw);
+    }
+
+    .tray {
+        display: flex;
+        justify-content: space-between;
+        position: fixed;
+        margin: auto;
+        left: 0;
+        right: 0;
+        transform: translateY(calc(5px - 100%));
+        transition: transform .1s;
+        z-index: 900;
+        padding: 1rem calc(150vw - 1160px);
+    }
+
+    .tray:before {
+        content: "This is not a puzzle.";
+        text-align: center;
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -100vh;
+        bottom: 0;
+        padding-top: 90vh;
+        background-color: #3a3c3f;
+        color: #f9f8f5;
+    }
+
+    .tray:after {
+        content: "\2630";
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        margin-top: -10px;
+        padding-top: 10px;
+        height: 64px;
+        cursor: grab;
+        color: #f9f8f5;
+        text-align: center;
+        font-size: 32px;
+        line-height: 40px;
+        background-image: linear-gradient(#3a3c3f, #3a3c3f);
+        background-size: 100% 48px;
+        background-repeat: no-repeat;
+        background-origin: content-box;
+    }
+
+    .tray div {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        flex-basis: 0;
+        z-index: 0;
+    }
+
+    .top-tabs {
+        align-items: flex-start;
+        margin: 0;
+        font-size: calc((960px - 100vw) / 16 + 20px);
+    }
+
+    .top-left-actions {
+        align-items: flex-end;
+    }
+
+    .top-left-actions a {
+        line-height: 2;
+        height: auto;
+        font-size: calc((960px - 100vw) * 3 / 80 + 18px);
+        margin: calc((960px - 100vw) * 3 / 80 + 6px) 0;
+    }
+
+    .top-right-actions {
+        float: none;
+        text-align: center;
+        padding-top: 64px;
+    }
+
+    .flavor {
+        margin-left: calc(100vw - 800px);
+        margin-right: calc(100vw - 800px);
+    }
+}
+
+@media screen and (max-width: 960px) and (any-hover: hover) {
+    .tray:not(:hover) {
+        transform: translateY(-100%);
+    }
+}
+
+@media screen and (max-width: 800px) {
+    html {
+        font-size: 12px;
+    }
+
+    body {
+        width: 90vw;
+    }
+
+    .tray {
+        padding: 1rem calc((100% - 90vw) / 2);
+    }
+
+    .top-tabs {
+        font-size: 30px;
+    }
+
+    .top-left-actions a {
+        font-size: 24px;
+        margin: 12px;
+    }
+
+    .flavor {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+.hunt-icon {
+    vertical-align: middle;
+}
+
+.gph-list-table {
+    min-width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+}
+
+.gph-list-table td, .gph-list-table th {
+    padding: 4px 8px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+@media screen {
+    .gph-list-table th {
+        border: none;
+        position: sticky;
+        top: 0;
+        background-color: #f9f8f5;
+        color: #a94050;
+        box-shadow: inset 0 -1px 0 0 #3a3c3f;
+    }
+}
+
+@media screen and (max-width: 960px) {
+    .gph-list-table th {
+        top: 4rem;
+    }
+}
+
+.no-break {
+    -webkit-column-break-inside: avoid; /* Chrome, Safari */
+    page-break-inside: avoid;           /* Theoretically FF 20+ */
+    break-inside: avoid;                /* IE 11 */
+    display: table;                     /* Actually FF 20+ */
+    width: 100%;
+}
+
+.submitted-text {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+@media print {
+    .story-chunk {
+        border-bottom: 1px solid #3a3c3f;
+    }
+}
+
+@media screen {
+    .story-chunk {
+        max-width: 600px;
+        border: 1px solid #3a3c3f;
+        padding: 20px 30px;
+        margin: 0 auto 30px;
+    }
+}
+
+.flavor {
+    margin-left: 22.5%;
+    margin-right: 22.5%;
+    text-align: center;
+    font-style: italic;
+}
+
+.form-section {
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.team-members-formset .delete-row {
+    float: right;
+}
+
+.errorlist {
+    padding: 10px;
+    border: 3px solid currentColor;
+    list-style-type: none;
+    color: #b21;
+    background-color: #eee;
+}
+
+.errorlist li {
+    margin-bottom: 0;
+    list-style-type: none;
+    text-indent: 0;
+    padding-left: 0;
+}
+
+.team-info-panel, .call-in-answer-panel, .solved-panel, .puzzle-stats-panel {
+    margin-bottom: 24px;
+}
+
+.call-in-answer-panel:last-child {
+    margin-bottom: 0;
+}
+
+.call-in-answer-panel .row {
+    margin: 1em 0;
+}
+
+.call-in-answer-panel .errorlist {
+    margin-bottom: 0;
+}
+
+.solved-panel {
+    color: #4a2;
+}
+
+.unsolved-panel {
+    color: #c32;
+}
+
+.solved-title-marker {
+    font-size: 50%;
+    color: #0c0906;
+}
+
+.solved-title-answer {
+    color: #4a2;
+}
+
+.stat-entry {
+    font-size: 2rem;
+}
+
+.stat-value {
+    font-weight: bold;
+}
+
+.current-team {
+    font-weight: bold;
+}
+
+.puzzle-erratum {
+    color: red;
+    margin-bottom: 10px;
+}
+
+.hint-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.hint-table th, .hint-table td {
+    border: none;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.hint-table .submitted-text {
+    padding: 0 2rem 2rem;
+}
+
+.hint-controls {
+    margin-bottom: 2rem;
+}
+
+.hint-controls > :last-child {
+    float: right;
+}
+
+.hint-controls form, .hint-controls input {
+    margin: 0;
+}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+
+{% block content %}
+
+<style>
+@media print {
+    a {
+        text-decoration: none;
+    }
+
+    p a {
+        color: inherit;
+    }
+
+    .feedback, .register {
+        display: none;
+    }
+
+    .print-register {
+        font-weight: bold;
+        margin: 20px 0 40px;
+    }
+}
+
+@media screen {
+    .print-register {
+        display: none;
+    }
+
+    .feedback, .register {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .register .btn {
+        height: 46px;
+        line-height: 46px;
+        font-size: 2rem;
+    }
+}
+
+h3 {
+    text-align: center;
+    margin: 0;
+}
+</style>
+
+<h1>FIXME Puzzle Hunt</h1>
+
+{% if hunt_is_over %}
+<div class="feedback">
+{% if hunt_is_closed %}
+The FIXME Puzzle Hunt has now come to a close. Thanks for puzzling with us!
+{% else %}
+Thanks for puzzling with us! The FIXME Puzzle Hunt is now over, but you can still register and progress through the hunt until {% format_time close_time '%B %d' %}.
+{% endif %}
+<br>
+Please fill out our <a href="https://FIXME">feedback form</a>
+{% if is_wrapup_page_visible %}
+and check out our <a href="{% url 'wrapup' %}">wrap-up</a>!
+{% else %}
+to let us know what you thought about the hunt.
+{% endif %}
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="four columns">
+        <h3>What</h3>
+        <p>
+            Lorem ipsum dolor sit amet<sup>*</sup>.
+        </p>
+        <p><small><sup>*</sup>consectetur adipiscing elit</small></p>
+    </div>
+    <div class="four columns">
+        <h3>When</h3>
+        <p>
+            The hunt {% if hunt_is_over %}began{% else %}will begin{% endif %} on
+            {% format_time start_time '%B %d, %Y at %I:%M %p %Z' %},
+            and {% if hunt_is_over %}ended{% else %}it will end{% endif %}
+            {% days_between start_time end_time %} days later on
+            {% format_time end_time '%B %d, %Y at %I:%M %p %Z' %}.
+        </p>
+    </div>
+    <div class="four columns">
+        <h3>Who</h3>
+        <p>
+            This {% if hunt_is_closed %}was{% else %}is{% endif %} a puzzlehunt run by FIXME,
+            the follow-up to the previous <a href="{% url 'archive' %}">FIXME Puzzle Hunts</a>.
+            {% if not hunt_is_closed %}
+            Registration is open! Be sure to check out the
+            <a href="{% url 'rules' %}">rules</a> and <a href="{% url 'faq' %}">FAQ</a>
+            for more information.
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+{% if not hunt_is_closed %}
+<div class="register">
+    <a href="{% url 'register' %}" class="btn">Register your team!</a>
+</div>
+<h3 class="print-register">
+    <a>Register at https://FIXME/</a>
+</h3>
+{% endif %}
+
+</div>
+
+{% endblock %}

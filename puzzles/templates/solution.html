@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+
+{% block page-title %}
+<title>Solution: {{ puzzle.name }}</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+{% endblock %}
+
+{% block content %}
+
+<style>
+h4 {
+    font-size: 2rem;
+    font-weight: normal;
+    font-style: italic;
+    margin-bottom: 24px;
+}
+
+.answers-used {
+    column-width: 350px;
+    white-space: pre;
+    font-family: monospace, monospace;
+}
+</style>
+
+<h1>
+    {% block puzzle-title %}
+    Solution: {{ puzzle.name }}
+    <div class="solved-title-marker">Answer: <span class="solved-title-answer">{{ puzzle.answer }}</span></div>
+    {% endblock %}
+</h1>
+
+<main>
+    <h4>
+        Written by
+        {% block puzzle-author %}
+        aliens
+        {% endblock %}
+    </h4>
+
+    {% captureas solution_body_content %}{% spaceless %}
+        {% block solution-body %}
+        This solution doesn&rsquo;t seem to exist yet.
+        Searched for a solution template named `{{ template_name }}`
+        {% endblock %}
+    {% endspaceless %}{% endcaptureas %}
+    {{ solution_body_content }}
+
+    {% captureas author_notes_content %}{% spaceless %}
+        {% block author-notes %}{% endblock %}
+    {% endspaceless %}{% endcaptureas %}
+
+    {% if author_notes_content %}
+    <hr>
+    <h4>Author&rsquo;s Notes</h4>
+    {{ author_notes_content }}
+    {% endif %}
+
+    {% captureas appendix_content %}{% spaceless %}
+        {% block appendix %}{% endblock %}
+    {% endspaceless %}{% endcaptureas %}
+
+    {% if appendix_content %}
+    <hr>
+    {{ appendix_content }}
+    {% endif %}
+      
+</main>
+
+{% endblock %}

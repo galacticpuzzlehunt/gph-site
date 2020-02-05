@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.row {
+    margin-bottom: 1em;
+}
+
+.help {
+    text-align: left;
+    justify-content: flex-start;
+    font-weight: normal;
+}
+</style>
+
+<h2>Register a new team</h2>
+
+{% if team %}
+<h4>You&rsquo;re already logged in as {{team.team_name}}!</h4>
+{% endif %}
+
+<form id="register" method="post">
+    {% csrf_token %}
+
+    {{ form.non_field_errors }}
+
+    <div class="form-section">
+    {% for field in form %}
+    <div class="row">
+        <div class="two columns">
+            {{ field.label_tag }}
+        </div>
+        <div class="four columns">
+            {{ field }}
+            {{ field.errors }}
+        </div>
+        <div class="six columns">
+            <label class="help">{{ field.help_text|safe }}</label>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+
+    <div class="form-section">
+    <h4>Team members</h4>
+
+    <p>
+        You will also be able to add and remove team members at any later time
+        on your team&rsquo;s profile page.<br>
+        You'll need to provide an email address for at least one of your team
+        members.
+    </p>
+
+    {{ team_members_formset.management_form }}
+    {{ team_members_formset.non_form_errors }}
+    {% for team_member_form in team_members_formset %}
+        <div class="team-members-formset row">
+            {% for field in team_member_form %}
+            <div class="two columns">
+                {{ field.label_tag }}
+            </div>
+            <div class="three columns">
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+
+    <div class="form-section">
+        <button class="btn" type="submit">Submit</button>
+    </div>
+</form>
+
+<script>
+$('.team-members-formset').formset({
+    prefix: '{{ team_members_formset.prefix }}',
+    addText: 'Add another team member',
+    deleteText: 'Remove',
+    addCssClass: 'formset-add-link',
+});
+$('.formset-add-link').click(function() {
+    $('.errorlist').remove();
+});
+</script>
+
+{% endblock %}

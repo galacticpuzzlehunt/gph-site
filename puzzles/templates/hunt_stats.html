@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block top-left-actions %}
+<a href="{% url 'wrapup' %}" class="btn">Back to wrap-up</a>
+{% endblock %}
+
+{% block content %}
+
+<style>
+.meta {
+    font-style: italic;
+}
+</style>
+
+<h1>Hunt Stats</h1>
+
+<main>
+    <div class="row puzzle-stats-panel">
+        <div class="row">
+            <div class="six columns">
+                <div class="stat-entry">Total guesses: <span class="stat-value">{{ total_guesses }}</span></div>
+            </div>
+            <div class="six columns">
+                <div class="stat-entry">Total solves: <span class="stat-value">{{ total_solves }}</span></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <div class="stat-entry">Total participants: <span class="stat-value">{{ total_participants }}</span></div>
+            </div>
+            <div class="six columns">
+                <div class="stat-entry">Total teams: <span class="stat-value">{{ total_teams }}</span></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <div class="stat-entry">Hints asked: <span class="stat-value">{{ total_hints }}</span></div>
+            </div>
+            <div class="six columns">
+                <div class="stat-entry">Metas solved: <span class="stat-value">{{ total_metas }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <table class="sortable gph-list-table">
+        <tr>
+            <th>Puzzle</th>
+            <th title="Total number of correct answers">Solves</th>
+            <th title="Total number of answer attempts">Guesses</th>
+            <th title="Total number of hints requested">Hints</th>
+            <th title="Total number of non-backsolves">Forward solves</th>
+            <th title="Forward solve after using no hints on this puzzle">0&#8288;-&#8288;hint forward</th>
+            <th title="Forward solve after using one hint on this puzzle">1&#8288;-&#8288;hint forward</th>
+            <th title="Forward solve after using multiple hints on this puzzle">2&#8288;+&#8288;-&#8288;hint forward</th>
+            <th title="Solved after the round meta or within five minutes of it">Back solves</th>
+            <th title="Made at least one guess but none were correct">No solve</th>
+        </tr>
+        {% for row in data %}
+        <tr>
+            <td sorttable_customkey="{{ forloop.counter }}" {% if row.puzzle.is_meta %}class="meta"{% endif %}><a href="{% url 'stats' row.puzzle.slug %}">{{ row.puzzle.name }}</a></td>
+            {% for number in row.numbers %}
+            <td {% if forloop.counter > 3 %}style="background-color: rgba(255, 255, 255, calc({{ number }} / {{ row.numbers|first }} / 2));"{% endif %}>{{ number }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</main>
+
+{% endblock %}

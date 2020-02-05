@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block page-title %}
+<title>Free answer: {{ puzzle.name }}</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+{% endblock %}
+
+{% block content %}
+
+<h1>Use a free answer on {{ puzzle.name }}</h1>
+
+<main>
+    {% if puzzle_answer != None %}
+    <div class="solved-panel">
+        <h4>Solved!</h4>
+        <p>The answer was <b>{{ puzzle_answer }}</b>.</p>
+    </div>
+    {% elif puzzle.is_meta %}
+    <p>You can't use a free answer on a metapuzzle.</p>
+    {% elif num_free_answers_remaining <= 0 %}
+    <p>You have no free answers to use.</p>
+    {% else %}
+    <p>You have <b>
+        {{ num_free_answers_remaining }}
+        free answer{{ num_free_answers_remaining|pluralize }}
+        {% include 'icon-answer.svg' %}
+    </b>. Are you sure you want to use one on this puzzle?</p>
+    <form method="post" class="call-in-answer-panel">
+        {% csrf_token %}
+        <button class="btn" type="submit" name="use" value="Yes">Yes</button>
+        <button class="btn" type="submit" name="use" value="No">No</button>
+    </form>
+    {% endif %}
+</main>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+Django==2.2.6
+Markdown==3.1.1
+disco-py==0.0.12
+gunicorn==19.9.0
+gevent==1.4.0
+pytz==2019.3
+requests==2.22.0
+django-mathfilters==0.4.0
+django-ratelimit==2.0.0
+django-impersonate==1.4.1

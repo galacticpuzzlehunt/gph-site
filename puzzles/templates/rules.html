@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+
+{% block content %}
+
+<h1>Rules</h1>
+
+<main>
+    <div class="no-break">
+        <h4 id="Format">Format</h4>
+        <ul>
+            <li>The puzzlehunt starts on <strong>{% format_time start_time '%A, %B %d, %Y at %I:%M %p %Z' %}</strong> and ends on <strong>{% format_time end_time '%A, %B %d, %Y at %I:%M %p %Z' %}</strong>, at which point puzzle solutions will be available. However, we will leave the website running until <strong>{% format_time close_time '%A, %B %d, %Y at %I:%M %p %Z' %}</strong> so teams can still submit answers and go through the hunt at their own pace (see the FAQ for a more detailed explanation).</li>
+            <li>Teams have a maximum size of 10. You may not create multiple accounts or be on multiple teams.</li>
+            <li>A few puzzles will be available at the start, and the primary way to unlock new puzzles is by solving puzzles and progressing through the hunt, although puzzles may also be unlocked over time.</li>
+            <li>Teams that complete the hunt will be ranked by the time at which they finish. Teams that do not complete the hunt will be ranked by number of puzzles solved and tie-broken by earliest last solve time.</li>
+        </ul>
+    </div>
+
+    <div class="no-break">
+        <h4 id="Solving">Solving</h4>
+        <ul>
+            <li>Each answer is a string of letters A-Z. Lowercase letters will be changed into uppercase, and any other characters will be stripped before checking for correctness.</li>
+            <li>You have <strong>20 total guesses</strong> for each puzzle. If you legitimately run out of guesses and need more, feel free to contact us, though we won&rsquo;t grant your request if we see that you were, for example, guessing random thematic answers, or brute-forcing all 10-letter words.</li>
+        </ul>
+    </div>
+
+    <div class="no-break">
+        <h4 id="Hints">Hints</h4>
+        <ul>
+            <li>Starting on {% format_time hint_time '%A, %B %d' %}, teams will receive <strong>two hints</strong> per day, at <strong>{% format_time hint_time '%I:%M %p %Z' %}</strong> each day, until the end of the hunt.</li>
+            <li>You can use a hint to get help on a puzzle. This can be something like a nudge in the right direction (i.e. you give us your progress on the puzzle and we&rsquo;ll try to get you unstuck) or an answer to a question (e.g. &ldquo;Which answers to these crossword clues are wrong?&rdquo;).
+</li>
+        </ul>
+    </div>
+
+    <div class="no-break">
+        <h4 id="Other">Other</h4>
+        <ul>
+            <li>You may use any external sources for help, including other people, as long as they aren&rsquo;t helping other teams and aren&rsquo;t actively participating in the hunt.</li>
+            <li>You may not publicly stream a solve of our hunt when the hunt is live.</li>
+            <li>It won&rsquo;t be necessary to look at the HTML source/Javascript/CSS on any webpages for any puzzle, but you&rsquo;re welcome to look anyway.</li>
+            <li>We reserve the right to disqualify any team for unsportsmanlike conduct.</li>
+            <li>We reserve the right to change any of these rules. If there&rsquo;s a big change, we&rsquo;ll announce it to all teams.</li>
+            <li>If you have any questions about these rules, or if you want to contact us for any reason, email <a href="mailto:FIXME">FIXME</a>. We will get back to you as soon as we can.</li>
+        </ul>
+    </div>
+</main>
+
+{% endblock %}

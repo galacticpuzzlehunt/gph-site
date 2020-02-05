@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block page-title %}
+<title>Surveys: {{ puzzle.name }}</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+{% endblock %}
+
+{% block content %}
+
+<style>
+th {
+    white-space: nowrap;
+}
+</style>
+
+<h1>Survey responses for {{ puzzle.name }}</h1>
+
+<main>
+    <table class="sortable gph-list-table">
+        <tr>
+            {% for field in fields %}
+            <th>{{ field.field.adjective|title }} ({{ field.average }} <small>/ {{ field.max }}</small>)</th>
+            {% endfor %}
+            <th>Comments</th>
+            <th>Team</th>
+        </tr>
+        {% for survey in surveys %}
+        <tr>
+            {% for rating in survey.ratings %}
+            <td>{{ rating.0 }} <small>/ {{ rating.1 }}</small></td>
+            {% endfor %}
+            <td><pre class="submitted-text">{{ survey.survey.comments }}</pre></td>
+            <td><a href="{% url 'teams' %}?team={{ survey.survey.team.team_name|urlencode }}">{{ survey.survey.team.team_name }}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</main>
+
+{% endblock %}

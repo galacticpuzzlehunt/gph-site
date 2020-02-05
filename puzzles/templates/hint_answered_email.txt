@@ -1,0 +1,9 @@
+{% autoescape off %}
+Your hint question for the puzzle {{ hint.puzzle }} has been answered.
+
+Question:
+{{ hint.hint_question }}
+
+Response:
+{{ hint.response }}
+{% endautoescape %}

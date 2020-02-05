@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+{% load humanize %}
+
+{% block page-title %}
+<title>Bigboard</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'wrapup' %}" class="btn">Back to wrap-up</a>
+{% endblock %}
+
+{% block content %}
+
+<style>
+body {
+    width: auto;
+    max-width: none;
+    margin: 0 5vw;
+}
+
+.bg {
+    display: none;
+}
+
+.content {
+    text-align: center;
+    font-size: 1.25rem;
+}
+
+table {
+    table-layout: fixed;
+}
+
+td, th {
+    padding: 0 0.3em;
+    line-height: 1.25;
+    white-space: nowrap;
+    min-width: 2.5em;
+    height: 2.5em;
+}
+
+td.U { {# unlocked #}
+    background-color: #888;
+}
+td.W { {# wrong #}
+    background-color: #aaa;
+}
+td.S { {# solved #}
+    background-color: #060;
+}
+td.b { {# backsolved from some metas #}
+    background-color: #282;
+}
+td.B { {# backsolved from all metas #}
+    background-color: #4a4;
+}
+td.F { {# free answer #}
+    background-color: #682;
+}
+td.H { {# hinted #}
+    background-image: linear-gradient(to bottom right, transparent 50%, #4f6a95 50%);
+}
+td.P { {# post-hunt solve #}
+    opacity: 0.5;
+}
+
+.end:not(:last-child) {
+    border-right: 1px solid #e1e1e1;
+}
+
+td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: #4f6a95;
+    z-index: 1;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+}
+
+th {
+    position: sticky;
+    top: 0;
+    background-color: #4f6a95;
+    z-index: 2;
+    text-align: center;
+}
+
+table .hunt-icon {
+    width: 24px;
+}
+
+small {
+    display: block;
+}
+
+#hide {
+    width: 2rem;
+    height: 5rem;
+    margin: 0 1rem 0 0;
+    vertical-align: bottom;
+}
+
+[for=hide] {
+    display: inline-block;
+    font-size: 2rem;
+    line-height: 5rem;
+}
+
+:checked ~ table .finished {
+    display: none;
+}
+</style>
+
+<input type="checkbox" id="hide"><label for="hide">Hide finished teams</label>
+<p>You can put ?30 after the URL to limit to 30 teams.</p>
+
+<table>
+{% spacelesser %}
+<col> {# team #}
+<col class="end"> {# place #}
+<col> {# deep #}
+<col> {# solves #}
+<col> {# intro #}
+<col> {# jungle #}
+<col> {# metas #}
+<col> {# hints #}
+<col class="end"> {# last solve #}
+{% for puzzle in puzzles %}
+<col{% if puzzle.puzzle.is_meta %} class="end"{% endif %}>
+{% endfor %}
+<tr>
+    <th>Team
+    <th>#
+    <th>{% include 'icon-deep.svg' %}
+    <th>Solves
+    <th>Intro
+    <th>Jungle
+    <th>Metas
+    <th>{% include 'icon-hint.svg' %}
+    <th>Last solve
+    {% for puzzle in puzzles %}
+    <th><a href="{% url 'stats' puzzle.puzzle.slug %}">{{ puzzle.puzzle.short_name }}</a>
+    {% endfor %}
+</tr>
+<tr>
+    <td>Solves
+    <td>
+    <td colspan="7">
+    {% for puzzle in puzzles %}
+    <td class="S">{{ puzzle.solves }}
+    {% endfor %}
+</tr>
+<tr>
+    <td>Guesses
+    <td>
+    <td colspan="7">
+    {% for puzzle in puzzles %}
+    <td class="W">{{ puzzle.total_guesses }}
+    {% endfor %}
+</tr>
+<tr>
+    <td>Unlocks
+    <td>
+    <td colspan="7">
+    {% for puzzle in puzzles %}
+    <td class="U">{{ puzzle.total_unlocks }}
+    {% endfor %}
+</tr>
+<tr>
+    <td>Hints
+    <td>
+    <td colspan="7">
+    {% for puzzle in puzzles %}
+    <td class="H">{{ puzzle.hints }}
+    {% endfor %}
+</tr>
+<tr>
+    <td>Free Answers
+    <td>
+    <td colspan="7">
+    {% for puzzle in puzzles %}
+    <td class="F">{{ puzzle.free_solves }}
+    {% endfor %}
+</tr>
+<tr>
+    <td>%Solve/Guess
+    <td>
+    <td colspan="7">
+    {% for puzzle in puzzles %}
+    <td>{% percentage puzzle.solves puzzle.total_guesses %}
+    {% endfor %}
+</tr>
+<tr>
+    <td>%Solve/Unlock
+    <td>
+    <td colspan="7">
+    {% for puzzle in puzzles %}
+    <td>{% percentage puzzle.solves puzzle.total_unlocks %}
+    {% endfor %}
+</tr>
+{% for board_entry in board %}
+<tr{% if board_entry.finished %} class="finished"{% endif %}>
+    <td>
+        <a href="{% url 'teams' %}?team={{ board_entry.team.team_name|urlencode }}">
+            {{ board_entry.team.team_name }}
+        </a>
+    <td>
+        {{ forloop.counter }}
+        {% if board_entry.finished %}
+        <small>{{ board_entry.finished }}</small>
+        {% endif %}
+    <td>
+        {% if board_entry.deep %}
+        {{ board_entry.deep|intcomma }}
+        {% endif %}
+    <td>
+        {% if board_entry.total_solves %}
+        {{ board_entry.total_solves }}
+        {% endif %}
+        {% if board_entry.wrong_guesses %}
+        -{{ board_entry.wrong_guesses }}
+        {% endif %}
+        {% if board_entry.free_solves %}
+        <small>+{{ board_entry.free_solves }}</small>
+        {% endif %}
+    <td>
+        {% if board_entry.intro_solves %}
+        {{ board_entry.intro_solves }}
+        {% endif %}
+    <td>
+        {% if board_entry.jungle_solves %}
+        {{ board_entry.jungle_solves }}
+        {% endif %}
+    <td>
+        {% if board_entry.meta_solves %}
+        {{ board_entry.meta_solves }}
+        {% endif %}
+    <td>
+        {{ board_entry.used_hints }} / {{ board_entry.total_hints }}
+    <td>
+        {% format_time board_entry.last_solve_time %}
+    {% for entry in board_entry.entries %}
+    <td{% if entry.cls %} class="{{ entry.cls }}"{% endif %}>
+        {% if entry.solve_position %}
+        {{ entry.solve_position }}
+        {% endif %}
+        {% if entry.wrong_guesses %}
+        -{{ entry.wrong_guesses }}
+        {% endif %}
+        {% if entry.hints %}
+        <small>+{{ entry.hints }}</small>
+        {% endif %}
+    {% endfor %}
+</tr>
+{% endfor %}
+{% endspacelesser %}
+</table>
+
+{% endblock %}

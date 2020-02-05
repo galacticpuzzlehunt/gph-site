@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block page-title %}
+<title>Call in: {{ puzzle.name }}</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+{% endblock %}
+
+{% block content %}
+
+<h1>Call in an answer for {{ puzzle.name }}</h1>
+
+<main>
+{% if puzzle_answer != None %}
+    <div class="solved-panel">
+        <h4>Solved!</h4>
+        <p>The answer was <b>{{ puzzle_answer }}</b>.</p>
+    </div>
+
+    {% if survey %}
+    <h4>Optional survey</h4>
+    <form method="post" class="call-in-answer-panel">
+        {% csrf_token %}
+
+        {{ survey.non_field_errors }}
+
+        <div class="row">
+        {% for field in survey %}
+            {% if 'adjective' in field.field.widget.attrs %}
+            <div class="six columns rating">
+                On a scale from 1 to {{ field.field.max_value }}, how
+                {{ field.field.widget.attrs.adjective }} was this puzzle?
+                <p>
+                {% spaceless %}
+                {% for option in field %}
+                    {{ option.tag }}
+                    <label for="{{ option.id_for_label }}">★</label>
+                    {% cycle '' '' '' '' '<wbr>' %}
+                {% endfor %}
+                {% endspaceless %}
+                </p>
+                {{ field.errors }}
+            </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+
+        {% for field in survey %}
+        {% if 'adjective' not in field.field.widget.attrs %}
+        <div>
+            <div class="three columns">
+                {{ field.label_tag }}
+            </div>
+            <div class="six columns">
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            <div class="three columns">
+                <button class="btn" type="submit">Submit</button>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        <p style="clear: both">
+            (Note: This survey will submit on behalf of your whole team. You
+            can come back to edit it as much as you want, but make sure you
+            don't have two responders overwriting each other's comments.)
+        </p>
+
+        <style>
+        .rating {
+            text-align: center;
+        }
+
+        .rating p {
+            white-space: nowrap;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .rating input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .rating label {
+            display: inline;
+            padding: 0 2px;
+            cursor: pointer;
+            pointer-events: initial;
+            font-size: 2rem;
+            text-shadow: 1px 1px 0 black, 1px -1px 0 black, -1px 1px 0 black, -1px -1px 0 black, 1px 0 0 black, -1px 0 0 black, 0 1px 0 black, 0 -1px 0 black;
+            color: gold;
+        }
+
+        .rating :invalid ~ label, .rating :checked ~ label ~ label {
+            color: white;
+        }
+
+        .rating p:hover label {
+            color: gold;
+        }
+
+        .rating label:hover ~ label {
+            color: white;
+        }
+        </style>
+    </form>
+    {% endif %}
+{% else %}
+    {% if guesses_remaining == 0 %}
+    <p>You have no more guesses remaining for this puzzle!</p>
+    {% else %}
+    <form method="post" class="call-in-answer-panel">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+        <div class="row">
+            <div class="four columns">
+                {{ field.label_tag }}
+            </div>
+            <div class="four columns">
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            <div class="four columns">
+                <button class="btn" type="submit">Submit</button>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+    <p>You have {{ guesses_remaining }} guess{{ guesses_remaining|pluralize:"es" }} remaining for this puzzle.</p>
+    {% endif %}
+
+    {% if not puzzle.is_meta and num_free_answers_remaining > 0 %}
+    <p>You have <b><a href="{% url 'free-answer' puzzle.slug %}">
+        {{ num_free_answers_remaining }}
+        free answer{{ num_free_answers_remaining|pluralize }}</a>
+        {% include 'icon-answer.svg' %}
+    </b> that you may use to instantly solve any non-meta puzzle.</p>
+    {% endif %}
+{% endif %}
+
+{% if puzzle_submissions %}
+    <h4>Previous guesses</h4>
+    <ul>
+        {% for submission in puzzle_submissions %}
+        <li>{{ submission.submitted_answer }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</main>
+
+{% endblock %}

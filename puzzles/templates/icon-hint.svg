@@ -1,0 +1,5 @@
+<svg width="32" height="32" version="1.1" viewBox="0 0 8.5 8.5" xmlns="http://www.w3.org/2000/svg" class="hunt-icon">
+  <path d="m4.3 0.61-0.7 0.035-0.55 0.67-1.1 0.39-0.37 2.7-0.6 0.092-0.27 1.4 0.12 0.74c0.096 0.078 0.2 0.15 0.31 0.15 0.045 0 0.09-0.014 0.13-0.032l-0.14-0.85 0.2-1 0.61-0.092 0.38-2.8 0.94-0.35 0.5-0.61 0.32-0.016 0.84 0.9 0.84-0.14 0.68 2.5 0.62-0.8 0.19 0.1 0.097 1.9-0.054 1.4c0.0089 8.3e-4 0.018 5e-3 0.027 5e-3 0.14 0 0.29-0.11 0.4-0.22l0.048-1.1-0.11-2.2-0.71-0.37-0.32 0.41-0.55-2-0.99 0.16z" style="fill:currentColor"/>
+  <path d="m0.11 6.7s0.39 0.68 1 0.68c0.64 0 1-0.68 1-0.68s0.39 0.68 1 0.68c0.64 0 1-0.68 1-0.68s0.39 0.68 1 0.68c0.64 0 1-0.68 1-0.68s0.39 0.68 1 0.68c0.64 0 1-0.68 1-0.68" style="fill:none;stroke-width:.21;stroke:currentColor"/>
+  <text x="2.7421408" y="5.8469901" style="fill:currentColor;font-family:sans-serif;font-size:18px;letter-spacing:0px;line-height:1.25;stroke-width:.26;word-spacing:0px" xml:space="preserve"><tspan x="2.7421408" y="5.8469901" style="fill:currentColor;font-family:D-DIN;font-size:4.9px;font-weight:bold;stroke-width:.26">A</tspan></text>
+</svg>

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+
+{% block page-title %}
+<title>Hints</title>
+{% endblock %}
+
+{% block content %}
+
+<h1>Open Hints</h1>
+
+<div class="hint-controls">
+    <a class="btn" href="javascript:askName(true)">
+        Your name is <b id="claimer">anonymous</b>.
+    </a>
+    <script src="/static/js/hint.js"></script>
+    <form action="/admin/puzzles/hint/" method="get">
+        <input placeholder="Search hints..." name="q">
+    </form>
+</div>
+
+<main>
+    <table class="hint-table">
+        {% for hint in unanswered %}
+        <tr>
+            <th>
+                <a href="{% url 'hint' hint.id %}">
+                    {% if hint.claimed_datetime %}
+                    Claimed {% duration_between hint.claimed_datetime now %} ago
+                    by {{ hint.claimer }}
+                    {% else %}
+                    Created {% duration_between hint.submitted_datetime now %} ago
+                    {% endif %}
+                </a>
+            </th>
+            <th>
+                <a href="{% url 'teams' %}?team={{ hint.team.team_name|urlencode }}">
+                    {{ hint.team }}
+                </a
+            ></th>
+            <th>
+                <a href="{% url 'solution' hint.puzzle.slug %}">
+                    {{ hint.puzzle }}
+                </a>
+            </th>
+        </tr>
+        {% if not hint.claimed_datetime %}
+        <tr>
+            <td></td>
+            <td>
+                <a href="/admin/puzzles/hint/?team__id__exact={{ hint.team_id }}">
+                    (all from same team)
+                </a>
+            </td>
+            <td>
+                <a href="/admin/puzzles/hint/?puzzle__id__exact={{ hint.puzzle_id }}">
+                    (all from same puzzle)
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3"><pre class="submitted-text">{{ hint.hint_question }}</pre></td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        <tr>
+            <th colspan="3">
+                <hr>
+                <h4>Requested by most teams</h4>
+            </th>
+        </tr>
+        {% for entry in popular %}
+        <tr>
+            <td>
+                <a href="{% url 'puzzle' entry.puzzle.slug %}">
+                    {{ entry.puzzle.name }}
+                </a>
+            </td>
+            <td>
+                {{ entry.puzzle.metas.all|join:", " }}
+            </td>
+            <td>
+                <a href="/admin/puzzles/hint/?puzzle__id__exact={{ entry.puzzle.id }}">
+                    {{ entry.count }}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</main>
+
+{% endblock %}

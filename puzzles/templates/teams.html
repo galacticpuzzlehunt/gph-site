@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+{% block content %}
+
+<h1>Team Scoreboard</h1>
+
+<main>
+    <table class="gph-list-table">
+        <col style="width: 10%">
+        {% if hunt_has_started %}
+            <col style="width: 60%">
+            <col style="width: 10%">
+            <col style="width: 20%">
+        {% else %}
+            <col style="width: 90%">
+        {% endif %}
+        <tbody>
+            <tr>
+                <th>Rank</th>
+                <th>Team</th>
+                {% if hunt_has_started %}
+                    <th>Solves</th>
+                    <th>Finish Time</th>
+                {% endif %}
+            </tr>
+            {% for team in teams %}
+            <tr {% if team.is_current %}class="current-team"{% endif %}>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    {% if team.metameta_solve_time is not None %}✈✈✈{% endif %}
+                    <a href="{% url 'teams' %}?team={{ team.team_name|urlencode }}">{{ team.team_name }}</a>
+                    {% if team.metameta_solve_time is not None %}✈✈✈{% endif %}
+                    {% if is_superuser %}
+                        (<a href="{% url 'impersonate-start' team.team.user_id %}">impersonate</a>)
+                    {% endif %}
+                </td>
+                {% if hunt_has_started %}
+                    <td>{{ team.total_solves }}</td>
+                    <td>{% format_time team.metameta_solve_time %}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</main>
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+
+{% block content %}
+
+<h1>FAQs</h1>
+
+<main>
+    <div class="no-break">
+        <h4>What is a puzzlehunt? How do I solve these puzzles?</h4>
+        <p>If you&rsquo;ve never heard of puzzlehunts before, here&rsquo;s a very brief summary: in a typical puzzle, you receive some information and have to extract an answer out of it, which is almost always an English word or phrase. Puzzles can come in many different forms; the only real commonality is that you usually receive no direct instructions, so it&rsquo;s up to you to figure out how to make sense of the information you&rsquo;re given.</p>
+        <p>If you are new to puzzles and are interested in seeing some examples, or if you&rsquo;re looking for some practice, we recommend looking at <a target="_blank" href="{% url 'archive' %}">previous FIXME Puzzle Hunts</a> or puzzles from other online hunts such as <a target="_blank" href="https://reddothunt.sg/2018">REDDOThunt</a>, <a target="_blank" href="https://puzzlepotluck.com/">Puzzle Potluck</a>, or the <a target="_blank" href="https://caltechpuzzlehunt.org/">Caltech Puzzle Hunt</a>.</p>
+    </div>
+
+    <div class="no-break">
+        <h4>Do I need to have a 10-person team?</h4>
+        <p>You certainly don&rsquo;t need to, and we believe the hunt will be fun for teams of all sizes. However, there will be a sizeable number of puzzles, so we recommend having closer to 10 people if you want to be more competitive.</p>
+    </div>
+
+    <div class="no-break">
+      <h4>How many puzzles will there be?</h4>
+      <p>Around 1300.</p>
+    </div>
+
+    <div class="no-break">
+      <h4>What exactly happens when the hunt ends?</h4>
+      <p>When the hunt ends on {% format_time end_time '%B %d' %}, the scoreboard will be frozen and solutions for all the puzzles will be released, and a wrap-up will be available several days later. However, if you have not finished and still want to experience the whole hunt, you&rsquo;ll still be able to register new teams, submit answers on the website, and progress through the hunt until {% format_time close_time '%B %d' %}. The only difference is that you won&rsquo;t be able to use hints after the hunt ends.</p>
+      <p>After {% format_time close_time '%B %d' %}, you can still do the puzzles and check your answers spoiler-free.</p>
+    </div>
+
+    <div class="no-break">
+        <h4>I think there&rsquo;s a mistake in this puzzle!</h4>
+        <p>Please describe the error in an email to <a href="mailto:FIXME">FIXME</a> and we&rsquo;ll try to correct it.</p>
+    </div>
+
+    <div class="no-break">
+      <h4>Can I write code that interacts with the puzzles / server?</h4>
+      <p>This will not be necessary to complete any aspect of the puzzlehunt. However, if you want to do this, please limit any automated requests to at most 1/second for our server&rsquo;s sake. We may disqualify teams that egregiously violate this request.</p>
+    </div>
+
+    <div class="no-break">
+      <h4>I&rsquo;m stuck on a puzzle. What should I do?</h4>
+      <p>Here are some general puzzle tips that might be useful:</p>
+      <ul>
+        <li>Thoroughly check the work that you&rsquo;ve already done. Fixing a small mistake or incorrect assumption can greatly help with getting unstuck.</li>
+        <li>Get fresh eyes on the puzzle, or conversely, take a break and look at something else.</li>
+        <li>Consider what information you haven&rsquo;t used yet.</li>
+        <li>It can be useful to put everything you have into your favorite search engine.</li>
+        <li><a target="_blank" href="https://www.mit.edu/~puzzle/resources/haveyoutried.pdf">Have you tried...</a></li>
+      </ul>
+      <p>Remember that after hints are released on Monday, you can also use them to get a nudge in the right direction.</p>
+    </div>
+
+    <div class="no-break">
+        <h4>Who&rsquo;s running this hunt?</h4>
+        <p>We&rsquo;re FIXME, a highly enigmatic group of puzzlers. Could we be... the person reading this right now?!</p>
+    </div>
+
+    <div class="no-break">
+        <h4>Are there any prizes?</h4>
+        <p>No.</p>
+    </div>
+
+    <div class="no-break">
+        <h4>Is there a physical component to the hunt? Will I ever need to be in a particular location to solve a puzzle?</h4>
+        <p>No.</p>
+    </div>
+
+    <div class="no-break">
+        <h4>Is there a registration deadline?</h4>
+        <p>No.</p>
+    </div>
+
+    <div class="no-break">
+        <h4>I have a question that&rsquo;s not on this list!</h4>
+        <p>Contact us at <a href="mailto:FIXME">FIXME</a> and we&rsquo;ll do our best to answer it.</p>
+    </div>
+</main>
+
+{% endblock %}

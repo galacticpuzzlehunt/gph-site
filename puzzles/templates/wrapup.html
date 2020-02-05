@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block top-left-actions %}
+<a href="{% url 'finishers' %}" class="btn">Finishers</a>
+<a href="{% url 'bigboard' %}" class="btn">Bigboard</a>
+<a href="{% url 'hunt-stats' %}" class="btn">Stats</a>
+{% endblock %}
+
+{% block content %}
+
+<h1>Wrap-Up</h1>
+
+<main>
+
+<p>Congratulations!</p>
+
+</main>
+
+{% endblock %}

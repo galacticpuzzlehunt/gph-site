@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Not Found</title>
+    <link rel="stylesheet" href="/static/css/normalize.css">
+    <link rel="stylesheet" href="/static/css/skeleton.css">
+    <link rel="icon" sizes="16x16 32x32 48x48 64x64" href="/static/images/favicon.ico" type="image/vnd.microsoft.icon">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <style>
+html {
+    background-image: url(https://upload.wikimedia.org/wikipedia/commons/a/ab/NGC_404_Hubble.jpg);
+    background-size: cover;
+    background-position: center;
+    height: 100%;
+}
+
+body {
+    text-align: center;
+    margin-top: 50vh;
+    transform: translateY(-50%);
+}
+
+a {
+    text-decoration: none;
+    font-size: 10rem;
+}
+    </style>
+</head>
+<body>
+    <a href="{% url 'index' %}" title="This is not a puzzle.">4&nbsp;&nbsp;4</a>
+</body>
+</html>

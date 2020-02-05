@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 style="text-align: center"></h1>
+
+<script>
+var start = new Date('{{ start.isoformat }}');
+setInterval(function() {
+    var diff = (start - new Date) / 1000;
+    if (diff < 0) {
+        diff = 0;
+    }
+    var min = diff / 60 | 0;
+    var sec = diff % 60 | 0;
+    if (sec < 10) {
+        sec = '0' + sec;
+    }
+    document.getElementsByTagName('h1')[0].textContent = min + ':' + sec;
+}, 100);
+</script>
+
+{% endblock %}

@@ -1,4 +1,4 @@
-Django==2.2.6
+Django==2.2.13
 Markdown==3.1.1
 disco-py==0.0.12
 gunicorn==19.9.0

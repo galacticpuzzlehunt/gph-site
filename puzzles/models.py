@@ -26,40 +26,61 @@ from puzzles.hunt_config import (
     HUNT_START_TIME,
     HUNT_END_TIME,
     MAX_GUESSES_PER_PUZZLE,
+
+    HINTS_ENABLED,
+    HINTS_PER_DAY,
     DAYS_BEFORE_HINTS,
+    TEAM_AGE_IN_DAYS_BEFORE_HINTS,
+    CAP_HINTS_BY_TEAM_AGE,
+
+    FREE_ANSWERS_ENABLED,
     DAYS_BEFORE_FREE_ANSWERS,
+    CAP_FREE_ANSWERS_BY_TEAM_AGE,
+    FREE_ANSWERS_PER_DAY,
+
     DEEP_MAX,
     INTRO_META_SLUG,
     META_META_SLUG,
-    FREE_ANSWERS_PER_DAY,
 )
 
 
 class Puzzle(models.Model):
     name = models.CharField(max_length=500)
 
-    # slug used in URLs to identify this puzzle
-    slug = models.SlugField(max_length=500, unique=True)
+    slug = models.SlugField(
+        max_length=500, unique=True,
+        help_text='Slug used in URLs to identify this puzzle (must be unique)',
+    )
 
-    # name of a Django template containing the puzzle content
-    body_template = models.CharField(max_length=500)
+    body_template = models.CharField(
+        max_length=500,
+        help_text='''File name of a Django template (including .html) under
+        puzzle_bodies and solution_bodies containing the puzzle and
+        solution content, respectively''',
+    )
 
-    # answer (fine if unnormalized)
-    answer = models.CharField(max_length=500)
+    answer = models.CharField(
+        max_length=500,
+        help_text='Answer (fine if unnormalized)',
+    )
 
-    # progress threshold to unlock this puzzle
-    deep = models.IntegerField(verbose_name='DEEP threshold')
+    deep = models.IntegerField(
+        verbose_name='DEEP threshold',
+        help_text='DEEP/Progress threshold teams must meet to unlock this puzzle'
+    )
 
     # indicates if this puzzle is a metapuzzle
     is_meta = models.BooleanField(default=False)
 
-    # all metas that this puzzle is part of
     metas = models.ManyToManyField(
-        'self', limit_choices_to={'is_meta': True}, symmetrical=False, blank=True
+        'self', limit_choices_to={'is_meta': True}, symmetrical=False, blank=True,
+        help_text='All metas that this puzzle is part of',
     )
 
-    # used in Discord integrations involving this puzzle
-    emoji = models.CharField(max_length=500, default=':question:')
+    emoji = models.CharField(
+        max_length=500, default=':question:',
+        help_text='Emoji to use in Discord integrations involving this puzzle'
+    )
 
     def __str__(self):
         return self.name
@@ -104,27 +125,45 @@ class Team(models.Model):
 
     # Public team name for scoreboards and comms -- not necessarily the same as
     # the user's name from the User object
-    team_name = models.CharField(max_length=100, unique=True)
+    team_name = models.CharField(
+        max_length=100, unique=True,
+        help_text='Public team name for scoreboards and communications',
+    )
 
     # Time of creation of team
     creation_time = models.DateTimeField(auto_now_add=True)
 
-    # How much earlier this team should start, for early-testing teams
-    # Be careful with this!
-    start_offset = models.DurationField(default=datetime.timedelta)
+    start_offset = models.DurationField(
+        default=datetime.timedelta,
+        help_text='''How much earlier this team should start, for early-testing
+        teams; be careful with this!''',
+    )
 
-    # Number of additional hints to award the team, on top of the 2 per day
-    total_hints_awarded = models.IntegerField(default=0)
-    total_free_answers_awarded = models.IntegerField(default=0)
+    total_hints_awarded = models.IntegerField(
+        default=0,
+        help_text='''Number of additional hints to award the team (on top of
+        the default amount per day)''',
+    )
+    total_free_answers_awarded = models.IntegerField(
+        default=0,
+        help_text='''Number of additional free answers to award the team (on
+        top of the default amount per day)''',
+    )
 
-    # Last solve time
     last_solve_time = models.DateTimeField(null=True, blank=True)
 
-    # If true, team will have access to puzzles before the hunt starts
-    is_prerelease_testsolver = models.BooleanField(default=False)
+    is_prerelease_testsolver = models.BooleanField(
+        default=False,
+        help_text='''Whether this team is a prerelease testsolver. If true, the
+        team will have access to puzzles before the hunt starts''',
+    )
 
     # If true, team will not be visible to the public
-    is_hidden = models.BooleanField(default=False)
+    is_hidden = models.BooleanField(
+        default=False,
+        help_text='''If a team is hidden, it will not be visible to the
+        public''',
+    )
 
     def __str__(self):
         return self.team_name
@@ -208,18 +247,24 @@ class Team(models.Model):
         return max(0, (self.creation_time - self.start_time).days)
 
     def num_hints_total(self): # used + remaining
+        if not HINTS_ENABLED: return 0
+
         now = min(self.now, HUNT_END_TIME)
         days_since_hunt_start = (now - self.start_time).days
         days_since_team_created = (now - self.creation_time).days
-        if days_since_team_created < 1:
-            # No hints available for first 24h.
+        if TEAM_AGE_IN_DAYS_BEFORE_HINTS is not None and days_since_team_created < TEAM_AGE_IN_DAYS_BEFORE_HINTS:
+            # No hints available for first X days of any team (to discourage
+            # creating additional teams after the hunt has started to farm
+            # hints)
             return 0
-        return max(0, min(
-            # First hint accumulation is on day 3...
-            days_since_hunt_start - DAYS_BEFORE_HINTS + 1,
-            # ...unless the team was created later than that.
-            days_since_hunt_start - self.team_created_after_hunt_start,
-        )) * 2 + self.total_hints_awarded
+
+        # First hint accumulation is on day 3...
+        days = days_since_hunt_start - DAYS_BEFORE_HINTS + 1
+        # ...unless the team was created later than that.
+        if CAP_HINTS_BY_TEAM_AGE:
+            days = min(days, days_since_hunt_start - self.team_created_after_hunt_start)
+
+        return max(0, days) * HINTS_PER_DAY + self.total_hints_awarded
 
     def num_hints_used(self):
         return self.hint_set.filter(status__in=(Hint.ANSWERED, Hint.NO_RESPONSE)).count()
@@ -231,8 +276,10 @@ class Team(models.Model):
         return self.total_hints_awarded - self.num_hints_used
 
     def num_free_answers_total(self):
+        if not FREE_ANSWERS_ENABLED: return 0
+
         days_since_hunt_start = (self.now - self.start_time).days
-        if self.team_created_after_hunt_start >= DAYS_BEFORE_FREE_ANSWERS - 1:
+        if CAP_FREE_ANSWERS_BY_TEAM_AGE and self.team_created_after_hunt_start >= DAYS_BEFORE_FREE_ANSWERS - 1:
             # No free answers at all for late-created teams.
             return 0
         return sum(
@@ -271,6 +318,22 @@ class Team(models.Model):
             .order_by('-unlock_datetime')
         )
 
+    # DEEP (name taken from the 2015 Mystery Hunt) is a global measure of
+    # progress through the hunt used to determine when teams unlock each
+    # puzzle. Each puzzle is unlocked at a certain global DEEP value. Solving
+    # puzzles grants each team DEEP, as does the passage of time.
+
+    # Because each Galactic Puzzle Hunt has had very different and often
+    # complicated unlocking mechanisms, we have just included a stripped-down
+    # implementation that computes how many puzzles each team has solved (so
+    # each puzzle is worth 1 DEEP). You may want to replace it with your own
+    # implementation, maybe depending on time or additional fields of puzzles,
+    # or just a completely different unlocking implementation. You may also
+    # want to cache its computation. This will depend on your hunt design and
+    # structure.
+
+    # If you do replace it, make sure to replace the descriptions where it's
+    # displayed.
     @staticmethod
     def compute_deep(context):
         if context.is_prerelease_testsolver or context.hunt_is_closed:
@@ -278,8 +341,8 @@ class Team(models.Model):
         if context.team is None:
             if context.hunt_is_over:
                 return DEEP_MAX
-            return 100 # FIXME
-        return 1000 # FIXME
+            return 0
+        return len(context.team.solves)
 
     # NOTE: This method creates unlocks with the current time; in other words,
     # time-based unlocks are not correctly backdated. This is because the DEEP

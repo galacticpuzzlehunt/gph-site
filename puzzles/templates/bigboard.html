@@ -41,13 +41,14 @@ td, th {
 }
 
 td.U { {# unlocked #}
-    background-color: #888;
+    background-color: #ccc;
 }
 td.W { {# wrong #}
-    background-color: #aaa;
+    background-color: #dbb;
 }
 td.S { {# solved #}
     background-color: #060;
+    color: white;
 }
 td.b { {# backsolved from some metas #}
     background-color: #282;
@@ -56,10 +57,10 @@ td.B { {# backsolved from all metas #}
     background-color: #4a4;
 }
 td.F { {# free answer #}
-    background-color: #682;
+    background-color: #cea;
 }
 td.H { {# hinted #}
-    background-image: linear-gradient(to bottom right, transparent 50%, #4f6a95 50%);
+    background-image: linear-gradient(to bottom right, transparent 50%, #bee 50%);
 }
 td.P { {# post-hunt solve #}
     opacity: 0.5;
@@ -72,7 +73,7 @@ td.P { {# post-hunt solve #}
 td:first-child {
     position: sticky;
     left: 0;
-    background-color: #4f6a95;
+    background-color: #ddd;
     z-index: 1;
     max-width: 160px;
     overflow: hidden;
@@ -83,7 +84,7 @@ td:first-child {
 th {
     position: sticky;
     top: 0;
-    background-color: #4f6a95;
+    background-color: #ddd;
     z-index: 2;
     text-align: center;
 }
@@ -134,8 +135,8 @@ small {
 <tr>
     <th>Team
     <th>#
-    <th>{% include 'icon-deep.svg' %}
-    <th>Solves
+    <th>Prog.
+    <th>{% include 'icon-solved.svg' %}
     <th>Intro
     <th>Jungle
     <th>Metas
@@ -221,7 +222,7 @@ small {
         {{ board_entry.total_solves }}
         {% endif %}
         {% if board_entry.wrong_guesses %}
-        -{{ board_entry.wrong_guesses }}
+        &minus;{{ board_entry.wrong_guesses }}
         {% endif %}
         {% if board_entry.free_solves %}
         <small>+{{ board_entry.free_solves }}</small>
@@ -248,7 +249,7 @@ small {
         {{ entry.solve_position }}
         {% endif %}
         {% if entry.wrong_guesses %}
-        -{{ entry.wrong_guesses }}
+        &minus;{{ entry.wrong_guesses }}
         {% endif %}
         {% if entry.hints %}
         <small>+{{ entry.hints }}</small>

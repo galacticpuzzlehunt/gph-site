@@ -15,9 +15,7 @@ body {
 
 @media screen {
     html {
-        background-color: #f9f8f5;
-        color: #0c0906;
-        background-image: linear-gradient(#3a3c3f, #3a3c3f);
+        background-image: linear-gradient(#111, #111);
         background-size: 100% 40px;
         background-repeat: no-repeat;
     }
@@ -36,8 +34,11 @@ p {
 
 li {
     list-style-position: outside;
-    list-style-type: disc;
     margin-left: 1.5em;
+}
+
+ul > li {
+    list-style-type: disc;
 }
 
 textarea {
@@ -79,7 +80,7 @@ tr:last-child td {
 }
 
 a, .btn {
-    color: #2f4f89;
+    color: #05a;
 }
 
 .btn {
@@ -106,7 +107,6 @@ form .btn {
 
 input[type=text], input[type=password], input[type=email] {
     width: 100%;
-    color: #0c0906;
     border-radius: 0;
 }
 
@@ -122,7 +122,7 @@ input[type=text], input[type=password], input[type=email] {
 
 @media print {
     main {
-        border-top: 1px solid #3a3c3f;
+        border-top: 1px solid #111;
     }
 
     .btn {
@@ -137,12 +137,8 @@ input[type=text], input[type=password], input[type=email] {
         box-sizing: border-box;
     }
 
-    h1 {
-        color: #32528a;
-    }
-
-    h2, h3, h4 {
-        color: #a94050;
+    h1, h2, h3, h4 {
+        color: #05a;
     }
 
     a {
@@ -151,19 +147,19 @@ input[type=text], input[type=password], input[type=email] {
 
     a:hover,
     a:focus {
-        color: #439ac8;
+        color: #2af;
     }
 
     .btn {
         transition: background-color 0.3s;
         color: #f9f8f5;
-        background-color: #2f4f89;
+        background-color: #05a;
     }
 
     .btn:hover,
     .btn:focus {
         color: #f9f8f5;
-        background-color: #439ac8;
+        background-color: #2af;
     }
 
     nav {
@@ -186,19 +182,11 @@ input[type=text], input[type=password], input[type=email] {
 
     .top-tabs a:hover,
     .top-tabs a:focus {
-        color: #94c8e3;
+        color: #2af;
     }
 
     .top-tabs .selected-tab {
         font-weight: bold;
-    }
-
-    .top-tabs .selected-tab:before {
-        content: "[";
-    }
-
-    .top-tabs .selected-tab:after {
-        content: "]";
     }
 
     .top-left-actions {
@@ -220,19 +208,28 @@ input[type=text], input[type=password], input[type=email] {
         word-spacing: initial;
     }
 
-    .cookie-count {
+    .current-stat {
         white-space: nowrap;
         display: inline-block;
         text-decoration: none;
     }
 
-    .cookie-label {
+    .current-stat-label {
         font-size: 24px;
         vertical-align: middle;
     }
 
+    .current-stat-box {
+        display: inline-block;
+        border: 1px solid black;
+        height: 1.5em;
+        width: 1.5em;
+        line-height: 1.5em;
+        text-align: center;
+    }
+
     .shortcuts {
-        border: 4px double #3a3c3f;
+        border: 4px double #111;
         background-color: white;
         position: absolute;
         padding: 1rem;
@@ -303,7 +300,7 @@ input[type=text], input[type=password], input[type=email] {
         top: -100vh;
         bottom: 0;
         padding-top: 90vh;
-        background-color: #3a3c3f;
+        background-color: #111;
         color: #f9f8f5;
     }
 
@@ -322,7 +319,7 @@ input[type=text], input[type=password], input[type=email] {
         text-align: center;
         font-size: 32px;
         line-height: 40px;
-        background-image: linear-gradient(#3a3c3f, #3a3c3f);
+        background-image: linear-gradient(#111, #111);
         background-size: 100% 48px;
         background-repeat: no-repeat;
         background-origin: content-box;
@@ -421,8 +418,7 @@ input[type=text], input[type=password], input[type=email] {
         position: sticky;
         top: 0;
         background-color: #f9f8f5;
-        color: #a94050;
-        box-shadow: inset 0 -1px 0 0 #3a3c3f;
+        box-shadow: inset 0 -1px 0 0 #111;
     }
 }
 
@@ -449,14 +445,14 @@ input[type=text], input[type=password], input[type=email] {
 
 @media print {
     .story-chunk {
-        border-bottom: 1px solid #3a3c3f;
+        border-bottom: 1px solid #111;
     }
 }
 
 @media screen {
     .story-chunk {
         max-width: 600px;
-        border: 1px solid #3a3c3f;
+        border: 1px solid #111;
         padding: 20px 30px;
         margin: 0 auto 30px;
     }

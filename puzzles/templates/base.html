@@ -1,12 +1,13 @@
 {% load puzzle_tags %}
 {% load humanize %}
+{% load static %}
 
 <!doctype html>
 <html>
 <head>
     <meta charset="utf-8">
     {% block page-title %}
-    <title>FIXME Puzzle Hunt</title>
+    <title>{{ hunt_title }}</title>
     {% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=0.5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
@@ -77,35 +78,36 @@
             {{ request.user }}
             {% endif %}
             {% if request.user.is_impersonate %}
-            <span class="cookie-count" title="Currently impersonating">
+            <span class="current-stat" title="Currently impersonating">
                 ({{ request.impersonator }}
                 <a href="{% url 'impersonate-stop' %}">&#x1F6D1;</a>)
             </span>
             {% endif %}
             {% if team and num_hints_remaining > 0 %}
-            <span class="cookie-count" title="Hints: {{ num_hints_remaining }}">
+            <span class="current-stat" title="Hints: {{ num_hints_remaining }}">
                 {% include 'icon-hint.svg' %}
-                <span class="cookie-label">{{ num_hints_remaining }}</span>
+                <span class="current-stat-label">{{ num_hints_remaining }}</span>
             </span>
             {% endif %}
             {% if team and hunt_has_started %}
-            <span class="cookie-count" title="Depth: {{ display_deep|intcomma }}">
-                {% include 'icon-deep.svg' %}
-                <span class="cookie-label">{{ display_deep|intcomma }}</span>
+            {# FIXME if DEEP ends up not equalling number of solved puzzles #}
+            <span class="current-stat" title="Solved: {{ display_deep|intcomma }}">
+                {% include 'icon-solved.svg' %}
+                <span class="current-stat-label">{{ display_deep|intcomma }}</span>
             </span>
             {% endif %}
             {% if team and num_free_answers_remaining > 0 %}
-            <span class="cookie-count" title="Free answers: {{ num_free_answers_remaining }}">
+            <span class="current-stat" title="Free answers: {{ num_free_answers_remaining }}">
                 {% include 'icon-answer.svg' %}
-                <span class="cookie-label">{{ num_free_answers_remaining }}</span>
+                <span class="current-stat-label">{{ num_free_answers_remaining }}</span>
             </span>
             {% endif %}
             {% if is_superuser %}
             <label for="shortcuts" title="Admin toolbox">Shortcuts</label>
             {% if unclaimed_hints %}
-            <a class="cookie-count" title="Hints that need answering: {{ unclaimed_hints }}" href="{% url 'hint-list' %}" style="color: red">
+            <a class="current-stat" title="Hints that need answering: {{ unclaimed_hints }}" href="{% url 'hint-list' %}" style="color: red">
                 {% include 'icon-hint.svg' %}
-                <span class="cookie-label">{{ unclaimed_hints }}</span>
+                <span class="current-stat-label">{{ unclaimed_hints }}</span>
             </a>
             {% endif %}
             {% endif %}

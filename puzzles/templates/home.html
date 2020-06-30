@@ -46,14 +46,14 @@ h3 {
 }
 </style>
 
-<h1>FIXME Puzzle Hunt</h1>
+<h1>{{ hunt_title }}</h1>
 
 {% if hunt_is_over %}
 <div class="feedback">
 {% if hunt_is_closed %}
-The FIXME Puzzle Hunt has now come to a close. Thanks for puzzling with us!
+The {{ hunt_title }} has now come to a close. Thanks for puzzling with us!
 {% else %}
-Thanks for puzzling with us! The FIXME Puzzle Hunt is now over, but you can still register and progress through the hunt until {% format_time close_time '%B %d' %}.
+Thanks for puzzling with us! The {{ hunt_title }} is now over, but you can still register and progress through the hunt until {% format_time close_time '%B %d' %}.
 {% endif %}
 <br>
 Please fill out our <a href="https://FIXME">feedback form</a>
@@ -69,9 +69,9 @@ to let us know what you thought about the hunt.
     <div class="four columns">
         <h3>What</h3>
         <p>
-            Lorem ipsum dolor sit amet<sup>*</sup>.
+            A mysterious list of puzzles has appeared on the internet! If you can solve them, you could win prizes and bragging rights!<sup>*</sup>.
         </p>
-        <p><small><sup>*</sup>consectetur adipiscing elit</small></p>
+        <p><small><sup>*</sup>there are no prizes</small></p>
     </div>
     <div class="four columns">
         <h3>When</h3>
@@ -86,8 +86,8 @@ to let us know what you thought about the hunt.
     <div class="four columns">
         <h3>Who</h3>
         <p>
-            This {% if hunt_is_closed %}was{% else %}is{% endif %} a puzzlehunt run by FIXME,
-            the follow-up to the previous <a href="{% url 'archive' %}">FIXME Puzzle Hunts</a>.
+            This {% if hunt_is_closed %}was{% else %}is{% endif %} a puzzlehunt run by FIXME.
+            {# It is the follow-up to the previous <a href="{% url 'archive' %}">FIXME Puzzle Hunts</a>. #}
             {% if not hunt_is_closed %}
             Registration is open! Be sure to check out the
             <a href="{% url 'rules' %}">rules</a> and <a href="{% url 'faq' %}">FAQ</a>

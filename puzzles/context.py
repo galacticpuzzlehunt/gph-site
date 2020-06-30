@@ -5,6 +5,7 @@ import types
 from django.utils import timezone
 
 from puzzles.hunt_config import (
+    HUNT_TITLE,
     STORY_PAGE_VISIBLE,
     ERRATA_PAGE_VISIBLE,
     WRAPUP_PAGE_VISIBLE,
@@ -13,6 +14,9 @@ from puzzles.hunt_config import (
     HUNT_CLOSE_TIME,
     DAYS_BEFORE_HINTS,
     DEEP_MAX,
+    CONTACT_EMAIL,
+    MAX_MEMBERS_PER_TEAM,
+    MAX_GUESSES_PER_PUZZLE,
 )
 
 from puzzles.shortcuts import get_shortcuts
@@ -69,6 +73,9 @@ def context_cache(cls):
 # a model method and just leave a stub call here.
 
 class BaseContext:
+    def hunt_title(self):
+        return HUNT_TITLE
+
     def now(self):
         return timezone.localtime()
 
@@ -101,6 +108,15 @@ class BaseContext:
 
     def display_deep(self):
         return '\u221e' if self.deep == DEEP_MAX else int(self.deep)
+
+    def contact_email(self):
+        return CONTACT_EMAIL
+
+    def max_members_per_team(self):
+        return MAX_MEMBERS_PER_TEAM
+
+    def max_guesses_per_puzzle(self):
+        return MAX_GUESSES_PER_PUZZLE
 
 @context_cache
 class Context:

@@ -5,16 +5,16 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="64"
-   height="32"
-   viewBox="0 0 16.933333 8.4666669"
+   id="svg1403"
    version="1.1"
-   id="svg4663"
+   viewBox="0 0 8.4666659 8.4666659"
+   height="32"
+   width="32"
    class="hunt-icon">
   <defs
-     id="defs4657" />
+     id="defs1397" />
   <metadata
-     id="metadata4660">
+     id="metadata1400">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -26,25 +26,23 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
-     transform="translate(0,-288.53332)">
-    <path
-       style="color:currentColor;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:currentColor;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.21166669;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-       d="m 12.891097,290.47339 0.84286,-0.13514 0.677975,2.46917 0.619599,-0.80495 0.185369,0.10034 0.09729,1.9008 -0.05428,1.36208 c 0.03521,0.0535 0.0867,0.0936 0.164023,0.10439 0.07007,0.01 0.126348,0.007 0.23191,-0.009 l 0.0803,-1.45692 -0.112654,-2.15987 -0.708699,-0.37485 -0.320553,0.41374 -0.554055,-2.01651 -0.994431,0.15864 -0.880778,-0.95912 -1.47552,0.59397 -2.5117186,-0.7461 -1.8886719,0.56641 -2.1268355,-0.23946 -0.5396603,0.69047 -1.15002,0.31243 -0.3717599,2.73339 -0.596044,0.0922 -0.2744672,1.40922 0.1315804,0.82759 c 0.1082913,-0.0225 0.1374802,-0.0353 0.2276297,-0.0984 0.093617,-0.0655 0.1228059,-0.10869 0.1630986,-0.18043 l -0.093197,-0.54034 0.2017528,-1.04973 0.6114067,-0.0922 0.3830247,-2.75978 1.0189316,-0.26328 0.4908354,-0.64308 1.9627865,0.23304 1.8496094,-0.55664 2.5253906,0.75195 1.351257,-0.53219 z"
-       id="path888" />
-    <path
-       id="path857"
-       d="m 0.11096839,295.2116 c 0,0 0.385706,0.68034 1.03059081,0.68034 0.6448844,0 1.0305916,-0.68034 1.0305916,-0.68034 0,0 0.3857069,0.68034 1.0305912,0.68034 0.6448846,0 1.0305911,-0.68034 1.0305911,-0.68034 0,0 0.3857074,0.68034 1.0305915,0.68034 0.6448845,0 1.0305913,-0.68034 1.0305913,-0.68034 0,0 0.3857072,0.68034 1.0305917,0.68034 0.6448843,0 1.0305911,-0.68034 1.0305911,-0.68034 0,0 0.385706,0.68034 1.0305909,0.68034 0.6448844,0 1.0305924,-0.68034 1.0305924,-0.68034 0,0 0.385706,0.68034 1.030591,0.68034 0.644884,0 1.030591,-0.68034 1.030591,-0.68034 0,0 0.385707,0.68034 1.030591,0.68034 0.644885,0 1.030592,-0.68034 1.030592,-0.68034 0,0 0.385707,0.68034 1.030591,0.68034 0.644885,0 1.030591,-0.68034 1.030591,-0.68034"
-       style="fill:none;stroke:currentColor;stroke-width:0.26458332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+     transform="translate(0,-288.53334)"
+     id="layer1">
+    <circle
+       r="3.96875"
+       cy="292.7738"
+       cx="4.2094951"
+       id="path1950"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5291667;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <text
-       id="text861"
-       y="294.38031"
-       x="3.7504723"
-       style="font-style:normal;font-weight:normal;font-size:18.45535278px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:currentColor;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       id="text2066"
+       y="294.56473"
+       x="2.40082"
+       style="font-style:normal;font-weight:normal;font-size:5.29166651px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        xml:space="preserve"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.92142773px;font-family:D-DIN;-inkscape-font-specification:'D-DIN Bold';letter-spacing:0.26458332px;fill:currentColor;fill-opacity:1;stroke-width:0.26458332"
-         y="294.38031"
-         x="3.7504723"
-         id="tspan859">ANS</tspan></text>
+         style="stroke-width:0.26458332"
+         y="294.56473"
+         x="2.40082"
+         id="tspan2064">A</tspan></text>
   </g>
 </svg>

@@ -146,23 +146,25 @@ LOGGING = {
             'format': '%(asctime)s [%(levelname)s] %(message)s'
         },
     },
+    # FIXME you may want to change the filenames to something like
+    # /srv/logs/django.log or similar
     'handlers': {
         'django': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/srv/gph/logs/django.log',
+            'filename': './logs/django.log',
             'formatter': 'django',
         },
         'puzzle': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/srv/gph/logs/puzzle.log',
+            'filename': './logs/puzzle.log',
             'formatter': 'puzzles',
         },
         'request': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/srv/gph/logs/request.log',
+            'filename': './logs/request.log',
             'formatter': 'puzzles',
         },
     },

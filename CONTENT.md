@@ -2,7 +2,7 @@ Some things you might consider editing the website to say.
 
 # Front page
 
-There's a lot of filler content here
+There's a lot of filler content here.
 
 # Culled from the FAQ
 

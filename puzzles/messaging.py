@@ -77,14 +77,14 @@ class EmptyEmbed:
         return {}
 
 class DiscordInterface:
-    TOKEN = 'FIXME'
+    TOKEN = None # FIXME
     GUILD = 'FIXME'
     HINT_CHANNEL = 'FIXME'
 
     def __init__(self):
         self.client = None
         self.avatars = {}
-        if not settings.IS_TEST:
+        if self.TOKEN and not settings.IS_TEST:
             self.client = APIClient(self.TOKEN)
             for member in self.client.guilds_members_list(self.GUILD).values():
                 self.avatars[member.name] = member.user.avatar_url

@@ -565,3 +565,9 @@ input[type=text], input[type=password], input[type=email] {
 .hint-controls form, .hint-controls input {
     margin: 0;
 }
+
+footer {
+    text-align: center;
+    opacity: 0.5;
+    font-size: 80%;
+}

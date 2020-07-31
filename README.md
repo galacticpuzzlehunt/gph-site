@@ -1,4 +1,4 @@
-This is an exported version of the software that runs the Galactic Puzzle Hunt website. The export was made in February 2020 and reflects some aspects of the 2019 and (planned) 2020 GPHes. This repository is **not maintained**.
+This is a Django app for running puzzlehunts, written by several members of ✈✈✈ Galactic Trendsetters ✈✈✈ for running the Galactic Puzzle Hunt. The present codebase is primarily based off an export made in February 2020, and reflects some aspects of the 2019 and (originally planned) 2020 GPHs. This repository is not formally maintained, but we're hoping to get it to such a state soon.
 
 # Quick Start
 

@@ -4,7 +4,7 @@
 
 ## PythonAnywhere
 
-This is completely free and overall pretty beginner-friendly, but if you do know your way around computers you might have a bit more trouble. (For example, being able to SSH from your own computer appears to be a paid feature.) It's mostly cribbed from:
+PythonAnywhere is a Python hosting service that has a reasonably powerful free tier, and is overall pretty beginner-friendly, but if you do know your way around computers you might have a bit more trouble. (For example, being able to SSH from your own computer appears to be a paid feature.) The instructions below are mostly cribbed from:
 
 - [Deploying an existing Django project on PythonAnywhere](https://help.pythonanywhere.com/pages/DeployExistingDjangoProject)
 - [How to setup static files in Django](https://help.pythonanywhere.com/pages/DjangoStaticFiles)
@@ -65,4 +65,34 @@ URL        | Directory
 -----------|---------------------------------
 `/static/` | `/home/yourusername/gph-site/static`
 
-Click the green Reload button on the Configuration page, and refresh your browser.
+Click the green Reload button on the Configuration page, and refresh your browser. If everything went as expected, the home page should be visible and styled. In the future, if you make further changes to the static files, you will need to run `python manage.py collectstatic` again.
+
+Although the home page loads, dynamic pages like Teams and Puzzles will show an error, because we haven't set up the database. Back in the shell, with your virtual environment activated and in the `gph-site` directory, run:
+
+```
+python manage.py migrate
+```
+
+If you want to create a user you can use to log in to the website and administer the hunt, run `python manage.py createsuperuser` in the terminal and follow instructions. There are also configurations that (currently) cannot be made directly through the website, which are generally in `hunt_config.py`.
+
+**IMPORTANT: Set the SECRET_KEY in `settings/base.py`** to a securely generated long random string. Your app will still run if you don't do this step, but it will be insecure!
+
+## Heroku
+
+Follow instructions on the Heroku website to install the Heroku CLI and then create an app. Mine is called `gph-site-test`. Then, clone this repository and run `heroku git:remote -a gph-site-test`.
+
+Heroku requires some configuration/code changes, which are on a separate branch `heroku` of this repo. It's not essential that you understand this list, but they will probably be helpful for debugging:
+
+- We need a `Procfile` to tell Heroku how to run our app.
+- [SQLite isn't a good fit for Heroku](https://devcenter.heroku.com/articles/sqlite3). Fortunately Heroku provides easy-to-use PostgreSQL, so we need to switch Django to use that instead. **Note** that running the website from the Heroku branch will be a bit harder because you need to get PostgreSQL running locally too. (It might be OK to switch the database only in the `prod` settings file, but we haven't set that up and `manage.py` still uses `dev` which means trying to running `manage.py` stuff on your prod server will not work. TODO: investigate if this is OK)
+- We install the `whitenoise` middleware so Django can serve static files directly in a production-ready way.
+
+If you run `git push heroku heroku:master`, you will push the `heroku` branch to its `master` and deploy the code.
+
+**Make sure to `heroku config:set SECRET_KEY="YOUR_SECRET_KEY_HERE"`** to a securely generated long random string. Your app will still run if you don't do this step, but it will be insecure!
+
+In theory, if you now visit `yourappname.herokuapp.com` you should see the properly styled front page of the puzzlehunt website with some text about a puzzlehunt. (Heroku will automatically run `collectstatic` for you.) However, dynamic pages like Teams and Puzzles will show an error. You will still need to set up the database by running `heroku run python manage.py migrate` manually, or you can [add it to the Procfile to run automatically on every release](https://help.heroku.com/GDQ74SU2/django-migrations):
+
+```
+release: python manage.py migrate
+```

@@ -16,7 +16,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Ensure logs directory exists.
-os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -152,19 +153,19 @@ LOGGING = {
         'django': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './logs/django.log',
+            'filename': os.path.join(LOGS_DIR, 'django.log'),
             'formatter': 'django',
         },
         'puzzle': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './logs/puzzle.log',
+            'filename': os.path.join(LOGS_DIR, 'puzzle.log'),
             'formatter': 'puzzles',
         },
         'request': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './logs/request.log',
+            'filename': os.path.join(LOGS_DIR, 'request.log'),
             'formatter': 'puzzles',
         },
     },

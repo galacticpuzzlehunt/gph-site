@@ -13,7 +13,7 @@ idna==2.6
 importlib-metadata==1.7.0
 Markdown==3.2.2
 pytz==2020.1
-requests==2.18.4
+requests==2.20.0
 six==1.11.0
 sqlparse==0.3.1
 urllib3==1.22

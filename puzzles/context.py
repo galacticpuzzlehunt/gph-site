@@ -12,6 +12,8 @@ from puzzles.hunt_config import (
     HUNT_START_TIME,
     HUNT_END_TIME,
     HUNT_CLOSE_TIME,
+    HINTS_ENABLED,
+    HINTS_PER_DAY,
     DAYS_BEFORE_HINTS,
     DEEP_MAX,
     CONTACT_EMAIL,
@@ -88,8 +90,17 @@ class BaseContext:
     def close_time(self):
         return HUNT_CLOSE_TIME
 
+    def hints_per_day(self):
+        if HINTS_ENABLED:
+            return HINTS_PER_DAY
+        else:
+            return 0
+
     def hint_time(self):
-        return self.start_time + datetime.timedelta(days=DAYS_BEFORE_HINTS)
+        if HINTS_ENABLED:
+            return self.start_time + datetime.timedelta(days=DAYS_BEFORE_HINTS)
+        else:
+            return None
 
     def hunt_has_started(self):
         return self.is_prerelease_testsolver or self.now >= self.start_time

@@ -27,7 +27,10 @@
             <li>It can be useful to put everything you have into your favorite search engine.</li>
             <li><a target="_blank" href="https://www.mit.edu/~puzzle/resources/haveyoutried.pdf">Have you tried...</a></li>
         </ul>
-        <p>Remember that after hints are released on Monday, you can also use them to get a nudge in the right direction.</p>
+        {% if hint_time %}
+        {# Original text: "after hints are released on Monday" #}
+        <p>Remember that after hints are released, you can also use them to get a nudge in the right direction.</p>
+        {% endif %}
     </div>
 
     <div class="no-break">

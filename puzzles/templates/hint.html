@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load puzzle_tags %}
+{% load static %}
 
 {% block page-title %}
 <title>Hint: {{ hint.puzzle }} from {{ hint.team }}</title>
@@ -13,7 +14,7 @@
     <a class="btn" href="javascript:askName(true)">
         Your name is <b id="claimer">anonymous</b>.
     </a>
-    <script src="/static/js/hint.js"></script>
+    <script src="{% static "js/hint.js" %}"></script>
     <a href="/admin/puzzles/hint/{{ hint.id }}/change/" class="btn">View in admin</a>
 </div>
 

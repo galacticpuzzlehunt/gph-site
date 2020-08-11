@@ -79,12 +79,14 @@ If you want to create a user you can use to log in to the website and administer
 
 ## Heroku
 
+Heroku is another hosting "platform as a service" with a free tier. The free tier is serviceable, but Heroku scales up and down to different amounts of compute power quite well and all costs are pro-rated (albeit by how long your app is set to that scale, not how much actual compute gets used).
+
 Follow instructions on the Heroku website to install the Heroku CLI and then create an app. Mine is called `gph-site-test`. Then, clone this repository and run `heroku git:remote -a gph-site-test`.
 
 Heroku requires some configuration/code changes, which are on a separate branch `heroku` of this repo. It's not essential that you understand this list, but they will probably be helpful for debugging:
 
 - We need a `Procfile` to tell Heroku how to run our app.
-- [SQLite isn't a good fit for Heroku](https://devcenter.heroku.com/articles/sqlite3). Fortunately Heroku provides easy-to-use PostgreSQL, so we need to switch Django to use that instead. **Note** that running the website from the Heroku branch will be a bit harder because you need to get PostgreSQL running locally too. (It might be OK to switch the database only in the `prod` settings file, but we haven't set that up and `manage.py` still uses `dev` which means trying to running `manage.py` stuff on your prod server will not work. TODO: investigate if this is OK)
+- [SQLite isn't a good fit for Heroku](https://devcenter.heroku.com/articles/sqlite3) because Heroku doesn't provide a "real" filesystem. Fortunately Heroku provides easy-to-use (and free at low volumes) PostgreSQL, so we need to switch Django to use that instead. **Note** that running the website from the Heroku branch will be a bit harder because you need to get PostgreSQL running locally too. (It might be OK to switch the database only in the `prod` settings file, but we haven't set that up and `manage.py` still uses `dev` which means trying to running `manage.py` stuff on your prod server will not work. TODO: investigate if this is OK)
 - We install the `whitenoise` middleware so Django can serve static files directly in a production-ready way.
 
 If you run `git push heroku heroku:master`, you will push the `heroku` branch to its `master` and deploy the code.

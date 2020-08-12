@@ -29,6 +29,8 @@ This is a Django app for running puzzlehunts, written by several members of âœˆâ
 
   + The site is set up to use a `db.sqlite3` file in the root of this repository as its database. If this doesn't exist, Django will create a new empty database. It's perfectly fine to start with this, but you won't have any puzzles populated and you almost certainly want to create a superuser.
 
+    If you just want to try out the website quickly with some sample data, you can run `./manage.py loaddata sample.yaml` to load a sample hunt, an admin account (username and password `admin`), and a test account with a team (username and password `test`). You can view the templates used to render the puzzles in the [puzzles/templates/puzzle_bodies](puzzles/templates/puzzle_bodies) and [puzzles/templates/solution_bodies](puzzles/templates/solution_bodies) folders, which you can also base your puzzles/solutions off of.
+
 - ...be a superuser?
 
   + Superusers are a Django concept that allows users access to the `/admin` control panel on the server. We have additionally set it to control access to certain site pages/actions, such as replying to hint requests from teams, or viewing solutions before the deadline. `./manage.py createsuperuser` will make a new superuser from the command line, but this user won't be associated with any team on the site (so it won't be able to e.g. solve puzzles). To fix this, you can either get a prepopulated `db.sqlite3` from a friend, hit the `Create team` button in the top bar on the main site to attach a new team to your user, or go into `/admin` and swap out the user on an existing team for your new one.

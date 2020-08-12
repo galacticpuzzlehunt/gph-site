@@ -1,0 +1,37 @@
+{% extends "puzzle.html" %}
+{% block puzzle-body %}
+
+↘↘↘↘
+{: .flavor}
+
+<style>
+.crossword-outer {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+</style>
+
+<div class="crossword-outer">
+<div class="six columns">
+<h3>Across</h3>
+<ol>
+<li>Color of the sky</li>
+<li value="5">Like this puzzle, hopefully</li>
+<li value="6">"Stop that, or ____!"</li>
+<li value="7">Adequate golf scores</li>
+</ol>
+</div>
+<div class="six columns" markdown="1">
+<h3>Down</h3>
+<ol>
+<li>Phone or microwave sound</li>
+<li>"____ Land" (2016 film involved in an Oscars gaffe)</li>
+<li>Former country in a Beatles song title (abbr.)</li>
+<li>Looks at</li>
+</ol>
+</div>
+</div>
+
+{% endblock %}

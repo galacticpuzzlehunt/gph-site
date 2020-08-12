@@ -1,0 +1,81 @@
+- model: puzzles.Puzzle
+  pk: 1
+  fields:
+    name: Ambiguity
+    slug: ambiguity
+    body_template: ambiguity.html
+    answer: ISAAC
+    deep: 0
+- model: puzzles.Puzzle
+  pk: 2
+  fields:
+    name: Bad Cryptogram Puzzle
+    slug: bad-cryptogram-puzzle
+    body_template: bad-cryptogram-puzzle.html
+    answer: ENGINEERS
+    deep: 0
+- model: puzzles.Puzzle
+  pk: 3
+  fields:
+    name: Break It Down
+    slug: break-it-down
+    body_template: break-it-down.html
+    answer: HAMMER
+    deep: 0
+- model: puzzles.Puzzle
+  pk: 4
+  fields:
+    name: Championship
+    slug: championship
+    body_template: championship.html
+    answer: SCRIPPS
+    deep: 0
+- model: puzzles.Puzzle
+  pk: 5
+  fields:
+    name: Diagramless
+    slug: diagramless
+    body_template: diagramless.html
+    answer: BASS
+    deep: 0
+- model: puzzles.Puzzle
+  pk: 6
+  fields:
+    name: Geometry
+    slug: geometry
+    body_template: geometry.html
+    answer: PARALLEL
+    deep: 0
+- model: puzzles.Puzzle
+  pk: 7
+  fields:
+    name: "Meta: Sample"
+    slug: sample
+    body_template: sample.html
+    answer: SAMPLE
+    deep: 0
+- model: auth.User
+  pk: 1
+  fields:
+    username: admin
+    password: pbkdf2_sha256$150000$admin$rHCEm45iy0F69gtXVPfBkSQ0Y5ubeAvCxGmb2M5QokM= # password is "admin"
+    is_staff: True
+    is_superuser: True
+- model: auth.User
+  pk: 2
+  fields:
+    username: test
+    password: pbkdf2_sha256$150000$test$tdsbQtbroRvN08LIFFbEvVL/5h5OP1WSUgjNAFGofjo= # password is "test"
+- model: puzzles.Team
+  pk: 1
+  fields:
+    user: 1
+    team_name: admin
+    creation_time: "9001-01-01T00:00:00+00:00"
+    is_prerelease_testsolver: True
+- model: puzzles.Team
+  pk: 2
+  fields:
+    user: 2
+    team_name: test
+    creation_time: "9001-01-01T00:00:00+00:00"

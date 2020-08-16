@@ -68,7 +68,7 @@ urlpatterns = [
     path('stats/<slug:slug>', views.stats, name='stats'),
     path('solution/<slug:slug>', views.solution, name='solution'),
     path('solution/<path:path>', views.solution_static, name='solution-static'),
-    
+
     path('story', views.story, name='story'),
     path('victory', views.victory, name='victory'),
     path('errata', views.errata, name='errata'),

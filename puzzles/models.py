@@ -45,6 +45,8 @@ from puzzles.hunt_config import (
 
 
 class Puzzle(models.Model):
+    '''A single puzzle in the puzzlehunt.'''
+
     name = models.CharField(max_length=500)
 
     slug = models.SlugField(
@@ -107,6 +109,8 @@ class Puzzle(models.Model):
         return s and re.sub(r'[^A-Z]', '', s.upper())
 
     def is_intro(self):
+        '''Is this puzzle in the intro round?'''
+        # FIXME: Not all hunts have an intro round.
         return any(meta.slug == INTRO_META_SLUG for meta in self.metas.all())
 
 
@@ -158,7 +162,6 @@ class Team(models.Model):
         team will have access to puzzles before the hunt starts''',
     )
 
-    # If true, team will not be visible to the public
     is_hidden = models.BooleanField(
         default=False,
         help_text='''If a team is hidden, it will not be visible to the
@@ -246,7 +249,10 @@ class Team(models.Model):
     def team_created_after_hunt_start(self):
         return max(0, (self.creation_time - self.start_time).days)
 
-    def num_hints_total(self): # used + remaining
+    def num_hints_total(self):
+        '''
+        Compute the total number of hints (used + remaining) available to this team.
+        '''
         if not HINTS_ENABLED: return 0
 
         now = min(self.now, HUNT_END_TIME)
@@ -542,6 +548,7 @@ class PuzzleMessage(models.Model):
 
 
 class RatingField(models.PositiveSmallIntegerField):
+    '''Represents a single numeric rating (either fun or difficulty) of a puzzle.'''
     def __init__(self, max_rating, adjective, **kwargs):
         self.max_rating = max_rating
         self.adjective = adjective

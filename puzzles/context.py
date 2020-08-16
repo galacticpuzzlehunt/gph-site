@@ -1,3 +1,8 @@
+# Roughly speaking, this module is most important for implementing "global
+# variables" that are available in every template with the Django feature of
+# "context processors". But it also does some stuff with caching computed
+# properties of teams (the caching is only within a single request (?)). See
+# https://docs.djangoproject.com/en/3.1/ref/templates/api/#using-requestcontext
 import datetime
 import inspect
 import types
@@ -37,6 +42,9 @@ def context_processor(request):
         return lambda: getattr(request.context, name)
     return {name: thunk(name) for name in request.context._cached_names}
 
+# Construct a get/set property from a name and a function to compute a value.
+# Doing this with name="foo" causes accesses to self.foo to call fn and cache
+# the result.
 def wrap_cacheable(name, fn):
     def fget(self):
         if not hasattr(self, '_cache'):
@@ -50,6 +58,10 @@ def wrap_cacheable(name, fn):
         self._cache[name] = value
     return property(fget, fset)
 
+# Decorator for a class, like the `Context` class below but also the `Team`
+# model, that replaces all non-special methods that take no arguments other
+# than `self` with a get/set property as constructed above, and also gather
+# their names into the property `_cached_names`.
 def context_cache(cls):
     cached_names = []
     for c in (BaseContext, cls):
@@ -74,6 +86,10 @@ def context_cache(cls):
 # you're adding something with complicated logic, prefer to put most of it in
 # a model method and just leave a stub call here.
 
+# In theory, `BaseContext` properties are things that make sense if all the info
+# you have is an optional team (e.g. you don't know about a specific puzzle, or
+# a user who might not be specified by the team). (But TODO(gph): this setup
+# may currently be overengineered.)
 class BaseContext:
     def hunt_title(self):
         return HUNT_TITLE
@@ -129,6 +145,9 @@ class BaseContext:
     def max_guesses_per_puzzle(self):
         return MAX_GUESSES_PER_PUZZLE
 
+# In theory, `Context` properties are things that don't make sense if all the
+# info you have is a team. They might make sense for a specific Django request
+# that specifies a puzzle.
 @context_cache
 class Context:
     def __init__(self, request):

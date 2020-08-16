@@ -114,6 +114,7 @@ def restrict_access(after_hunt_end=None):
         return inner
     return decorator
 
+# These are basically static pages:
 
 @require_GET
 def index(request):
@@ -235,6 +236,7 @@ def password_reset(request):
 
 @require_GET
 def teams(request):
+    '''List all teams on a leaderboard.'''
     team_name = request.GET.get('team')
     user_team = request.context.team
 
@@ -379,6 +381,12 @@ def edit_team(request):
 
 @require_GET
 def puzzles(request):
+    '''List all unlocked puzzles.
+
+    Includes solved puzzles and displays their answer.
+
+    Most teams will visit this page a lot.'''
+
     if request.context.hunt_has_started:
         pass
     elif request.context.hunt_has_almost_started:
@@ -442,6 +450,7 @@ def puzzles(request):
 @require_GET
 @validate_puzzle()
 def puzzle(request):
+    '''View a single puzzle's content.'''
     team = request.context.team
     template_name = 'puzzle_bodies/{}'.format(request.context.puzzle.body_template)
     data = {
@@ -466,6 +475,8 @@ def puzzle(request):
 @validate_puzzle(require_team=True)
 @restrict_access(after_hunt_end=False)
 def solve(request):
+    '''Submit an answer for a puzzle, and check if it's correct.'''
+
     puzzle = request.context.puzzle
     team = request.context.team
     form = None
@@ -544,6 +555,8 @@ def solve(request):
 @validate_puzzle(require_team=True)
 @restrict_access(after_hunt_end=False)
 def free_answer(request):
+    '''Use a free answer on a puzzle.'''
+
     puzzle = request.context.puzzle
     team = request.context.team
     if request.method == 'POST':
@@ -569,6 +582,8 @@ def free_answer(request):
 @validate_puzzle()
 @restrict_access(after_hunt_end=True)
 def post_hunt_solve(request):
+    '''Check an answer client-side for a puzzle after the hunt ends.'''
+
     puzzle = request.context.puzzle
     answer = Puzzle.normalize_answer(request.GET.get('answer'))
     is_correct = answer == puzzle.normalized_answer
@@ -583,6 +598,8 @@ def post_hunt_solve(request):
 @validate_puzzle()
 @restrict_access()
 def survey(request):
+    '''For admins. See survey reuslts.'''
+
     surveys = [
         {'survey': survey, 'ratings': []} for survey in
         request.context.puzzle.survey_set.select_related('team').order_by('id')
@@ -605,6 +622,8 @@ def survey(request):
 @require_GET
 @restrict_access()
 def hint_list(request):
+    '''For admins. List popular and outstanding hint requests.'''
+
     unanswered = (
         Hint.objects
         .select_related()
@@ -629,6 +648,8 @@ def hint_list(request):
 @validate_puzzle(require_team=True)
 @restrict_access(after_hunt_end=False)
 def hints(request):
+    '''List or submit hint requests for a puzzle.'''
+
     puzzle = request.context.puzzle
     team = request.context.team
 
@@ -683,6 +704,8 @@ def hints(request):
 
 @restrict_access()
 def hint(request, id):
+    '''For admins. Handle a particular hint.'''
+
     hint = Hint.objects.select_related().filter(id=id).first()
     if not hint:
         raise Http404
@@ -739,6 +762,8 @@ def hint(request, id):
 @require_GET
 @restrict_access(after_hunt_end=True)
 def hunt_stats(request):
+    '''After hunt ends, view stats for the entire hunt.'''
+
     total_teams = Team.objects.exclude(is_hidden=True).count()
     total_participants = TeamMember.objects.exclude(team__is_hidden=True).count()
 
@@ -810,6 +835,8 @@ def hunt_stats(request):
 @validate_puzzle()
 @restrict_access(after_hunt_end=True)
 def stats(request):
+    '''After hunt ends, view stats for a specific puzzle.'''
+
     puzzle = request.context.puzzle
     team = request.context.team
     q = Q(team__is_hidden=False)
@@ -871,6 +898,8 @@ def stats(request):
 @validate_puzzle()
 @restrict_access(after_hunt_end=True)
 def solution(request):
+    '''After hunt ends, view a puzzle's solution.'''
+
     template_name = 'solution_bodies/{}'.format(request.context.puzzle.body_template)
     data = {'template_name': template_name}
     try:
@@ -887,6 +916,10 @@ def solution_static(request, path):
 
 @require_GET
 def story(request):
+    '''View your team's story page based on your current progress.'''
+
+    # FIXME: This will depend a lot on your hunt. It might not make any sense
+    # at all.
     if not STORY_PAGE_VISIBLE:
         raise Http404
     story_points = {
@@ -913,6 +946,8 @@ def story(request):
 
 @require_GET
 def victory(request):
+    '''View your team's victory page, if you've finished the hunt.'''
+
     team = request.context.team
     if request.context.hunt_is_over:
         return render(request, 'victory.html', {'hunt_finished': True})

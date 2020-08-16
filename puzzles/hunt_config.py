@@ -62,6 +62,12 @@ FREE_ANSWERS_PER_DAY = [1, 2, 2]
 
 # DEEP value used to indicate that you can see everything, e.g. the hunt is over.
 DEEP_MAX = float('inf')
+
+# These two slugs are used in a couple places to determine teams' progress
+# through the major milestones of the hunt (e.g. to determine how much story
+# they can view) and to classify puzzles as intro-round or not. They won't make
+# sense for every hunt.
+
 # Slug for the intro meta.
 INTRO_META_SLUG = 'intro-meta'
 # Slug for the metameta.

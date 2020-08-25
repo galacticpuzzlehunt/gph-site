@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from puzzles.hunt_config import (
     HUNT_TITLE,
+    HUNT_ORGANIZERS,
     STORY_PAGE_VISIBLE,
     ERRATA_PAGE_VISIBLE,
     WRAPUP_PAGE_VISIBLE,
@@ -37,6 +38,8 @@ def context_middleware(get_response):
         return get_response(request)
     return middleware
 
+# A context processor takes a request and returns a dictionary of (key: value)s
+# to merge into the request's context.
 def context_processor(request):
     def thunk(name):
         return lambda: getattr(request.context, name)
@@ -93,6 +96,9 @@ def context_cache(cls):
 class BaseContext:
     def hunt_title(self):
         return HUNT_TITLE
+
+    def hunt_organizers(self):
+        return HUNT_ORGANIZERS
 
     def now(self):
         return timezone.localtime()

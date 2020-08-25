@@ -1,8 +1,8 @@
 {% autoescape off %}
-You have successfully registered team {{ team_name }} for the FIXME Puzzle Hunt.
+You have successfully registered team {{ team_name }} for the {{ hunt_title }}.
 
 If you need to modify your team information, you can do so at {{ team_link }}
 
 See you at the hunt!
-FIXME Puzzlesetters
+{{ hunt_organizers }}
 {% endautoescape %}

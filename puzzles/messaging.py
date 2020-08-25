@@ -54,9 +54,16 @@ def log_request_middleware(get_response):
     return middleware
 
 
+# NOTE: we don't have a request available, so this doesn't render with a
+# RequestContext, so the magic from our context processor is not available! (We
+# maybe could sometimes provide a request, but I don't want to add that
+# coupling right now.)
 def send_mail_wrapper(subject, template, context, recipients):
     if not recipients:
         return
+    # Manually plug in some template variables we know we want
+    context['hunt_title'] = HUNT_TITLE
+    context['hunt_organizers'] = HUNT_ORGANIZERS
     subject = settings.EMAIL_SUBJECT_PREFIX + subject
     body = render_to_string(template + '.txt', context)
     if settings.IS_TEST:

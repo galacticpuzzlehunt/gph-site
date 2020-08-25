@@ -2,8 +2,11 @@ import datetime
 from django.conf import settings
 from django.utils import timezone
 
-# included in various templates
+# included in various templates. NOTE, sometimes appears with a "the" before
+# it, maybe check those are what you want.
 HUNT_TITLE = 'FIXME Puzzle Hunt'
+
+# included in various templates and displayed on the static site
 HUNT_ORGANIZERS = 'FIXME Puzzlesetters'
 
 # included in various templates and set as reply-to for automatic emails

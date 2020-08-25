@@ -495,7 +495,7 @@ def notify_on_answer_submission(sender, instance, created, **kwargs):
                     'Correct!' if instance.is_correct else 'Incorrect!!',
                     hint_line,
                 ),
-                username='GPH WinBot' if instance.is_correct else 'GPH FailBot')
+                correct=instance.is_correct)
         if not instance.is_correct:
             return
         if instance.puzzle.slug == INTRO_META_SLUG:

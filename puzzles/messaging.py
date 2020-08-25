@@ -19,8 +19,30 @@ from puzzles.hunt_config import (
 
 logger = logging.getLogger('puzzles.messaging')
 
+# Usernames that the bot will send messages to Discord with when various things
+# happen. It's really not important that these are different. It's just for
+# flavor.
+ALERT_DISCORD_USERNAME = 'FIXME PH AlertBot'
+CORRECT_SUBMISSION_DISCORD_USERNAME = 'FIXME PH WinBot'
+INCORRECT_SUBMISSION_DISCORD_USERNAME = 'FIXME PH FailBot'
+FREE_ANSWER_DISCORD_USERNAME = 'FIXME PH HelpBot'
+VICTORY_DISCORD_USERNAME = 'FIXME PH CongratBot'
 
-def dispatch_discord_alert(webhook, content, username='GPH Django'):
+# Should be Discord webhook URLs that look like
+# https://discordapp.com/api/webhooks/(numbers)/(letters)
+# From a channel you can create them under Integrations > Webhooks.
+# They can be the same webhook if you don't care about keeping them in separate
+# channels.
+ALERT_WEBHOOK_URL = 'FIXME'
+SUBMISSION_WEBHOOK_URL = 'FIXME'
+FREE_ANSWER_WEBHOOK_URL = 'FIXME'
+VICTORY_WEBHOOK_URL = 'FIXME'
+
+# Assuming you want messages on a messaging platform that's not Discord but
+# supports at least a vaguely similar API, change the following code
+# accordingly:
+
+def dispatch_discord_alert(webhook, content, username):
     content = '[{}] {}'.format(timezone.localtime().strftime('%H:%M:%S'), content)
     if len(content) >= 2000:
         content = content[:1996] + '...'
@@ -29,17 +51,18 @@ def dispatch_discord_alert(webhook, content, username='GPH Django'):
         return
     requests.post(webhook, data={'username': username, 'content': content})
 
-def dispatch_general_alert(content, username='GPH AlertBot'):
-    dispatch_discord_alert('FIXME', content, username)
+def dispatch_general_alert(content):
+    dispatch_discord_alert(ALERT_WEBHOOK_URL, content, ALERT_DISCORD_USERNAME)
 
-def dispatch_submission_alert(content, username='GPH SubmissionBot'):
-    dispatch_discord_alert('FIXME', content, username)
+def dispatch_submission_alert(content, correct):
+    username = CORRECT_SUBMISSION_DISCORD_USERNAME if correct else INCORRECT_SUBMISSION_DISCORD_USERNAME
+    dispatch_discord_alert(SUBMISSION_WEBHOOK_URL, content, username)
 
-def dispatch_free_answer_alert(content, username='GPH HelpBot'):
-    dispatch_discord_alert('FIXME', content, username)
+def dispatch_free_answer_alert(content):
+    dispatch_discord_alert(FREE_ANSWER_WEBHOOK_URL, content, FREE_ANSWER_DISCORD_USERNAME)
 
-def dispatch_victory_alert(content, username='GPH CongratBot'):
-    dispatch_discord_alert('FIXME', content, username)
+def dispatch_victory_alert(content):
+    dispatch_discord_alert(VICTORY_WEBHOOK_URL, content, VICTORY_DISCORD_USERNAME)
 
 
 puzzle_logger = logging.getLogger('puzzles.puzzle')

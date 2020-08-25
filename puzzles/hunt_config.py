@@ -1,12 +1,18 @@
 import datetime
 from django.conf import settings
 from django.utils import timezone
-from puzzles.messaging import send_mail_wrapper
 
 # included in various templates
 HUNT_TITLE = 'FIXME Puzzle Hunt'
 HUNT_ORGANIZERS = 'FIXME Puzzlesetters'
+
+# included in various templates and set as reply-to for automatic emails
 CONTACT_EMAIL = 'FIXME@example.com'
+
+# the sender from which automatic emails are sent; your mail sending service
+# might require you set this to something (check settings/base.py to put your
+# actual mail sending service credentials)
+MESSAGING_SENDER_EMAIL = 'no-reply@FIXME.example.com'
 
 # Change this to True to reveal the story page to everyone.
 STORY_PAGE_VISIBLE = False

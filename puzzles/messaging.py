@@ -10,6 +10,12 @@ from django.conf import settings
 from django.core.mail.message import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
+from puzzles.hunt_config import (
+    HUNT_TITLE,
+    HUNT_ORGANIZERS,
+    CONTACT_EMAIL,
+    MESSAGING_SENDER_EMAIL
+)
 
 logger = logging.getLogger('puzzles.messaging')
 
@@ -60,10 +66,10 @@ def send_mail_wrapper(subject, template, context, recipients):
     mail = EmailMultiAlternatives(
         subject=subject,
         body=body,
-        from_email='FIXME',
+        from_email=MESSAGING_SENDER_EMAIL,
         to=recipients,
         alternatives=[(render_to_string(template + '.html', context), 'text/html')],
-        reply_to=['FIXME'])
+        reply_to=[CONTACT_EMAIL])
     try:
         if mail.send() != 1:
             raise RuntimeError('Unknown failure???')

@@ -19,7 +19,7 @@ from django.template import TemplateDoesNotExist
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.html import escape
-from django.utils.http import urlsafe_base64_encode, urlencode
+from django.utils.http import urlsafe_base64_encode
 from django.views.decorators.http import require_GET, require_POST
 from django.views.static import serve
 
@@ -172,13 +172,14 @@ def register(request):
                 )
 
             login(request, user)
+            team_link = request.build_absolute_uri(
+                reverse('team', args=(data.get('team_name'),))
+            )
             send_mail_wrapper(
                 'Team created', 'registration_email',
                 {
                     'team_name': data.get('team_name'),
-                    'team_link':
-                        request.build_absolute_uri(reverse('teams')) +
-                        '?' + urlencode({'team': data.get('team_name')}),
+                    'team_link': team_link,
                 },
                 team.get_emails())
             return redirect('index')
@@ -233,94 +234,108 @@ def password_reset(request):
 
     return render(request, 'password_reset.html', {'form': form})
 
-
 @require_GET
-def teams(request):
+def team(request, team_name):
+    '''List stats for a single team.'''
+    user_team = request.context.team
+
+    is_own_team = user_team is not None and user_team.team_name == team_name
+    can_view_info = is_own_team or request.context.is_superuser
+    team_query = Team.objects.filter(team_name=team_name)
+    if not can_view_info:
+        team_query = team_query.exclude(is_hidden=True)
+    team = team_query.first()
+    if not team:
+        messages.error(request, 'Team \u201c{}\u201d not found.'.format(team_name))
+        return redirect('teams')
+
+    # This Team.leaderboard() call is expensive, but is the only way
+    # right now to calculate rank accurately. Hopefully it is not an
+    # issue in practice.
+    leaderboard = Team.leaderboard(user_team)
+    rank = None
+    for i, leaderboard_team in enumerate(leaderboard):
+        if team.team_name == leaderboard_team['team_name']:
+            rank = i + 1 # ranks are 1-indexed
+            break
+
+    guesses = defaultdict(int)
+    correct = {}
+    team_solves = {}
+    unlock_time_map = {
+        unlock.puzzle_id: unlock.unlock_datetime
+        for unlock in team.db_unlocks
+    }
+    for submission in team.submissions:
+        if submission.is_correct:
+            team_solves[submission.puzzle_id] = submission.puzzle
+            correct[submission.puzzle_id] = {
+                'slug': submission.puzzle.slug,
+                'name': submission.puzzle.name,
+                'is_meta': submission.puzzle.is_meta,
+                'answer': submission.submitted_answer,
+                'unlock_time': unlock_time_map.get(submission.puzzle_id),
+                'solve_time': submission.submitted_datetime,
+                'used_free_answer': submission.used_free_answer,
+                'open_duration':
+                    (submission.submitted_datetime - unlock_time_map[submission.puzzle_id])
+                    .total_seconds() if submission.puzzle_id in unlock_time_map else None,
+            }
+        else:
+            guesses[submission.puzzle_id] += 1
+    submissions = []
+    for puzzle in correct:
+        correct[puzzle]['guesses'] = guesses[puzzle]
+        submissions.append(correct[puzzle])
+    submissions.sort(key=lambda submission: submission['solve_time'])
+    solves = [HUNT_START_TIME] + [s['solve_time'] for s in submissions]
+    if solves[-1] >= HUNT_END_TIME:
+        solves.append(min(request.context.now, HUNT_CLOSE_TIME))
+    else:
+        solves.append(HUNT_END_TIME)
+    chart = {
+        'hunt_length': (solves[-1] - HUNT_START_TIME).total_seconds(),
+        'solves': [{
+            'before': (solves[i - 1] - HUNT_START_TIME).total_seconds(),
+            'after': (solves[i] - HUNT_START_TIME).total_seconds(),
+        } for i in range(1, len(solves))],
+        'metas': [
+            (s['solve_time'] - HUNT_START_TIME).total_seconds()
+            for s in submissions if s['is_meta']
+        ],
+        'end': (HUNT_END_TIME - HUNT_START_TIME).total_seconds(),
+    }
+    team.solves = team_solves
+
+    return render(request, 'team.html', {
+        'view_team': team,
+        'submissions': submissions,
+        'chart': chart,
+        'solves': sum(1 for s in submissions if not s['used_free_answer']),
+        'modify_info_available': is_own_team and not request.context.hunt_is_closed,
+        'view_info_available': can_view_info,
+        'rank': rank,
+    })
+
+def teams_generic(request, hide_hidden):
     '''List all teams on a leaderboard.'''
     team_name = request.GET.get('team')
     user_team = request.context.team
 
-    if team_name:
-        is_own_team = user_team is not None and user_team.team_name == team_name
-        can_view_info = is_own_team or request.context.is_superuser
-        team_query = Team.objects.filter(team_name=team_name)
-        if not can_view_info:
-            team_query = team_query.exclude(is_hidden=True)
-        team = team_query.first()
-        if not team:
-            messages.error(request, 'Team \u201c{}\u201d not found.'.format(team_name))
-            return redirect('teams')
+    return render(request, 'teams.html', {
+        'teams': Team.leaderboard(user_team, hide_hidden=hide_hidden)
+    })
 
-        # This Team.leaderboard() call is expensive, but is the only way
-        # right now to calculate rank accurately. Hopefully it is not an
-        # issue in practice.
-        leaderboard = Team.leaderboard(user_team)
-        rank = None
-        for i, leaderboard_team in enumerate(leaderboard):
-            if team.team_name == leaderboard_team['team_name']:
-                rank = i + 1 # ranks are 1-indexed
-                break
+@require_GET
+def teams(request):
+    '''List all teams on the leaderboard.'''
+    return teams_generic(request, hide_hidden=True)
 
-        guesses = defaultdict(int)
-        correct = {}
-        team_solves = {}
-        unlock_time_map = {
-            unlock.puzzle_id: unlock.unlock_datetime
-            for unlock in team.db_unlocks
-        }
-        for submission in team.submissions:
-            if submission.is_correct:
-                team_solves[submission.puzzle_id] = submission.puzzle
-                correct[submission.puzzle_id] = {
-                    'slug': submission.puzzle.slug,
-                    'name': submission.puzzle.name,
-                    'is_meta': submission.puzzle.is_meta,
-                    'answer': submission.submitted_answer,
-                    'unlock_time': unlock_time_map.get(submission.puzzle_id),
-                    'solve_time': submission.submitted_datetime,
-                    'used_free_answer': submission.used_free_answer,
-                    'open_duration':
-                        (submission.submitted_datetime - unlock_time_map[submission.puzzle_id])
-                        .total_seconds() if submission.puzzle_id in unlock_time_map else None,
-                }
-            else:
-                guesses[submission.puzzle_id] += 1
-        submissions = []
-        for puzzle in correct:
-            correct[puzzle]['guesses'] = guesses[puzzle]
-            submissions.append(correct[puzzle])
-        submissions.sort(key=lambda submission: submission['solve_time'])
-        solves = [HUNT_START_TIME] + [s['solve_time'] for s in submissions]
-        if solves[-1] >= HUNT_END_TIME:
-            solves.append(min(request.context.now, HUNT_CLOSE_TIME))
-        else:
-            solves.append(HUNT_END_TIME)
-        chart = {
-            'hunt_length': (solves[-1] - HUNT_START_TIME).total_seconds(),
-            'solves': [{
-                'before': (solves[i - 1] - HUNT_START_TIME).total_seconds(),
-                'after': (solves[i] - HUNT_START_TIME).total_seconds(),
-            } for i in range(1, len(solves))],
-            'metas': [
-                (s['solve_time'] - HUNT_START_TIME).total_seconds()
-                for s in submissions if s['is_meta']
-            ],
-            'end': (HUNT_END_TIME - HUNT_START_TIME).total_seconds(),
-        }
-        team.solves = team_solves
-
-        return render(request, 'team.html', {
-            'view_team': team,
-            'submissions': submissions,
-            'chart': chart,
-            'solves': sum(1 for s in submissions if not s['used_free_answer']),
-            'modify_info_available': is_own_team and not request.context.hunt_is_closed,
-            'view_info_available': can_view_info,
-            'rank': rank,
-        })
-
-    return render(request, 'teams.html', {'teams': Team.leaderboard(user_team)})
-
+@require_GET
+@restrict_access()
+def teams_unhidden(request):
+    '''List all teams on the leaderboard, including hidden teams.'''
+    return teams_generic(request, hide_hidden=False)
 
 @restrict_access(after_hunt_end=False)
 def edit_team(request):
@@ -390,7 +405,7 @@ def puzzles(request):
     if request.context.hunt_has_started:
         pass
     elif request.context.hunt_has_almost_started:
-        return render(request, 'countdown.html', {'start': HUNT_START_TIME})
+        return render(request, 'countdown.html', {'start': request.context.start_time})
     else:
         raise Http404
     team = request.context.team
@@ -712,10 +727,10 @@ def hint(request, id):
     form = AnswerHintForm(instance=hint)
     form.cleaned_data = {}
 
-    if request.method == 'POST' and request.POST.get('action') == 'Unclaim':
+    if request.method == 'POST' and request.POST.get('action') == 'unclaim':
         if hint.status == Hint.NO_RESPONSE:
             hint.claimed_datetime = None
-            hint.claimer = None
+            hint.claimer = ''
             hint.save()
             messages.warning(request, 'Unclaimed.')
         return redirect('hint-list')
@@ -729,19 +744,20 @@ def hint(request, id):
             messages.success(request, 'Hint saved.')
             return redirect('hint-list')
 
-    claimer = request.COOKIES.get('claimer', '')
-    if hint.status != Hint.NO_RESPONSE:
-        form.add_error(None, 'This hint has been answered{}!'.format(
-            ' by ' + hint.claimer if hint.claimer else ''))
-    elif hint.claimed_datetime:
-        if hint.claimer != claimer:
-            form.add_error(None, 'This hint is currently claimed{}!'.format(
+    if request.GET.get('claim'):
+        claimer = request.COOKIES.get('claimer', '')
+        if hint.status != Hint.NO_RESPONSE:
+            form.add_error(None, 'This hint has been answered{}!'.format(
                 ' by ' + hint.claimer if hint.claimer else ''))
-    else:
-        hint.claimed_datetime = request.context.now
-        hint.claimer = claimer or 'anonymous'
-        hint.save()
-        messages.success(request, 'You have claimed this hint!')
+        elif hint.claimed_datetime:
+            if hint.claimer != claimer:
+                form.add_error(None, 'This hint is currently claimed{}!'.format(
+                    ' by ' + hint.claimer if hint.claimer else ''))
+        else:
+            hint.claimed_datetime = request.context.now
+            hint.claimer = claimer or 'anonymous'
+            hint.save()
+            messages.success(request, 'You have claimed this hint!')
 
     limit = request.META.get('QUERY_STRING', '')
     limit = int(limit) if limit.isdigit() else 20
@@ -1038,10 +1054,19 @@ def finishers(request):
         data.reverse()
     return render(request, 'finishers.html', {'data': data})
 
-
 @require_GET
-@restrict_access(after_hunt_end=True)
-def bigboard(request):
+@restrict_access()
+def bridge(request):
+    recipients = TeamMember.objects.values_list('email', flat=True)
+    recipients = list(filter(None, recipients))
+    recipient_count = len(recipients)
+    recipients_list = "\n".join(recipients)
+    return render(request, 'bridge.html', {
+        'recipient_count': recipient_count,
+        'recipients_list': recipients_list,
+    })
+
+def bigboard_generic(request, hide_hidden):
     puzzles = request.context.all_puzzles
     puzzle_map = {}
     puzzle_metas = defaultdict(set)
@@ -1074,9 +1099,15 @@ def bigboard(request):
     free_answer_map = defaultdict(set) # team -> {puzzle id}
     free_answer_by_puzzle_map = defaultdict(int) # puzzle -> number of free answers
 
+    correct_q = Q(is_correct=True)
+    incorrect_q = Q(is_correct=False)
+    if hide_hidden:
+        correct_q &= Q(team__is_hidden=False)
+        incorrect_q &= Q(team__is_hidden=False)
+
     for team_id, puzzle_id, used_free_answer, submitted_datetime in (
         AnswerSubmission.objects
-        .filter(team__is_hidden=False, is_correct=True)
+        .filter(correct_q)
         .order_by('submitted_datetime')
         .values_list('team_id', 'puzzle_id', 'used_free_answer', 'submitted_datetime')
     ):
@@ -1100,7 +1131,7 @@ def bigboard(request):
 
     for aggregate in (
         AnswerSubmission.objects
-        .filter(team__is_hidden=False, is_correct=False)
+        .filter(incorrect_q)
         .values('team_id', 'puzzle_id')
         .annotate(count=Count('*'))
     ):
@@ -1122,9 +1153,14 @@ def bigboard(request):
         used_hints_by_team_map[team_id] += aggregate['count']
         used_hints_by_puzzle_map[puzzle_id] += aggregate['count']
 
+    if hide_hidden:
+        teams = Team.objects.filter(is_hidden=False)
+    else:
+        teams = Team.objects.all()
+
     # Reproduce Team.leaderboard behavior for ignoring solves after hunt end,
     # but not _teams_ created after hunt end. They'll just all be at the bottom.
-    leaderboard = sorted(Team.objects.filter(is_hidden=False), key=lambda team: (
+    leaderboard = sorted(teams, key=lambda team: (
         during_hunt_solve_time_map[team.id].get(meta_meta_id, HUNT_END_TIME),
         -len(during_hunt_solve_time_map[team.id]),
         team.last_solve_time or team.creation_time,
@@ -1205,6 +1241,15 @@ def bigboard(request):
         'puzzles': annotated_puzzles,
     })
 
+@require_GET
+@restrict_access(after_hunt_end=True)
+def bigboard(request):
+    return bigboard_generic(request, hide_hidden=True)
+
+@require_GET
+@restrict_access()
+def bigboard_unhidden(request):
+    return bigboard_generic(request, hide_hidden=False)
 
 @require_GET
 @restrict_access(after_hunt_end=True)

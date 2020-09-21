@@ -12,5 +12,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gph.settings.prod')
+# ??? This might have sometimes helped us generate HTTPS URLs
+# os.environ.setdefault('HTTPS', 'on')
 
 application = get_wsgi_application()

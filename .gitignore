@@ -24,3 +24,5 @@ dump.rdb
 
 *.swp
 \.vscode/
+
+/logs/*.log

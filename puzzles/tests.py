@@ -32,7 +32,7 @@ class Misc(TestCase):
         self.team_a.save()
         self.team_b = Team(
             user=self.user_b,
-            team_name="Team B",
+            team_name="Team 🐉 B+B/B <script>&mdash;",
             creation_time=datetime.fromtimestamp(0),
             is_prerelease_testsolver=True,
         )
@@ -105,3 +105,10 @@ class Misc(TestCase):
         puzzle = puzzles[0]
         self.assertEqual(puzzle['puzzle'].name, "Sample")
         self.assertEqual(puzzle['answer'], "SAMPLEANSWER")
+
+    def test_team_page(self):
+        c = Client()
+        c.login(username="b", password="password")
+
+        response = c.get(urls.reverse("team", args=(self.team_b.team_name,)))
+        self.assertEqual(response.status_code, 200)

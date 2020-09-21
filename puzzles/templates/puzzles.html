@@ -4,7 +4,7 @@
 
 <h1>Puzzles</h1>
 
-{% if is_prerelease_testsolver %}
+{% if hunt_is_prereleased %}
 <h4 style="text-align: center">
     You are a pre-release testsolver, so you may be seeing puzzles that are
     locked for the general public. Please be careful!
@@ -62,7 +62,7 @@
         {% endif %}
         {% if 'survey_stats' in data %}
         {% for stat in data.survey_stats %}
-        <b>{{ stat.average }} <small>/ {{ stat.max_rating }}</small></b> {{ stat.adjective }}
+        <b>{{ stat.average|floatformat:2 }} <small>/ {{ stat.max_rating }}</small></b> {{ stat.adjective }}
         {% if not forloop.last %}|{% endif %}
         {% endfor %}
         {% endif %}

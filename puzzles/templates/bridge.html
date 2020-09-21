@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>The Bridge</h1>
+
+<main>
+    <style>
+        textarea {
+            background-color: #f8f8f8;
+            min-height: 200px;
+            overflow-y: scroll;
+            font-family: monospace;
+            min-width: 100%;
+        }
+    </style>
+    <h4>Email recipients list</h4>
+    <p>There are currently <strong>{{ recipient_count }}</strong> recipient{{ recipient_count|pluralize }}.</p>
+    <textarea>{{ recipients_list }}</textarea>
+</main>
+
+{% endblock %}

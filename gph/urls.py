@@ -14,13 +14,26 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 '''
 
+from urllib.parse import quote_plus, unquote_plus
+
 from django.conf import settings
-from django.urls import path, re_path, include
+from django.urls import path, re_path, include, register_converter
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
 import puzzles.views as views
 import puzzles.puzzlehandlers as puzzlehandlers
+
+class QuotedStringConverter:
+    regex = '[^/]+'
+
+    def to_python(self, value):
+        return unquote_plus(value)
+
+    def to_url(self, value):
+        return quote_plus(value, safe='')
+
+register_converter(QuotedStringConverter, 'quotedstr')
 
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
@@ -45,7 +58,7 @@ urlpatterns = [
     path('password-reset-done',
         auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'),
         name='password_reset_done'),
-    re_path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+    re_path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,32})/$',
         auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'),
         name='password_reset_confirm'),
     path('reset/done',
@@ -53,6 +66,8 @@ urlpatterns = [
         name='password_reset_complete'),
 
     path('teams', views.teams, name='teams'),
+    path('team/<quotedstr:team_name>', views.team, name='team'),
+    path('teams/unhidden', views.teams_unhidden, name='teams-unhidden'),
     path('edit-team', views.edit_team, name='edit-team'),
 
     path('puzzles', views.puzzles, name='puzzles'),
@@ -75,7 +90,9 @@ urlpatterns = [
     path('wrapup', views.wrapup, name='wrapup'),
     path('wrapup/finishers', views.finishers, name='finishers'),
 
+    path('bridge', views.bridge, name='bridge'),
     path('bigboard', views.bigboard, name='bigboard'),
+    path('bigboard/unhidden', views.bigboard_unhidden, name='bigboard-unhidden'),
     path('bridge/guess.csv', views.guess_csv, name='guess-csv'),
     path('bridge/hint.csv', views.hint_csv, name='hint-csv'),
     path('bridge/puzzle.log', views.puzzle_log, name='puzzle-log'),

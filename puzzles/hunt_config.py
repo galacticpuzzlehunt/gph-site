@@ -57,10 +57,10 @@ HINTS_ENABLED = True
 HINTS_PER_DAY = 2
 DAYS_BEFORE_HINTS = 3
 
-# reasonable settings are 1, True;
-# set to 0, False to let teams get hints right away after signing up in the
-# middle of the hunt; probably useful to try out the hint interface
-TEAM_AGE_IN_DAYS_BEFORE_HINTS = 1
+# reasonable settings are datetime.timedelta(days=1), True; set to None, False
+# to let teams get hints right away after signing up in the middle of the hunt;
+# probably useful to try out the hint interface
+TEAM_AGE_BEFORE_HINTS = datetime.timedelta(days=1)
 CAP_HINTS_BY_TEAM_AGE = True
 
 FREE_ANSWERS_ENABLED = True

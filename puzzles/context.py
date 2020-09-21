@@ -112,6 +112,15 @@ class BaseContext:
     def close_time(self):
         return HUNT_CLOSE_TIME
 
+    def is_story_page_visible(self):
+        return STORY_PAGE_VISIBLE
+
+    def is_errata_page_visible(self):
+        return ERRATA_PAGE_VISIBLE
+
+    def is_wrapup_page_visible(self):
+        return WRAPUP_PAGE_VISIBLE
+
     def hints_per_day(self):
         if HINTS_ENABLED:
             return HINTS_PER_DAY
@@ -124,8 +133,14 @@ class BaseContext:
         else:
             return None
 
+    # XXX do NOT name this the same as a field on the actual Team model or
+    # you'll silently be unable to update that field because you'll be writing
+    # to this instead of the actual model field!
+    def hunt_is_prereleased(self):
+        return self.team and self.team.is_prerelease_testsolver
+
     def hunt_has_started(self):
-        return self.is_prerelease_testsolver or self.now >= self.start_time
+        return self.hunt_is_prereleased or self.now >= self.start_time
 
     def hunt_has_almost_started(self):
         return self.start_time - self.now < datetime.timedelta(hours=1)
@@ -164,18 +179,6 @@ class Context:
 
     def team(self):
         return getattr(self.request.user, 'team', None)
-
-    def is_prerelease_testsolver(self):
-        return self.team and self.team.is_prerelease_testsolver
-
-    def is_story_page_visible(self):
-        return STORY_PAGE_VISIBLE
-
-    def is_errata_page_visible(self):
-        return ERRATA_PAGE_VISIBLE
-
-    def is_wrapup_page_visible(self):
-        return WRAPUP_PAGE_VISIBLE
 
     def shortcuts(self):
         return tuple(get_shortcuts(self))

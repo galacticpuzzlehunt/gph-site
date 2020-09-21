@@ -80,9 +80,9 @@ label {
             <p class="nr">No response yet.</p>
             {% elif hint.status == 'ANS' %}
             <p><b>A: </b>{{ hint.response }}</p>
-            {% elif hint.status == 'AMB' %}
-            <p><b>A: </b>We could not answer your hint. Your use of the hint was refunded.</p>
-            <p><b>Clarification: </b>{{ hint.response }}</p>
+            {% elif hint.status == 'REF' %}
+            <p><b>A: </b>{{ hint.response }}</p>
+            <p>(Your use of the hint was refunded.)</p>
             {% elif hint.status == 'OBS' %}
             <p class="obs">Looks like you solved this puzzle before we could send you a response, nice! Your use of the hint was refunded.</p>
             {% endif %}

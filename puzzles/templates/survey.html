@@ -22,7 +22,7 @@ th {
     <table class="sortable gph-list-table">
         <tr>
             {% for field in fields %}
-            <th>{{ field.field.adjective|title }} ({{ field.average }} <small>/ {{ field.max }}</small>)</th>
+            <th>{{ field.field.adjective|title }} ({{ field.average|floatformat:2 }} <small>/ {{ field.max }}</small>)</th>
             {% endfor %}
             <th>Comments</th>
             <th>Team</th>
@@ -33,7 +33,7 @@ th {
             <td>{{ rating.0 }} <small>/ {{ rating.1 }}</small></td>
             {% endfor %}
             <td><pre class="submitted-text">{{ survey.survey.comments }}</pre></td>
-            <td><a href="{% url 'teams' %}?team={{ survey.survey.team.team_name|urlencode }}">{{ survey.survey.team.team_name }}</a></td>
+            <td><a href="{% url 'team' survey.survey.team.team_name %}">{{ survey.survey.team.team_name }}</a></td>
         </tr>
         {% endfor %}
     </table>

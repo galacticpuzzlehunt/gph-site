@@ -205,7 +205,7 @@ small {
 {% for board_entry in board %}
 <tr{% if board_entry.finished %} class="finished"{% endif %}>
     <td>
-        <a href="{% url 'teams' %}?team={{ board_entry.team.team_name|urlencode }}">
+        <a href="{% url 'team' board_entry.team.team_name %}">
             {{ board_entry.team.team_name }}
         </a>
     <td>

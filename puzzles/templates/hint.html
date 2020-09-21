@@ -25,7 +25,7 @@
                 {{ hint.submitted_datetime }}
             </th>
             <th>
-                <a href="{% url 'teams' %}?team={{ hint.team.team_name|urlencode }}">
+                <a href="{% url 'team' hint.team.team_name %}">
                     {{ hint.team }}
                 </a>
             </th>
@@ -34,15 +34,26 @@
                     {{ hint.puzzle }}
                 </a>
             </th>
+            <th>
+                <a href="/admin/puzzles/answersubmission/?team__id__exact={{ hint.team_id }}&puzzle__id__exact={{ hint.puzzle_id }}">
+                    (guesses)
+                </a>
+            </th>
         </tr>
         <tr>
             <td>
                 {% if hint.answered_datetime %}
                 Answered {% duration_between hint.answered_datetime now %}
-                {% else %}
-                Claimed {% duration_between hint.claimed_datetime now %}
-                {% endif %}
                 ago by {{ hint.claimer }}
+                {% elif hint.claimed_datetime %}
+                Claimed {% duration_between hint.claimed_datetime now %}
+                ago by {{ hint.claimer }}
+                {% elif hint.claimer %}
+                Claimed at unknown time (!?) by {{ hint.claimer }}
+                {% else %}
+                <strong>UNCLAIMED</strong>
+                <a href="{% url 'hint' hint.id %}?claim=true" class="btn">Claim this hint</a>
+                {% endif %}
             </td>
             <td>
                 <a href="/admin/puzzles/hint/?team__id__exact={{ hint.team_id }}">
@@ -54,14 +65,19 @@
                     (all from same puzzle)
                 </a>
             </td>
+            <td>
+                <a href="/admin/puzzles/hint/?team__id__exact={{ hint.team_id }}&puzzle__id__exact={{ hint.puzzle_id }}">
+                    (both)
+                </a>
+            </td>
         </tr>
         <tr>
-            <td colspan="3">
+            <td colspan="4">
                 <pre class="submitted-text">{{ hint.hint_question }}</pre>
             </td>
         </tr>
         <tr>
-            <td colspan="3">
+            <td colspan="4">
                 {{ form.non_field_errors }}
                 <form method="post" class="call-in-answer-panel hint-controls">
                     {% csrf_token %}
@@ -73,7 +89,7 @@
                     {% endfor %}
                     <button class="btn" name="action" type="submit">Submit</button>
                     {% if hint.status == 'NR' %}
-                    <button class="btn" name="action" type="submit" formnovalidate>Unclaim</button>
+                    <button class="btn" name="action" type="submit" value="unclaim" formnovalidate>Unclaim</button>
                     {% else %}
                     <a class="btn" href="{% url 'hint-list' %}">Back to list</a>
                     {% endif %}
@@ -81,6 +97,8 @@
                 <hr>
             </td>
         </tr>
+    </table>
+    <table class="hint-table">
         {% for hint in previous %}
         <tr>
             <td>

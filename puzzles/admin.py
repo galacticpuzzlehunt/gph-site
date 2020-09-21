@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.urls import reverse
 from django import forms
 
 from puzzles.models import (
@@ -17,6 +18,9 @@ class PuzzleMessageInline(admin.TabularInline):
     model = PuzzleMessage
 
 class PuzzleAdmin(admin.ModelAdmin):
+    def view_on_site(self, obj):
+        return reverse('puzzle', args=(obj.slug,))
+
     inlines = [PuzzleMessageInline]
     ordering = ('deep', 'name')
     list_display = ('name', 'slug', 'deep', 'emoji', 'is_meta')
@@ -32,7 +36,17 @@ class TeamMemberInline(admin.TabularInline):
 
 class TeamAdmin(admin.ModelAdmin):
     inlines = [TeamMemberInline]
-    list_display = ('team_name', 'creation_time', 'is_hidden')
+
+    def view_on_site(self, obj):
+        return reverse('team', args=(obj.team_name,))
+
+    # You can't sort by this column but meh.
+    def is_prerelease_testsolver_short(self, obj):
+        return obj.is_prerelease_testsolver
+    is_prerelease_testsolver_short.short_description = 'Prerel.?'
+    is_prerelease_testsolver_short.boolean = True
+
+    list_display = ('team_name', 'creation_time', 'is_prerelease_testsolver_short', 'is_hidden')
     list_filter = ('is_prerelease_testsolver', 'is_hidden')
     search_fields = ('team_name',)
 
@@ -55,6 +69,9 @@ class SurveyAdmin(admin.ModelAdmin):
     search_fields = ('comments',)
 
 class HintAdmin(admin.ModelAdmin):
+    def view_on_site(self, obj):
+        return reverse('hint', args=(obj.id,))
+
     list_display = ('team', 'puzzle', 'submitted_datetime', 'claimer', 'claimed_datetime', 'status', 'answered_datetime')
     list_filter = ('status', 'claimed_datetime', 'answered_datetime', 'puzzle', 'team', 'claimer')
     search_fields = ('hint_question', 'response')

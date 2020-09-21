@@ -46,7 +46,7 @@
                     Puzzles
                 </a>
                 {% endif %}
-                <a{% if '/teams' in request.path %} class="selected-tab"{% endif %} href="{% url 'teams' %}">
+                <a{% if '/team' in request.path %} class="selected-tab"{% endif %} href="{% url 'teams' %}">
                     Teams
                 </a>
                 <a{% if request.path == '/faq' %} class="selected-tab"{% endif %} href="{% url 'faq' %}">
@@ -73,7 +73,7 @@
         <div class="top-right-actions">
         {% if request.user.is_authenticated %}
             {% if team %}
-            <a class="team-name" href="{% url 'teams' %}?team={{ team.team_name|urlencode }}">{{ request.user }}</a>
+            <a class="team-name" href="{% url 'team' team.team_name %}">{{ request.user }}</a>
             {% else %}
             {{ request.user }}
             {% endif %}

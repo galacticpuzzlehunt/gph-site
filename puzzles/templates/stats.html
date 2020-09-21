@@ -39,7 +39,7 @@
             </tr>
             {% for solver in solvers %}
             <tr{% if solver.is_current %} class="current-team"{% endif %}>
-                <td><a href="{% url 'teams' %}?team={{ solver.team.team_name|urlencode }}">{{ solver.team.team_name }}</a></td>
+                <td><a href="{% url 'team' solver.team.team_name %}">{{ solver.team.team_name }}</a></td>
                 <td>{{ solver.total_guesses }}</td>
                 <td sorttable_customkey="{{ solver.unlock_time|unix_time }}">{% format_time solver.unlock_time %}</td>
                 <td sorttable_customkey="{{ solver.open_duration }}">{% format_duration solver.open_duration %}</td>

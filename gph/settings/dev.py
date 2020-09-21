@@ -31,30 +31,30 @@ LOGGING = {
     },
     'handlers': {
         'django': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': './logs/django.log',
             'formatter': 'django-file',
         },
         'puzzle': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': './logs/puzzle.log',
             'formatter': 'puzzles-file',
         },
         'request': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': './logs/request.log',
             'formatter': 'puzzles-file',
         },
         'django-console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'django-console',
         },
         'puzzles-console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'puzzles-console',
         },
@@ -62,16 +62,16 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['django', 'django-console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'django.db.backends': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['django'],
             'propagate': False,
         },
         'django.server': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['django'],
             'propagate': False,
         },
@@ -81,17 +81,17 @@ LOGGING = {
         },
         'puzzles': {
             'handlers': ['puzzles-console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'puzzles.puzzle': {
             'handlers': ['puzzle', 'puzzles-console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'puzzles.request': {
             'handlers': ['request', 'puzzles-console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
     },

@@ -28,7 +28,7 @@
                 <td>{{ forloop.counter }}</td>
                 <td>
                     {% if team.metameta_solve_time is not None %}✈✈✈{% endif %}
-                    <a href="{% url 'teams' %}?team={{ team.team_name|urlencode }}">{{ team.team_name }}</a>
+                    <a href="{% url 'team' team.team_name %}">{{ team.team_name }}</a>
                     {% if team.metameta_solve_time is not None %}✈✈✈{% endif %}
                     {% if is_superuser %}
                         (<a href="{% url 'impersonate-start' team.team.user_id %}">impersonate</a>)

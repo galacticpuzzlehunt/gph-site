@@ -1,8 +1,10 @@
 import datetime
 import re
 from collections import defaultdict
+from urllib.parse import quote_plus
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -10,7 +12,6 @@ from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
-from django.utils.http import urlencode
 
 from puzzles.context import context_cache
 
@@ -30,7 +31,7 @@ from puzzles.hunt_config import (
     HINTS_ENABLED,
     HINTS_PER_DAY,
     DAYS_BEFORE_HINTS,
-    TEAM_AGE_IN_DAYS_BEFORE_HINTS,
+    TEAM_AGE_BEFORE_HINTS,
     CAP_HINTS_BY_TEAM_AGE,
 
     FREE_ANSWERS_ENABLED,
@@ -49,16 +50,26 @@ class Puzzle(models.Model):
 
     name = models.CharField(max_length=500)
 
+    # I considered making this default to django.utils.text.slugify(name) via
+    # cleaning, but that's a bit more invasive because you need blank=True for
+    # the admin page to let you submit blank strings, and there will be errors
+    # if a blank slug sneaks past into your database (e.g. the puzzle page
+    # can't be URL-reversed). Note that not all routes a model could enter the
+    # database will call clean().
     slug = models.SlugField(
         max_length=500, unique=True,
         help_text='Slug used in URLs to identify this puzzle (must be unique)',
     )
 
+    # As in the comment above, although we replace blank values with the
+    # default in clean(), a blank body template could sneak in anyway, but it
+    # seems less likely to be harmful here.
     body_template = models.CharField(
-        max_length=500,
+        max_length=500, blank=True,
         help_text='''File name of a Django template (including .html) under
         puzzle_bodies and solution_bodies containing the puzzle and
-        solution content, respectively''',
+        solution content, respectively. Defaults to slug + ".html" if not
+        specified.''',
     )
 
     answer = models.CharField(
@@ -84,6 +95,10 @@ class Puzzle(models.Model):
         help_text='Emoji to use in Discord integrations involving this puzzle'
     )
 
+    def clean(self):
+        if not self.body_template:
+            self.body_template = self.slug + '.html'
+
     def __str__(self):
         return self.name
 
@@ -98,7 +113,10 @@ class Puzzle(models.Model):
             elif c != "'":
                 if c != ' ': ret.append(c)
                 last_alpha = False
-        return ''.join(ret)
+        if len(ret) >= 7:
+            return ''.join(ret[:4]) + '...'
+        else:
+            return ''.join(ret)
 
     @property
     def normalized_answer(self):
@@ -112,7 +130,6 @@ class Puzzle(models.Model):
         '''Is this puzzle in the intro round?'''
         # FIXME: Not all hunts have an intro round.
         return any(meta.slug == INTRO_META_SLUG for meta in self.metas.all())
-
 
 @context_cache
 class Team(models.Model):
@@ -203,7 +220,7 @@ class Team(models.Model):
         return MAX_GUESSES_PER_PUZZLE + extra_guesses - wrong_guesses
 
     @staticmethod
-    def leaderboard(current_team):
+    def leaderboard(current_team, hide_hidden=True):
         '''
         Returns a list of all teams in order they should appear on the
         leaderboard. Some extra fields are annotated to each team:
@@ -213,9 +230,18 @@ class Team(models.Model):
           - metameta_solve_time: time of finishing the hunt (if before hunt end)
         This depends on the viewing team for hidden teams
         '''
-        q = Q(is_hidden=False)
-        if current_team:
-            q |= Q(id=current_team.id)
+
+        q = Q()
+        # be careful, this is not "always true", I think it's "always true" if
+        # &'d and "always false" if |'d
+
+        if hide_hidden:
+            # hide hidden teams (usually)
+            q &= Q(is_hidden=False)
+            if current_team:
+                # ...but always show current team, regardless of hidden status
+                q |= Q(id=current_team.id)
+
         all_teams = Team.objects.filter(q, creation_time__lt=HUNT_END_TIME)
 
         total_solves = defaultdict(int)
@@ -257,8 +283,8 @@ class Team(models.Model):
 
         now = min(self.now, HUNT_END_TIME)
         days_since_hunt_start = (now - self.start_time).days
-        days_since_team_created = (now - self.creation_time).days
-        if TEAM_AGE_IN_DAYS_BEFORE_HINTS is not None and days_since_team_created < TEAM_AGE_IN_DAYS_BEFORE_HINTS:
+        time_since_team_created = now - self.creation_time
+        if TEAM_AGE_BEFORE_HINTS is not None and time_since_team_created < TEAM_AGE_BEFORE_HINTS:
             # No hints available for first X days of any team (to discourage
             # creating additional teams after the hunt has started to farm
             # hints)
@@ -342,7 +368,7 @@ class Team(models.Model):
     # displayed.
     @staticmethod
     def compute_deep(context):
-        if context.is_prerelease_testsolver or context.hunt_is_closed:
+        if context.hunt_is_prereleased or context.hunt_is_closed:
             return DEEP_MAX
         if context.team is None:
             if context.hunt_is_over:
@@ -500,15 +526,18 @@ def notify_on_answer_submission(sender, instance, created, **kwargs):
             return
         if instance.puzzle.slug == INTRO_META_SLUG:
             send_mail_wrapper('Intro Meta', 'FIXME', {}, instance.team.get_emails())
-        Hint.objects.filter(
+
+        obsoleted_hints = Hint.objects.filter(
             team=instance.team,
             puzzle=instance.puzzle,
             status=Hint.NO_RESPONSE,
-        ).update(
-            status=Hint.OBSOLETE,
-            answered_datetime=now,
         )
-
+        # Do this instead of obsoleted_hints.update(status=Hint.OBSOLETE,
+        # answered_datetime=now) to trigger post_save.
+        for hint in obsoleted_hints:
+            hint.status = Hint.OBSOLETE
+            hint.answered_datetime = now
+            hint.save()
 
 class ExtraGuessGrant(models.Model):
     '''Extra guesses granted to a particular team.'''
@@ -602,14 +631,18 @@ class Hint(models.Model):
 
     NO_RESPONSE = 'NR'
     ANSWERED = 'ANS'
-    AMBIGUOUS = 'AMB'
+    REFUNDED = 'REF'
     OBSOLETE = 'OBS'
 
     STATUSES = (
         (NO_RESPONSE, 'No response'),
         (ANSWERED, 'Answered'),
-        (AMBIGUOUS, 'Ambiguous'), # we can't answer for some reason. refund
-        (OBSOLETE, 'Obsolete'),   # puzzle was solved while waiting for hint
+
+        # we can't answer for some reason, or think that the hint is too small
+        (REFUNDED, 'Refunded'),
+
+        # puzzle was solved while waiting for hint
+        (OBSOLETE, 'Obsolete'),
     )
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
@@ -620,12 +653,17 @@ class Hint(models.Model):
     notify_emails = models.CharField(default='none', max_length=255)
 
     claimed_datetime = models.DateTimeField(null=True)
-    claimer = models.CharField(null=True, blank=False, max_length=255)
-    discord_id = models.CharField(null=True, blank=False, max_length=255)
+
+    # Making these null=True, blank=False is painful and apparently not
+    # idiomatic Django. For example, if set that way, the Django admin won't
+    # let you save a model with blank values. Just check for the empty string
+    # or falsiness when you're using them.
+    claimer = models.CharField(blank=True, max_length=255)
+    discord_id = models.CharField(blank=True, max_length=255)
 
     answered_datetime = models.DateTimeField(null=True)
     status = models.CharField(choices=STATUSES, default=NO_RESPONSE, max_length=3)
-    response = models.TextField(null=True, blank=False)
+    response = models.TextField(blank=True)
 
     def __str__(self):
         def abbr(s):
@@ -648,21 +686,29 @@ class Hint(models.Model):
             return []
         return [self.notify_emails]
 
-    def discord_message(self):
+    def full_url(self, claim=False):
+        url = settings.DOMAIN + 'hint/%s' % self.id
+        if claim: url += '?claim=true'
+        return url
+
+    def short_discord_message(self, threshold=500):
         return (
             'Hint requested on {} {} by {}\n'
-            '**Question:** ```{}```\n'
-            '**Team:** {} ({})\n'
-            '**Puzzle:** {} ({})\n'
-            '**Claim and answer hint:** {}\n'
+            '```{}```\n'
         ).format(
             self.puzzle.emoji, self.puzzle, self.team,
-            self.hint_question[:1500],
-            settings.DOMAIN + 'teams?' + urlencode({'team': self.team.team_name}),
+            self.hint_question[:threshold],
+        )
+
+    def long_discord_message(self):
+        return self.short_discord_message(1500) + (
+            '**Team:** {} ({})\n'
+            '**Puzzle:** {} ({})\n'
+        ).format(
+            settings.DOMAIN + 'team/%s' % quote_plus(self.team.team_name, safe=''),
             settings.DOMAIN + 'admin/puzzles/hint/?team__id__exact=%s' % self.team_id,
             settings.DOMAIN + 'solution/' + self.puzzle.slug,
             settings.DOMAIN + 'admin/puzzles/hint/?puzzle__id__exact=%s' % self.puzzle_id,
-            settings.DOMAIN + 'hint/%s' % self.id,
         )
 
 

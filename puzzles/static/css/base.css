@@ -118,6 +118,13 @@ input[type=text], input[type=password], input[type=email] {
         justify-content: flex-end;
         align-items: center;
     }
+    /* normally the label is right-aligned because it's in a column inside a
+     * row and left of the corresponding input, but sometimes it's just by
+     * itself in a row above the input (hints page) */
+    .row > label {
+        text-align: left;
+        justify-content: flex-start;
+    }
 }
 
 @media print {

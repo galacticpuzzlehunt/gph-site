@@ -47,8 +47,9 @@ def dispatch_discord_alert(webhook, content, username):
     if len(content) >= 2000:
         content = content[:1996] + '...'
     if settings.IS_TEST:
-        logger.info('Discord alert:\n' + content)
+        logger.info('(Test) Discord alert:\n' + content)
         return
+    logger.info('(Real) Discord alert:\n' + content)
     requests.post(webhook, data={'username': username, 'content': content})
 
 def dispatch_general_alert(content):
@@ -108,12 +109,18 @@ def send_mail_wrapper(subject, template, context, recipients):
             subject, ', '.join(recipients), traceback.format_exc()))
 
 
+# Set to this to delete an embed from a message. (None doesn't work; that's
+# interpreted as "don't change the embed". MessageEmbed() does not work; you
+# get a small, ugly embed with nothing in it.)
 class EmptyEmbed:
     def to_dict(self):
         return {}
 
 class DiscordInterface:
-    TOKEN = None # FIXME
+    TOKEN = None # FIXME a long token from Discord
+
+    # the next two should be big decimal numbers; in Discord, you can right
+    # click and Copy ID to get them
     GUILD = 'FIXME'
     HINT_CHANNEL = 'FIXME'
 
@@ -122,23 +129,53 @@ class DiscordInterface:
         self.avatars = {}
         if self.TOKEN and not settings.IS_TEST:
             self.client = APIClient(self.TOKEN)
-            for member in self.client.guilds_members_list(self.GUILD).values():
+            members = self.client.guilds_members_list(self.GUILD).values()
+            for member in members:
+                self.avatars[member.user.username] = member.user.avatar_url
+            for member in members:
                 self.avatars[member.name] = member.user.avatar_url
 
+    # If you get an error code 50001 when trying to create a message, even
+    # though you're sure your bot has all the permissions, it might be because
+    # you need to "connect to and identify with a gateway at least once"??
+    # https://discord.com/developers/docs/resources/channel#create-message
+
+    # I spent like four hours trying to find weird asynchronous ways to do this
+    # right before each time I send a message, but it seems maybe you actually
+    # just need to do this once and your bot can create messages forever?
+    # disco.py's Client (not APIClient) wraps an APIClient and a GatewayClient,
+    # the latter of which does this. So I believe you can fix this by running a
+    # script like the following *once* on your local machine (it will, as
+    # advertised, run forever; just kill it after a few seconds)?
+
+    # from gevent import monkey
+    # monkey.patch_all()
+    # from disco.client import Client, ClientConfig
+    # Client(ClientConfig({'token': TOKEN})).run_forever()
+
     def update_hint(self, hint):
+        embed = MessageEmbed()
+        embed.author.url = hint.full_url()
         if hint.claimed_datetime:
-            embed = MessageEmbed()
-            embed.color = 0xff0000
+            embed.color = 0xdddddd
             embed.timestamp = hint.claimed_datetime.isoformat()
             embed.author.name = 'Claimed by {}'.format(hint.claimer)
             if hint.claimer in self.avatars:
                 embed.author.icon_url = self.avatars[hint.claimer]
             debug = 'claimed by {}'.format(hint.claimer)
         else:
-            embed = EmptyEmbed()
+            embed.color = 0xff00ff
+            embed.author.name = 'U N C L A I M E D'
+            claim_url = hint.full_url(claim=True)
+            embed.title = 'Claim: ' + claim_url
+            embed.url = claim_url
             debug = 'unclaimed'
 
-        if hint.discord_id and self.client is not None:
+        if self.client is None:
+            message = hint.long_discord_message()
+            logger.info('Hint, {}: {}\n{}'.format(debug, hint, message))
+            logger.info('Embed: {}'.format(embed.to_dict()))
+        elif hint.discord_id:
             try:
                 self.client.channels_messages_modify(
                     self.HINT_CHANNEL, hint.discord_id, embed=embed)
@@ -146,10 +183,7 @@ class DiscordInterface:
                 dispatch_general_alert('Discord API failure: modify\n{}'.format(
                     traceback.format_exc()))
         else:
-            message = hint.discord_message()
-            if self.client is None:
-                logger.info('Hint, {}: {}\n{}'.format(debug, hint, message))
-                return
+            message = hint.long_discord_message()
             try:
                 discord_id = self.client.channels_messages_create(
                     self.HINT_CHANNEL, message, embed=embed).id
@@ -171,7 +205,30 @@ class DiscordInterface:
             except Exception:
                 dispatch_general_alert('Discord API failure: delete\n{}'.format(
                     traceback.format_exc()))
-            hint.discord_id = None
+            hint.discord_id = ''
             hint.save(update_fields=('discord_id',))
+
+            # what DPPH did instead of deleting messages:
+            # (nb. I tried to make these colors color-blind friendly)
+            #
+            # embed = MessageEmbed()
+            # if hint.status == 'ANS':
+            #     embed.color = 0xaaffaa
+            # elif hint.status == 'REF':
+            #     embed.color = 0xcc6600
+            # # nothing for obsolete
+            #
+            # embed.author.name = '{} by {}'.format(hint.status, hint.claimer)
+            # embed.author.url = hint.full_url()
+            # embed.description = hint.response[:250]
+            # if hint.claimer in self.avatars:
+            #     embed.author.icon_url = self.avatars[hint.claimer]
+            # debug = 'claimed by {}'.format(hint.claimer)
+            # try:
+            #     self.client.channels_messages_modify(
+            #         self.HINT_CHANNEL, hint.discord_id, content=hint.short_discord_message(), embed=embed)
+            # except Exception:
+            #     dispatch_general_alert('Discord API failure: modify\n{}'.format(
+            #         traceback.format_exc()))
 
 discord_interface = DiscordInterface()

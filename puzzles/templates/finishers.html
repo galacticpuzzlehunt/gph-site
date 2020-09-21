@@ -47,12 +47,12 @@ td {
         <th>Team</th>
         <th>Metameta unlock (EDT)</th>
         <th>Time to solve<br>after unlock</th>
-        <th>Time to solve<br>after <tt>WORLD PEACE</tt></th>
+        <th>Time to solve<br>after last wrong answer</th>
         <th>Metameta solve (EDT)</th>
     </tr>
     {% for team in data %}
     <tr>
-        <td><a href="{% url 'teams' %}?team={{ team.team.team_name|urlencode }}">
+        <td><a href="{% url 'team' team.team.team_name %}">
             {{ team.team.team_name }}
         </a></td>
         <td sorttable_customkey="{{ team.mm1_time|unix_time }}">

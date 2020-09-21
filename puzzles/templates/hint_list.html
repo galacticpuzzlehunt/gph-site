@@ -35,7 +35,7 @@
                 </a>
             </th>
             <th>
-                <a href="{% url 'teams' %}?team={{ hint.team.team_name|urlencode }}">
+                <a href="{% url 'team' hint.team.team_name %}">
                     {{ hint.team }}
                 </a
             ></th>

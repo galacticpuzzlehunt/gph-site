@@ -8,7 +8,8 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Q
+from django.db.models import F, FilteredRelation, Q, Case, When, Count, Min
+from django.db.models.functions import Coalesce
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -222,13 +223,41 @@ class Team(models.Model):
     @staticmethod
     def leaderboard(current_team, hide_hidden=True):
         '''
-        Returns a list of all teams in order they should appear on the
-        leaderboard. Some extra fields are annotated to each team:
-          - is_current: true if the team is the current team
-          - total_solves: number of non-free solves (before hunt end)
-          - last_solve_time: last non-free solve (before hunt end)
-          - metameta_solve_time: time of finishing the hunt (if before hunt end)
-        This depends on the viewing team for hidden teams
+        Returns a list of dictionaries with data of teams in the order they
+        should appear on the leaderboard. Dictionaries have the following keys:
+          - 'id'
+          - 'user_id'
+          - 'team_name'
+          - 'total_solves': number of solves (before hunt end)
+          - 'last_solve_or_creation_time': last non-free solve (before hunt
+            end), or if none, team creation time
+          - 'metameta_solve_time': time of finishing the hunt (if before hunt
+            end)
+
+        This depends on the viewing team for hidden teams.
+        '''
+
+        return Team.leaderboard_teams(current_team, hide_hidden).values(
+            'id',
+            'user_id',
+            'team_name',
+            'total_solves',
+            'last_solve_or_creation_time',
+            'metameta_solve_time',
+        )
+
+    @staticmethod
+    def leaderboard_teams(current_team, division=None, hide_hidden=True):
+        '''
+        Returns a (lazy, not-yet-evaluated) QuerySet of teams, in the order
+        they should appear on the leaderboard, with the following annotations:
+          - 'total_solves': number of solves (before hunt end)
+          - 'last_solve_or_creation_time': last non-free solve (before hunt
+            end), or if none, team creation time
+          - 'metameta_solve_time': time of finishing the hunt (if before hunt
+            end)
+
+        This depends on the viewing team for hidden teams.
         '''
 
         q = Q()
@@ -244,30 +273,72 @@ class Team(models.Model):
 
         all_teams = Team.objects.filter(q, creation_time__lt=HUNT_END_TIME)
 
-        total_solves = defaultdict(int)
-        meta_times = {}
-        for team_id, slug, time in AnswerSubmission.objects.filter(
-            used_free_answer=False, is_correct=True, submitted_datetime__lt=HUNT_END_TIME
-        ).values_list('team__id', 'puzzle__slug', 'submitted_datetime'):
-            total_solves[team_id] += 1
-            if slug == META_META_SLUG:
-                meta_times[team_id] = time
-
-        return sorted(
-            [{
-                'team_name': team.team_name,
-                'is_current': team == current_team,
-                'total_solves': total_solves[team.id],
-                'last_solve_time': team.last_solve_time or team.creation_time,
-                'metameta_solve_time': meta_times.get(team.id),
-                'team': team,
-            } for team in all_teams],
-            key=lambda d: (
-                d['metameta_solve_time'] or HUNT_END_TIME,
-                -d['total_solves'],
-                d['last_solve_time'],
-            )
+        # https://docs.djangoproject.com/en/3.1/ref/models/querysets/#filteredrelation-objects
+        # FilteredRelation does a LEFT OUTER JOIN with additional conditions in
+        # the ON clause, so every team survives; the other stuff aggregates it
+        all_teams = all_teams.annotate(
+            scoring_submissions=FilteredRelation(
+                'answersubmission',
+                condition=Q(
+                    answersubmission__used_free_answer=False,
+                    answersubmission__is_correct=True,
+                    answersubmission__submitted_datetime__lt=HUNT_END_TIME,
+                )
+            ),
+            total_solves=Count('scoring_submissions'),
+            metameta_solve_time=Min(Case(
+                When(
+                    scoring_submissions__puzzle__slug=META_META_SLUG,
+                    then='scoring_submissions__submitted_datetime',
+                )
+                # else, null by default
+            )),
+            # Coalesce(things) = the first of things that isn't null
+            last_solve_or_creation_time=Coalesce('last_solve_time', 'creation_time'),
+        ).order_by(
+            F('metameta_solve_time').asc(nulls_last=True),
+            F('total_solves').desc(),
+            F('last_solve_or_creation_time'),
         )
+
+        return all_teams
+
+        # Old joined-in-python implementation, with a different output format,
+        # follows. I couldn't convince myself that pushing all the annotations
+        # and sort into the database necessarily improved performance, but I
+        # don't think it got significantly worse either, and the above version
+        # feels like it enables future optimizations more effectively; for
+        # example, I think the fact that computing the ranking on the team page
+        # only needs values_list('id', flat=True) is pretty good. (On the
+        # other hand, there are hunt formats where completing the sort in the
+        # database is very difficult or even impossible due to a more
+        # complicated scoring/ranking algorithm or one that uses information
+        # not available in the database, like GPH 2018...)
+
+        # total_solves = defaultdict(int)
+        # meta_times = {}
+        # for team_id, slug, time in AnswerSubmission.objects.filter(
+        #     used_free_answer=False, is_correct=True, submitted_datetime__lt=HUNT_END_TIME
+        # ).values_list('team__id', 'puzzle__slug', 'submitted_datetime'):
+        #     total_solves[team_id] += 1
+        #     if slug == META_META_SLUG:
+        #         meta_times[team_id] = time
+
+        # return sorted(
+        #     [{
+        #         'team_name': team.team_name,
+        #         'is_current': team == current_team,
+        #         'total_solves': total_solves[team.id],
+        #         'last_solve_time': team.last_solve_time or team.creation_time,
+        #         'metameta_solve_time': meta_times.get(team.id),
+        #         'team': team,
+        #     } for team in all_teams],
+        #     key=lambda d: (
+        #         d['metameta_solve_time'] or HUNT_END_TIME,
+        #         -d['total_solves'],
+        #         d['last_solve_time'],
+        #     )
+        # )
 
     def team(self):
         return self
@@ -608,6 +679,9 @@ class Survey(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE)
 
+    # NOTE: Due to some pretty dynamic queries, the names of rating fields
+    # should be pretty unique! They definitely shouldn't overlap with the names
+    # of any fields of Puzzle.
     fun = RatingField(6, 'fun')
     difficulty = RatingField(6, 'hard')
     comments = models.TextField(blank=True, verbose_name='Anything else:')

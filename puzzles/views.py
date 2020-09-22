@@ -12,7 +12,7 @@ from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.db.models import F, Q, Count
+from django.db.models import F, Q, Avg, Count
 from django.forms import formset_factory, modelformset_factory
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, render
@@ -250,13 +250,14 @@ def team(request, team_name):
         messages.error(request, 'Team \u201c{}\u201d not found.'.format(team_name))
         return redirect('teams')
 
-    # This Team.leaderboard() call is expensive, but is the only way
-    # right now to calculate rank accurately. Hopefully it is not an
-    # issue in practice.
-    leaderboard = Team.leaderboard(user_team)
+    # This Team.leaderboard_teams() call is expensive, but is
+    # the only way right now to calculate rank accurately.
+    # Hopefully it is not an issue in practice (especially
+    # after all this database optimization --beta)
+    leaderboard_ids = Team.leaderboard_teams(user_team).values_list('id', flat=True)
     rank = None
-    for i, leaderboard_team in enumerate(leaderboard):
-        if team.team_name == leaderboard_team['team_name']:
+    for i, leaderboard_id in enumerate(leaderboard_ids):
+        if team.id == leaderboard_id:
             rank = i + 1 # ranks are 1-indexed
             break
 
@@ -324,7 +325,8 @@ def teams_generic(request, hide_hidden):
     user_team = request.context.team
 
     return render(request, 'teams.html', {
-        'teams': Team.leaderboard(user_team, hide_hidden=hide_hidden)
+        'teams': Team.leaderboard(user_team, hide_hidden=hide_hidden),
+        'current_team': user_team,
     })
 
 @require_GET
@@ -421,24 +423,29 @@ def puzzles(request):
     guesses = defaultdict(int)
     teams = defaultdict(set)
     full_stats = request.context.is_superuser or request.context.hunt_is_over
-    for submission in (
+    for puzzle_id, is_correct, team_id in (
         AnswerSubmission.objects
         .filter(used_free_answer=False, team__is_hidden=False, submitted_datetime__lt=HUNT_END_TIME)
+        .values_list('puzzle_id', 'is_correct', 'team_id')
     ):
-        if submission.is_correct:
-            correct[submission.puzzle_id] += 1
-        guesses[submission.puzzle_id] += 1
-        teams[submission.puzzle_id].add(submission.team_id)
+        if is_correct:
+            correct[puzzle_id] += 1
+        guesses[puzzle_id] += 1
+        teams[puzzle_id].add(team_id)
 
     fields = Survey.fields()
-    surveys = defaultdict(lambda: {'count': 0, 'totals': [0 for _ in fields]})
+    survey_averages = dict() # puzzle.id -> [average rating for field in fields]
     if SURVEYS_AVAILABLE:
         # We can consider adding a threshold for e.g. only showing these
-        # results once at least N teams have filled out the survey.
-        for survey in Survey.objects.filter(team__is_hidden=False):
-            surveys[survey.puzzle_id]['count'] += 1
-            for i, field in enumerate(fields):
-                surveys[survey.puzzle_id]['totals'][i] += field.value_from_object(survey)
+        # results once at least N teams have filled out the survey. That would
+        # just be a Count('survey') annotation.
+        surveyed_puzzles = Puzzle.objects.annotate(**{
+            field.name: Avg('survey__' + field.name)
+            for field in fields
+        }).values_list('id', *(field.name for field in fields))
+        for sp in surveyed_puzzles:
+            if all(a is not None for a in sp[1:]):
+                survey_averages[sp[0]] = sp[1:]
 
     unlocks = request.context.unlocks
     for data in unlocks['puzzles']:
@@ -453,12 +460,12 @@ def puzzles(request):
             'guesses': guesses[puzzle_id],
             'teams': len(teams[puzzle_id]),
         }
-        if puzzle_id in surveys:
+        if puzzle_id in survey_averages:
             data['survey_stats'] = [{
-                'average': total / surveys[puzzle_id]['count'],
+                'average': average,
                 'adjective': field.adjective,
                 'max_rating': field.max_rating,
-            } for (field, total) in zip(fields, surveys[puzzle_id]['totals'])]
+            } for (field, average) in zip(fields, survey_averages[puzzle_id])]
 
     return render(request, 'puzzles.html')
 

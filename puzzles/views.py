@@ -4,6 +4,7 @@ import json
 import os
 from collections import defaultdict, OrderedDict, Counter
 from functools import wraps
+from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib import messages
@@ -745,19 +746,23 @@ def hint(request, id):
             return redirect('hint-list')
 
     if request.GET.get('claim'):
-        claimer = request.COOKIES.get('claimer', '')
-        if hint.status != Hint.NO_RESPONSE:
-            form.add_error(None, 'This hint has been answered{}!'.format(
-                ' by ' + hint.claimer if hint.claimer else ''))
-        elif hint.claimed_datetime:
-            if hint.claimer != claimer:
-                form.add_error(None, 'This hint is currently claimed{}!'.format(
+        claimer = request.COOKIES.get('claimer')
+        if claimer:
+            claimer = unquote(claimer)
+            if hint.status != Hint.NO_RESPONSE:
+                form.add_error(None, 'This hint has been answered{}!'.format(
                     ' by ' + hint.claimer if hint.claimer else ''))
+            elif hint.claimed_datetime:
+                if hint.claimer != claimer:
+                    form.add_error(None, 'This hint is currently claimed{}!'.format(
+                        ' by ' + hint.claimer if hint.claimer else ''))
+            else:
+                hint.claimed_datetime = request.context.now
+                hint.claimer = claimer
+                hint.save()
+                messages.success(request, 'You have claimed this hint!')
         else:
-            hint.claimed_datetime = request.context.now
-            hint.claimer = claimer or 'anonymous'
-            hint.save()
-            messages.success(request, 'You have claimed this hint!')
+            messages.error(request, 'Please set your name before claiming hints! (If you just set your name, you can refresh or click Claim.)')
 
     limit = request.META.get('QUERY_STRING', '')
     limit = int(limit) if limit.isdigit() else 20

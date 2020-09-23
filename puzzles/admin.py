@@ -46,8 +46,8 @@ class TeamAdmin(admin.ModelAdmin):
     is_prerelease_testsolver_short.short_description = 'Prerel.?'
     is_prerelease_testsolver_short.boolean = True
 
-    list_display = ('team_name', 'creation_time', 'is_prerelease_testsolver_short', 'is_hidden')
-    list_filter = ('is_prerelease_testsolver', 'is_hidden')
+    list_display = ('team_name', 'creation_time', 'is_prerelease_testsolver_short', 'is_hidden', 'division')
+    list_filter = ('is_prerelease_testsolver', 'is_hidden', 'division')
     search_fields = ('team_name',)
 
 class PuzzleUnlockAdmin(admin.ModelAdmin):

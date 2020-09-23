@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=0.5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static "css/skeleton.css" %}">
     <link rel="stylesheet" href="{% static "css/base.css" %}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -20,6 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2.2/jquery.formset.min.js"></script>
     <script src="{% static "js/sorttable.js" %}"></script>
     <script src="{% static "js/tray.js" %}"></script>
+    <script src="{% static "js/hints.js" %}"></script>
     <link rel="icon" sizes="16x16 32x32 48x48 64x64" href="{% static "images/favicon.ico" %}" type="image/vnd.microsoft.icon">
     {% ga_code %}
 </head>
@@ -62,9 +64,11 @@
                     Wrap-Up
                 </a>
                 {% endif %}
+                <!--
                 <a{% if request.path == '/archive' %} class="selected-tab"{% endif %} href="{% url 'archive' %}">
                     Archive
                 </a>
+                -->
             </div>
             <div class="top-left-actions">
                 {% block top-left-actions %}{% endblock %}
@@ -84,15 +88,14 @@
             </span>
             {% endif %}
             {% if team and num_hints_remaining > 0 %}
-            <span class="current-stat" title="Hints: {{ num_hints_remaining }}">
+            <span class="current-stat" title="Hint requests: {{ num_hints_remaining }}">
                 {% include 'icon-hint.svg' %}
                 <span class="current-stat-label">{{ num_hints_remaining }}</span>
             </span>
             {% endif %}
             {% if team and hunt_has_started %}
-            {# FIXME if DEEP ends up not equalling number of solved puzzles #}
-            <span class="current-stat" title="Solved: {{ display_deep|intcomma }}">
-                {% include 'icon-solved.svg' %}
+            <span class="current-stat" title="Points: {{ display_deep|intcomma }}">
+                ✨
                 <span class="current-stat-label">{{ display_deep|intcomma }}</span>
             </span>
             {% endif %}

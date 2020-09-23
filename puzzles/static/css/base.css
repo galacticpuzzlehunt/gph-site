@@ -1,5 +1,5 @@
 body {
-    font-family: sans-serif;
+    font-family: "Source Sans Pro", sans-serif;
     font-variant-ligatures: none;
     line-height: 2.6rem;
     font-size: 1.75rem;
@@ -15,7 +15,7 @@ body {
 
 @media screen {
     html {
-        background-image: linear-gradient(#111, #111);
+        background-image: linear-gradient(#311, #311);
         background-size: 100% 40px;
         background-repeat: no-repeat;
     }
@@ -80,7 +80,7 @@ tr:last-child td {
 }
 
 a, .btn {
-    color: #05a;
+    color: #700;
 }
 
 .btn {
@@ -118,18 +118,16 @@ input[type=text], input[type=password], input[type=email] {
         justify-content: flex-end;
         align-items: center;
     }
-    /* normally the label is right-aligned because it's in a column inside a
-     * row and left of the corresponding input, but sometimes it's just by
-     * itself in a row above the input (hints page) */
-    .row > label {
+
+    li label {
+        display: block;
         text-align: left;
-        justify-content: flex-start;
     }
 }
 
 @media print {
     main {
-        border-top: 1px solid #111;
+        border-top: 1px solid #311;
     }
 
     .btn {
@@ -145,7 +143,7 @@ input[type=text], input[type=password], input[type=email] {
     }
 
     h1, h2, h3, h4 {
-        color: #05a;
+        color: #700;
     }
 
     a {
@@ -154,19 +152,20 @@ input[type=text], input[type=password], input[type=email] {
 
     a:hover,
     a:focus {
-        color: #2af;
+        color: #b50;
     }
 
     .btn {
-        transition: background-color 0.3s;
+        transition: background-color 0.3s, box-shadow 0.3s;
         color: #f9f8f5;
-        background-color: #05a;
+        background-color: #700;
     }
 
     .btn:hover,
     .btn:focus {
         color: #f9f8f5;
-        background-color: #2af;
+        background-color: #940;
+        box-shadow: 0 0 2px #fc0;
     }
 
     nav {
@@ -189,7 +188,13 @@ input[type=text], input[type=password], input[type=email] {
 
     .top-tabs a:hover,
     .top-tabs a:focus {
-        color: #2af;
+        color: #fc0;
+        text-shadow: 0 0 1px #fc0;
+    }
+
+    input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, textarea:focus, select:focus {
+        border: 1px solid #fc0;
+        box-shadow: 0 0 2px #fc0;
     }
 
     .top-tabs .selected-tab {
@@ -236,7 +241,7 @@ input[type=text], input[type=password], input[type=email] {
     }
 
     .shortcuts {
-        border: 4px double #111;
+        border: 4px double #311;
         background-color: white;
         position: absolute;
         padding: 1rem;
@@ -307,7 +312,7 @@ input[type=text], input[type=password], input[type=email] {
         top: -100vh;
         bottom: 0;
         padding-top: 90vh;
-        background-color: #111;
+        background-color: #311;
         color: #f9f8f5;
     }
 
@@ -326,7 +331,7 @@ input[type=text], input[type=password], input[type=email] {
         text-align: center;
         font-size: 32px;
         line-height: 40px;
-        background-image: linear-gradient(#111, #111);
+        background-image: linear-gradient(#311, #311);
         background-size: 100% 48px;
         background-repeat: no-repeat;
         background-origin: content-box;
@@ -419,13 +424,26 @@ input[type=text], input[type=password], input[type=email] {
     overflow-wrap: anywhere;
 }
 
+.preview-next {
+    text-align: center;
+}
+.preview-next.fade1 {
+    opacity: 0.7;
+}
+.preview-next.fade2 {
+    opacity: 0.5;
+}
+.preview-next span {
+    font-style: italic;
+}
+
 @media screen {
     .gph-list-table th {
         border: none;
         position: sticky;
         top: 0;
         background-color: #f9f8f5;
-        box-shadow: inset 0 -1px 0 0 #111;
+        box-shadow: inset 0 -1px 0 0 #311;
     }
 }
 
@@ -452,14 +470,14 @@ input[type=text], input[type=password], input[type=email] {
 
 @media print {
     .story-chunk {
-        border-bottom: 1px solid #111;
+        border-bottom: 1px solid #311;
     }
 }
 
 @media screen {
     .story-chunk {
         max-width: 600px;
-        border: 1px solid #111;
+        border: 1px solid #311;
         padding: 20px 30px;
         margin: 0 auto 30px;
     }
@@ -470,6 +488,10 @@ input[type=text], input[type=password], input[type=email] {
     margin-right: 22.5%;
     text-align: center;
     font-style: italic;
+}
+
+.flavor strong {
+    font-style: normal;
 }
 
 .form-section {
@@ -577,4 +599,8 @@ footer {
     text-align: center;
     opacity: 0.5;
     font-size: 80%;
+}
+
+.hidden {
+    display: none;
 }

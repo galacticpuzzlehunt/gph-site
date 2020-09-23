@@ -1,8 +1,29 @@
 {% extends "base.html" %}
 {% load puzzle_tags %}
 {% block content %}
+<style>
+.leaderboards {
+    text-align: center;
+}
 
+</style>
+
+{% if division == 'MS' %}
+<h1>Team Scoreboard: Middle School</h1>
+{% elif division == 'HS' %}
+<h1>Team Scoreboard: High School</h1>
+{% else %}
 <h1>Team Scoreboard</h1>
+{% endif %}
+
+<nav class="leaderboards">
+    View leaderboard for:
+    <a href="{% url 'teams-middle-school' %}">Middle School</a>
+    |
+    <a href="{% url 'teams-high-school' %}">High School</a>
+    |
+    <a href="{% url 'teams' %}">All Teams</a>
+</nav>
 
 <main>
     <table class="gph-list-table">
@@ -19,7 +40,7 @@
                 <th>Rank</th>
                 <th>Team</th>
                 {% if hunt_has_started %}
-                    <th>Solves</th>
+                    <th>✨</th>
                     <th>Finish Time</th>
                 {% endif %}
             </tr>
@@ -35,7 +56,7 @@
                     {% endif %}
                 </td>
                 {% if hunt_has_started %}
-                    <td>{{ team.total_solves }}</td>
+                    <td>{{ team.total_points }}</td>
                     <td>{% format_time team.metameta_solve_time %}</td>
                 {% endif %}
             </tr>

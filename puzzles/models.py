@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import F, FilteredRelation, Q, Case, When, Count, Min
+from django.db.models import F, FilteredRelation, Q, Case, When, Sum, Min
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -83,13 +83,29 @@ class Puzzle(models.Model):
         help_text='DEEP/Progress threshold teams must meet to unlock this puzzle'
     )
 
+    reward = models.IntegerField(
+        verbose_name='Reward',
+        help_text='Amount of points solving this puzzle earns',
+        default=0,
+    )
+
+    order = models.IntegerField(
+        verbose_name='Order',
+        help_text='Used to tiebreak order of puzzle presentation of puzzles with the same threshold',
+        default=0,
+    )
+
+    round = models.IntegerField(
+        verbose_name='Round',
+        help_text='Which round this puzzle is in; 0-indexed',
+        default=0,
+    )
+
     # indicates if this puzzle is a metapuzzle
     is_meta = models.BooleanField(default=False)
 
-    metas = models.ManyToManyField(
-        'self', limit_choices_to={'is_meta': True}, symmetrical=False, blank=True,
-        help_text='All metas that this puzzle is part of',
-    )
+    def same_round_metas(self):
+        return Puzzle.objects.filter(round=self.round, is_meta=True)
 
     emoji = models.CharField(
         max_length=500, default=':question:',
@@ -126,11 +142,6 @@ class Puzzle(models.Model):
     @staticmethod
     def normalize_answer(s):
         return s and re.sub(r'[^A-Z]', '', s.upper())
-
-    def is_intro(self):
-        '''Is this puzzle in the intro round?'''
-        # FIXME: Not all hunts have an intro round.
-        return any(meta.slug == INTRO_META_SLUG for meta in self.metas.all())
 
 @context_cache
 class Team(models.Model):
@@ -186,6 +197,17 @@ class Team(models.Model):
         public''',
     )
 
+    DIVISION_CHOICES = [
+        ('MS', 'Middle School'),
+        ('HS', 'High School'),
+        ('OP', 'Open'),
+    ]
+    division = models.CharField(
+        max_length=2,
+        choices=DIVISION_CHOICES,
+        help_text='''Categorization of teams based on e.g. year/age range, for separate leaderboards''',
+    )
+
     def __str__(self):
         return self.team_name
 
@@ -196,10 +218,24 @@ class Team(models.Model):
         ]
 
     def puzzle_submissions(self, puzzle):
-        return [
+        submissions = [
             submission for submission in self.submissions
             if submission.puzzle == puzzle
         ]
+
+        if submissions:
+            # NOTE: only keeps one response per semicleaned guess /shrug
+            # also trying to minimize DB queries
+            puzzle_messages = {
+                message.semicleaned_guess: message.response
+                for message in puzzle.puzzlemessage_set.all()
+            }
+
+            for submission in submissions:
+                # submitted_answer is fully (not just semi) cleaned
+                submission.response = puzzle_messages.get(submission.submitted_answer)
+
+        return submissions
 
     def puzzle_answer(self, puzzle):
         return puzzle.answer if any(
@@ -221,27 +257,29 @@ class Team(models.Model):
         return MAX_GUESSES_PER_PUZZLE + extra_guesses - wrong_guesses
 
     @staticmethod
-    def leaderboard(current_team, hide_hidden=True):
+    def leaderboard(current_team, division=None, hide_hidden=True):
         '''
         Returns a list of dictionaries with data of teams in the order they
         should appear on the leaderboard. Dictionaries have the following keys:
           - 'id'
           - 'user_id'
           - 'team_name'
-          - 'total_solves': number of solves (before hunt end)
+          - 'total_points': number of points (before hunt end)
           - 'last_solve_or_creation_time': last non-free solve (before hunt
             end), or if none, team creation time
           - 'metameta_solve_time': time of finishing the hunt (if before hunt
             end)
 
         This depends on the viewing team for hidden teams.
+
+        division is None or the literal string to filter by division.
         '''
 
-        return Team.leaderboard_teams(current_team, hide_hidden).values(
+        return Team.leaderboard_teams(current_team, division, hide_hidden).values(
             'id',
             'user_id',
             'team_name',
-            'total_solves',
+            'total_points',
             'last_solve_or_creation_time',
             'metameta_solve_time',
         )
@@ -251,13 +289,15 @@ class Team(models.Model):
         '''
         Returns a (lazy, not-yet-evaluated) QuerySet of teams, in the order
         they should appear on the leaderboard, with the following annotations:
-          - 'total_solves': number of solves (before hunt end)
+          - 'total_points': number of points (before hunt end)
           - 'last_solve_or_creation_time': last non-free solve (before hunt
             end), or if none, team creation time
           - 'metameta_solve_time': time of finishing the hunt (if before hunt
             end)
 
         This depends on the viewing team for hidden teams.
+
+        division is None or the literal string to filter by division.
         '''
 
         q = Q()
@@ -271,6 +311,8 @@ class Team(models.Model):
                 # ...but always show current team, regardless of hidden status
                 q |= Q(id=current_team.id)
 
+        if division is not None:
+            q &= Q(division=division)
         all_teams = Team.objects.filter(q, creation_time__lt=HUNT_END_TIME)
 
         # https://docs.djangoproject.com/en/3.1/ref/models/querysets/#filteredrelation-objects
@@ -285,7 +327,7 @@ class Team(models.Model):
                     answersubmission__submitted_datetime__lt=HUNT_END_TIME,
                 )
             ),
-            total_solves=Count('scoring_submissions'),
+            total_points=Coalesce(Sum('scoring_submissions__puzzle__reward'), 0),
             metameta_solve_time=Min(Case(
                 When(
                     scoring_submissions__puzzle__slug=META_META_SLUG,
@@ -297,7 +339,7 @@ class Team(models.Model):
             last_solve_or_creation_time=Coalesce('last_solve_time', 'creation_time'),
         ).order_by(
             F('metameta_solve_time').asc(nulls_last=True),
-            F('total_solves').desc(),
+            F('total_points').desc(),
             F('last_solve_or_creation_time'),
         )
 
@@ -315,11 +357,13 @@ class Team(models.Model):
         # complicated scoring/ranking algorithm or one that uses information
         # not available in the database, like GPH 2018...)
 
+        # total_points = defaultdict(int)
         # total_solves = defaultdict(int)
         # meta_times = {}
-        # for team_id, slug, time in AnswerSubmission.objects.filter(
+        # for team_id, slug, reward, time in AnswerSubmission.objects.filter(
         #     used_free_answer=False, is_correct=True, submitted_datetime__lt=HUNT_END_TIME
-        # ).values_list('team__id', 'puzzle__slug', 'submitted_datetime'):
+        # ).values_list('team__id', 'puzzle__slug', 'puzzle__reward', 'submitted_datetime'):
+        #     total_points[team_id] += reward
         #     total_solves[team_id] += 1
         #     if slug == META_META_SLUG:
         #         meta_times[team_id] = time
@@ -328,6 +372,7 @@ class Team(models.Model):
         #     [{
         #         'team_name': team.team_name,
         #         'is_current': team == current_team,
+        #         'total_points': total_points[team.id],
         #         'total_solves': total_solves[team.id],
         #         'last_solve_time': team.last_solve_time or team.creation_time,
         #         'metameta_solve_time': meta_times.get(team.id),
@@ -335,7 +380,7 @@ class Team(models.Model):
         #     } for team in all_teams],
         #     key=lambda d: (
         #         d['metameta_solve_time'] or HUNT_END_TIME,
-        #         -d['total_solves'],
+        #         -d['total_points'],
         #         d['last_solve_time'],
         #     )
         # )
@@ -403,7 +448,6 @@ class Team(models.Model):
         return tuple(
             self.answersubmission_set
             .select_related('puzzle')
-            .prefetch_related('puzzle__metas')
             .order_by('-submitted_datetime')
         )
 
@@ -445,7 +489,7 @@ class Team(models.Model):
             if context.hunt_is_over:
                 return DEEP_MAX
             return 0
-        return len(context.team.solves)
+        return sum(puzzle.reward for puzzle in context.team.solves.values())
 
     # NOTE: This method creates unlocks with the current time; in other words,
     # time-based unlocks are not correctly backdated. This is because the DEEP
@@ -453,6 +497,16 @@ class Team(models.Model):
     # warrant calculating the inverse function. This method will be called the
     # next time a puzzle or the puzzles list is loaded, so solvers should not
     # be affected, but it may be worth keeping in mind if you're doing analysis.
+
+    # Possible unlock states:
+    # Halfway through round 1, show unlock thresholds for next two puzzles
+    # Near end of round 1, show unlock thresholds for puzzle and meta
+    # Near end of round 1, show unlock threshold for meta
+    # Finished round 1, solve the meta to go to next round
+
+    # note: not responsibility of this function to decide if the puzzle was
+    # solved or even if the hunt is totally done
+
     @staticmethod
     def compute_unlocks(context):
         team = context.team
@@ -460,16 +514,21 @@ class Team(models.Model):
         unlocks = None
         if team and not team.is_prerelease_testsolver:
             unlocks = {unlock.puzzle_id for unlock in team.db_unlocks}
-        out = {'puzzles': [], 'ids': set()}
-        for puzzle in context.all_puzzles:
-            if puzzle.deep > deep:
-                break
-            if deep != DEEP_MAX and unlocks is not None and puzzle.id not in unlocks:
-                PuzzleUnlock(team=team, puzzle=puzzle).save()
-            out['puzzles'].append({'puzzle': puzzle})
-            out['ids'].add(puzzle.id)
-        return out
 
+        rounds = [{'puzzles': [], 'next': None, 'second_next': None} for _ in range(2)]
+        unlocked_ids = set()
+        for puzzle in context.all_puzzles:
+            if puzzle.deep > deep: # not yet unlocked
+                if rounds[puzzle.round]['next'] is None:
+                    rounds[puzzle.round]['next'] = puzzle
+                elif rounds[puzzle.round]['second_next'] is None:
+                    rounds[puzzle.round]['second_next'] = puzzle
+            else:
+                if deep != DEEP_MAX and unlocks is not None and puzzle.id not in unlocks:
+                    PuzzleUnlock(team=team, puzzle=puzzle).save()
+                rounds[puzzle.round]['puzzles'].append({'puzzle': puzzle})
+                unlocked_ids.add(puzzle.id)
+        return {'rounds': rounds, 'ids': unlocked_ids}
 
 @receiver(post_save, sender=Team)
 def notify_on_team_creation(sender, instance, created, **kwargs):
@@ -515,11 +574,13 @@ class PuzzleUnlock(models.Model):
 
 @receiver(post_save, sender=PuzzleUnlock)
 def notify_on_meta_unlock(sender, instance, created, **kwargs):
-    if created:
-        if instance.puzzle.slug == INTRO_META_SLUG:
-            send_mail_wrapper('Intro Meta', 'FIXME', {}, instance.team.get_emails())
-        elif instance.puzzle.slug == META_META_SLUG:
-            send_mail_wrapper('Meta Meta', 'FIXME', {}, instance.team.get_emails())
+    pass
+    # let's just not
+    # if created:
+    #     if instance.puzzle.slug == INTRO_META_SLUG:
+    #         send_mail_wrapper('Intro Meta', 'FIXME', {}, instance.team.get_emails())
+    #     elif instance.puzzle.slug == META_META_SLUG:
+    #         send_mail_wrapper('Meta Meta', 'FIXME', {}, instance.team.get_emails())
 
 
 class AnswerSubmission(models.Model):
@@ -595,9 +656,9 @@ def notify_on_answer_submission(sender, instance, created, **kwargs):
                 correct=instance.is_correct)
         if not instance.is_correct:
             return
-        if instance.puzzle.slug == INTRO_META_SLUG:
-            send_mail_wrapper('Intro Meta', 'FIXME', {}, instance.team.get_emails())
-
+        # let's just not
+        # if instance.puzzle.slug == INTRO_META_SLUG:
+        #     send_mail_wrapper('Intro Meta', 'FIXME', {}, instance.team.get_emails())
         obsoleted_hints = Hint.objects.filter(
             team=instance.team,
             puzzle=instance.puzzle,

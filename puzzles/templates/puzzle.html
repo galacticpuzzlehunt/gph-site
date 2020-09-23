@@ -13,7 +13,7 @@
 {% endif %}
 {% endif %}
 {% if can_view_hints %}
-<a href="{% url 'hints' puzzle.slug %}" class="btn">{% if can_ask_for_hints and puzzle_answer is None %}Ask for a hint{% else %}View hints{% endif %}</a>
+<a href="{% url 'hints' puzzle.slug %}" class="btn">Hints</a>
 {% endif %}
 {% if hunt_is_closed or not team and hunt_is_over %}
 <a href="{% url 'post-hunt-solve' puzzle.slug %}" class="btn">Check your answer spoiler-free</a>

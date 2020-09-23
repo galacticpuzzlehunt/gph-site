@@ -68,6 +68,8 @@ urlpatterns = [
     path('teams', views.teams, name='teams'),
     path('team/<quotedstr:team_name>', views.team, name='team'),
     path('teams/unhidden', views.teams_unhidden, name='teams-unhidden'),
+    path('teams/high-school', views.teams_high_school, name='teams-high-school'),
+    path('teams/middle-school', views.teams_middle_school, name='teams-middle-school'),
     path('edit-team', views.edit_team, name='edit-team'),
 
     path('puzzles', views.puzzles, name='puzzles'),

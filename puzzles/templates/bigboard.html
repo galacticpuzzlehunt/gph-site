@@ -125,7 +125,7 @@ small {
 <col> {# deep #}
 <col> {# solves #}
 <col> {# intro #}
-<col> {# jungle #}
+<col> {# main #}
 <col> {# metas #}
 <col> {# hints #}
 <col class="end"> {# last solve #}
@@ -138,7 +138,7 @@ small {
     <th>Prog.
     <th>{% include 'icon-solved.svg' %}
     <th>Intro
-    <th>Jungle
+    <th>Main
     <th>Metas
     <th>{% include 'icon-hint.svg' %}
     <th>Last solve
@@ -170,6 +170,7 @@ small {
     <td class="U">{{ puzzle.total_unlocks }}
     {% endfor %}
 </tr>
+{% comment %}
 <tr>
     <td>Hints
     <td>
@@ -186,6 +187,7 @@ small {
     <td class="F">{{ puzzle.free_solves }}
     {% endfor %}
 </tr>
+{% endcomment %}
 <tr>
     <td>%Solve/Guess
     <td>
@@ -232,8 +234,8 @@ small {
         {{ board_entry.intro_solves }}
         {% endif %}
     <td>
-        {% if board_entry.jungle_solves %}
-        {{ board_entry.jungle_solves }}
+        {% if board_entry.main_solves %}
+        {{ board_entry.main_solves }}
         {% endif %}
     <td>
         {% if board_entry.meta_solves %}

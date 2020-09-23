@@ -151,6 +151,17 @@ class BaseContext:
     def hunt_is_closed(self):
         return self.now >= self.close_time
 
+    def num_canned_hints_released(self):
+        if self.hunt_is_prereleased:
+            return 2
+
+        elapsed = self.now - self.start_time
+        if elapsed >= datetime.timedelta(days=2):
+            return 2
+        elif elapsed >= datetime.timedelta(days=1):
+            return 1
+        return 0
+
     def deep(self):
         return models.Team.compute_deep(self)
 
@@ -196,7 +207,7 @@ class Context:
         return models.Team.compute_unlocks(self)
 
     def all_puzzles(self):
-        return tuple(models.Puzzle.objects.prefetch_related('metas').order_by('deep'))
+        return tuple(models.Puzzle.objects.order_by('deep', 'order'))
 
     def unclaimed_hints(self):
         return models.Hint.objects.filter(status=models.Hint.NO_RESPONSE, claimer=None).count()

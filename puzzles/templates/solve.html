@@ -152,7 +152,9 @@
     <h4>Previous guesses</h4>
     <ul>
         {% for submission in puzzle_submissions %}
-        <li>{{ submission.submitted_answer }}</li>
+        <li>{{ submission.submitted_answer }}
+            {% if submission.response %}({{ submission.response }}){% endif %}
+        </li>
         {% endfor %}
     </ul>
 {% endif %}

@@ -35,6 +35,16 @@ class RegisterForm(forms.Form):
         label='Retype Password',
         widget=forms.PasswordInput,
     )
+    DIVISION_CHOICES = [
+        ('MS', 'Middle School'),
+        ('HS', 'High School'),
+        ('OP', 'Open'),
+    ]
+    division = forms.ChoiceField(
+        choices=Team.DIVISION_CHOICES,
+        help_text='All of your team members should be within the grade/year range of the division you sign up for. Middle School means Grade/Year 8 or younger, and High School means Grade/Year 12 or younger. (Open means no restriction.) If your school or country doesn\u2019t use these terms, just use your best judgment. If your division changes later, please email us and we\u2019ll change it for you.',
+        widget=forms.RadioSelect(),
+    )
 
     def clean(self):
         cleaned_data = super(RegisterForm, self).clean()

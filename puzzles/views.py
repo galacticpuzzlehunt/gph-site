@@ -179,6 +179,7 @@ def register(request):
             team = Team.objects.create(
                 user=user,
                 team_name=data.get('team_name'),
+                division=data.get('division'),
             )
             for team_member in formset_data:
                 TeamMember.objects.create(
@@ -334,26 +335,39 @@ def team(request, team_name):
         'rank': rank,
     })
 
-def teams_generic(request, hide_hidden):
-    '''List all teams on a leaderboard.'''
-    team_name = request.GET.get('team')
+def teams_division(request, division, hide_hidden=True):
+    '''List all teams on a leaderboard. Or look up info about a specific team,
+    apparently (why did we do this).'''
+    # division should be 'HS', 'MS', or None from the other
+
     user_team = request.context.team
 
     return render(request, 'teams.html', {
-        'teams': Team.leaderboard(user_team, hide_hidden=hide_hidden),
+        'teams': Team.leaderboard(user_team, division=division, hide_hidden=hide_hidden),
         'current_team': user_team,
+        'division': division,
     })
 
 @require_GET
 def teams(request):
     '''List all teams on the leaderboard.'''
-    return teams_generic(request, hide_hidden=True)
+    return teams_division(request, None)
 
 @require_GET
 @require_admin
 def teams_unhidden(request):
     '''List all teams on the leaderboard, including hidden teams.'''
-    return teams_generic(request, hide_hidden=False)
+    return teams_division(request, None, hide_hidden=False)
+
+@require_GET
+def teams_high_school(request):
+    '''List all teams on the high-school leaderboard.'''
+    return teams_division(request, "HS")
+
+@require_GET
+def teams_middle_school(request):
+    '''List all teams on the middle-school leaderboard.'''
+    return teams_division(request, "MS")
 
 @require_before_hunt_closed_or_admin
 def edit_team(request):
@@ -462,27 +476,39 @@ def puzzles(request):
             if all(a is not None for a in sp[1:]):
                 survey_averages[sp[0]] = sp[1:]
 
+    solved_metameta = False
     unlocks = request.context.unlocks
-    for data in unlocks['puzzles']:
-        puzzle_id = data['puzzle'].id
-        if puzzle_id in solved:
-            data['answer'] = solved[puzzle_id].normalized_answer
-        if puzzle_id in hints:
-            data['hints'] = hints[puzzle_id]
-        data['full_stats'] = full_stats
-        data['solve_stats'] = {
-            'correct': correct[puzzle_id],
-            'guesses': guesses[puzzle_id],
-            'teams': len(teams[puzzle_id]),
-        }
-        if puzzle_id in survey_averages:
-            data['survey_stats'] = [{
-                'average': average,
-                'adjective': field.adjective,
-                'max_rating': field.max_rating,
-            } for (field, average) in zip(fields, survey_averages[puzzle_id])]
+    for round in unlocks['rounds']:
+        round['meta_solved'] = False
+        for data in round['puzzles']:
+            puzzle_id = data['puzzle'].id
 
-    return render(request, 'puzzles.html')
+            if puzzle_id in solved:
+                data['answer'] = solved[puzzle_id].normalized_answer
+                if data['puzzle'].is_meta:
+                    round['meta_solved'] = True
+                if data['puzzle'].slug == META_META_SLUG:
+                    solved_metameta = True
+            if puzzle_id in hints:
+                data['hints'] = hints[puzzle_id]
+
+            data['full_stats'] = full_stats
+            data['solve_stats'] = {
+                'correct': correct[puzzle_id],
+                'guesses': guesses[puzzle_id],
+                'teams': len(teams[puzzle_id]),
+            }
+            if puzzle_id in survey_averages:
+                data['survey_stats'] = [{
+                    'average': average,
+                    'adjective': field.adjective,
+                    'max_rating': field.max_rating,
+                } for (field, average) in zip(fields, survey_averages[puzzle_id])]
+
+    return render(request, 'puzzles.html', {
+        'solved_any': bool(solved),
+        'solved_metameta': solved_metameta,
+    })
 
 
 @require_GET
@@ -496,7 +522,8 @@ def puzzle(request):
         'can_view_hints':
             team and not request.context.hunt_is_closed and (
                 team.num_hints_total > 0 or
-                team.num_free_answers_total > 0
+                team.num_free_answers_total > 0 or
+                request.context.num_canned_hints_released > 0
             ),
         'can_ask_for_hints':
             team and not request.context.hunt_is_over and (
@@ -542,16 +569,23 @@ def solve(request):
         )
         is_correct = normalized_answer == puzzle.normalized_answer
 
+        addendum = ''
         form = SubmitAnswerForm(request.POST)
         if puzzle_messages:
             for message in puzzle_messages:
-                form.add_error(None, message.response)
-        elif not normalized_answer:
+                # form.add_error(None, message.response)
+                addendum = ' ' + message.response
+
+        # NOTE: Unlike GPH, we want to be a lot more aggressive about including
+        # puzzle messages, so conversely we want to log them and count them
+        # against the guess limit. (Also we don't prevent them from being
+        # correct? idk)
+        if not normalized_answer:
             form.add_error(None, 'All puzzle answers will have '
-                'at least one letter A through Z (case does not matter).')
+                'at least one letter A through Z (case does not matter).%s' % addendum)
         elif tried_before:
             form.add_error(None, 'You\u2019ve already tried calling in the '
-                'answer \u201c%s\u201d for this puzzle.' % normalized_answer)
+                'answer \u201c%s\u201d for this puzzle.%s' % (normalized_answer, addendum))
         elif form.is_valid():
             AnswerSubmission(
                 team=team,
@@ -568,9 +602,9 @@ def solve(request):
                 if puzzle.slug == META_META_SLUG:
                     return redirect('victory')
                 else:
-                    messages.success(request, '%s is correct!' % normalized_answer)
+                    messages.success(request, '%s is correct!%s' % (normalized_answer, addendum))
             else:
-                messages.error(request, '%s is incorrect.' % normalized_answer)
+                messages.error(request, '%s is incorrect.%s' % (normalized_answer, addendum))
             return redirect('solve', puzzle.slug)
 
     elif request.method == 'POST':
@@ -692,6 +726,7 @@ def hints(request):
 
     puzzle = request.context.puzzle
     team = request.context.team
+    template_name = 'hint_bodies/{}'.format(puzzle.body_template)
 
     if request.method == 'POST':
         if request.context.puzzle_answer is not None:
@@ -736,11 +771,15 @@ def hints(request):
     else:
         form = RequestHintForm(team)
 
-    return render(request, 'hints.html', {
+    data = {
         'hints': Hint.objects.filter(team=team, puzzle=puzzle),
         'form': form,
-    })
-
+        'template_name': template_name,
+    }
+    try:
+        return render(request, template_name, data)
+    except TemplateDoesNotExist:
+        return render(request, 'hints.html', data)
 
 @require_admin
 def hint(request, id):
@@ -816,7 +855,7 @@ def hunt_stats(request):
         return puzzle.is_meta or all(
             solve_times[puzzle.id, team_id] <=
             solve_times[meta.id, team_id] - datetime.timedelta(minutes=5)
-            for meta in puzzle.metas.all()
+            for meta in puzzle.same_round_metas()
         )
 
     total_hints = 0
@@ -1095,10 +1134,13 @@ def bridge(request):
         'recipients_list': recipients_list,
     })
 
-def bigboard_generic(request, hide_hidden):
+
+def bigboard_generic(request, hide_hidden=True):
     puzzles = request.context.all_puzzles
-    puzzle_map = {}
-    puzzle_metas = defaultdict(set)
+    puzzle_map = {} # id -> puzzle
+    # puzzle_metas = defaultdict(set)
+    puzzle_rounds = dict() # feeder puzzle id -> round id
+    meta_id_map = dict() # round id -> meta puzzle id
     intro_meta_id = None
     meta_meta_id = None
     for puzzle in puzzles:
@@ -1107,9 +1149,11 @@ def bigboard_generic(request, hide_hidden):
             intro_meta_id = puzzle.id
         if puzzle.slug == META_META_SLUG:
             meta_meta_id = puzzle.id
-        if not puzzle.is_meta:
-            for meta in puzzle.metas.all():
-                puzzle_metas[puzzle.id].add(meta.id)
+
+        if puzzle.is_meta:
+            meta_id_map[puzzle.round] = puzzle.id
+        else:
+            puzzle_rounds[puzzle.id] = puzzle.round
 
     wrong_guesses_map = defaultdict(int) # key (team, puzzle)
     wrong_guesses_by_team_map = defaultdict(int) # key team
@@ -1121,10 +1165,11 @@ def bigboard_generic(request, hide_hidden):
     used_hints_by_puzzle_map = defaultdict(int) # puzzle -> number of hints
     solves_map = defaultdict(dict) # team -> {puzzle id -> puzzle}
     intro_solves_map = defaultdict(int) # team -> number of puzzle solves
-    jungle_solves_map = defaultdict(int) # team -> number of puzzle solves
+    main_solves_map = defaultdict(int) # team -> number of puzzle solves
     meta_solves_map = defaultdict(int) # team -> number of meta solves
     solve_time_map = defaultdict(dict) # team -> {puzzle id -> solve time}
     during_hunt_solve_time_map = defaultdict(dict) # team -> {puzzle id -> solve time}
+    during_hunt_points_map = defaultdict(int) # team -> score
     free_answer_map = defaultdict(set) # team -> {puzzle id}
     free_answer_by_puzzle_map = defaultdict(int) # puzzle -> number of free answers
 
@@ -1150,13 +1195,15 @@ def bigboard_generic(request, hide_hidden):
             solve_time_map[team_id][puzzle_id] = submitted_datetime
             if submitted_datetime < HUNT_END_TIME:
                 during_hunt_solve_time_map[team_id][puzzle_id] = submitted_datetime
+                during_hunt_points_map[team_id] += puzzle_map[puzzle_id].reward
         solves_map[team_id][puzzle_id] = puzzle_map[puzzle_id]
-        if puzzle_id not in puzzle_metas:
-            meta_solves_map[team_id] += 1
-        elif intro_meta_id in puzzle_metas[puzzle_id]:
-            intro_solves_map[team_id] += 1
+        if puzzle_id in puzzle_rounds:
+            if puzzle_rounds[puzzle_id]:
+                main_solves_map[team_id] += 1
+            else:
+                intro_solves_map[team_id] += 1
         else:
-            jungle_solves_map[team_id] += 1
+            meta_solves_map[team_id] += 1
 
     for aggregate in (
         AnswerSubmission.objects
@@ -1191,7 +1238,7 @@ def bigboard_generic(request, hide_hidden):
     # but not _teams_ created after hunt end. They'll just all be at the bottom.
     leaderboard = sorted(teams, key=lambda team: (
         during_hunt_solve_time_map[team.id].get(meta_meta_id, HUNT_END_TIME),
-        -len(during_hunt_solve_time_map[team.id]),
+        -during_hunt_points_map[team.id],
         team.last_solve_time or team.creation_time,
     ))
     limit = request.META.get('QUERY_STRING', '')
@@ -1218,19 +1265,30 @@ def bigboard_generic(request, hide_hidden):
             yield 'H' # hinted
         if solve_time and solve_time > HUNT_END_TIME:
             yield 'P' # post-hunt solve
-        if solve_time and puzzle_metas.get(puzzle_id):
-            metas_before = 0
-            metas_after = 0
-            for meta_id in puzzle_metas[puzzle_id]:
+        if solve_time and puzzle_id in puzzle_rounds:
+            # feeder
+            round_id = puzzle_rounds[puzzle_id]
+            if round_id in meta_id_map:
+                # round with meta
+                meta_id = meta_id_map[round_id]
                 meta_time = solve_time_map[team_id].get(meta_id)
-                if meta_time and solve_time > meta_time - datetime.timedelta(minutes=5):
-                    metas_before += 1
-                else:
-                    metas_after += 1
-            if metas_after == 0:
-                yield 'B' # backsolved from all metas
-            elif metas_before != 0:
-                yield 'b' # backsolved from some metas
+                if meta_time and solve_time > meta_time:
+                    # "backsolve" (for our hunt, you can't really tell)
+                    yield 'B'
+
+        # if solve_time and puzzle_metas.get(puzzle_id):
+        #     metas_before = 0
+        #     metas_after = 0
+        #     for meta_id in puzzle_metas[puzzle_id]:
+        #         meta_time = solve_time_map[team_id].get(meta_id)
+        #         if meta_time and solve_time > meta_time - datetime.timedelta(minutes=5):
+        #             metas_before += 1
+        #         else:
+        #             metas_after += 1
+        #     if metas_after == 0:
+        #         yield 'B' # backsolved from all metas
+        #     elif metas_before != 0:
+        #         yield 'b' # backsolved from some metas
 
     board = []
     for team in leaderboard:
@@ -1246,7 +1304,7 @@ def bigboard_generic(request, hide_hidden):
             'finished': solve_position_map.get((team.id, meta_meta_id)),
             'deep': team.display_deep,
             'intro_solves': intro_solves_map[team.id],
-            'jungle_solves': jungle_solves_map[team.id],
+            'main_solves': main_solves_map[team.id],
             'meta_solves': meta_solves_map[team.id],
             'entries': [{
                 'wrong_guesses': wrong_guesses_map[(team.id, puzzle.id)],

@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load humanize %}
 {% block content %}
+<style>
+.tutorial { border: 1px solid black; padding: 1em; }
+.victory { text-align: center; font-weight: bold; }
+</style>
 
 <h1>Puzzles</h1>
 
@@ -11,11 +15,30 @@
 </h4>
 {% endif %}
 
+{% for round in unlocks.rounds %}
+{% if round.puzzles %}
+{% if forloop.first %}
+<h4>Round 1</h4>
+
+<p>Insert story here!</p>
+
+{% if team and not solved_any %}
+<p class="tutorial">If this is your first puzzlehunt, we encourage you to check out all the unlocked puzzles! You can solve them in any order. The text in this box is not part of any puzzle, and will disappear after your first solve.</p>
+{% endif %}
+
+{% else %}
+{# For more than 2 rounds, use forloop.counter to decide what to show? #}
+<h4>Round 2: Attack of the Clones</h4>
+
+<p>Insert story here!</p>
+{% endif %}
+
 <table class="gph-list-table">
 <tr>
     <th>Puzzle</th>
     <th>Solved?</th>
-    <th>Stats</th>
+    <th>✨ Value</th>
+    <th>Solves / Guesses</th>
     <th>
         {% if unlocks.puzzles and unlocks.puzzles.0.full_stats %}
         Solution
@@ -26,7 +49,7 @@
     <th>
     </th>
 </tr>
-{% for data in unlocks.puzzles %}
+{% for data in round.puzzles %}
 <tr>
     <td><a href="{% url 'puzzle' data.puzzle.slug %}">{{ data.puzzle.name }}</a></td>
     <td>
@@ -35,14 +58,16 @@
         {% endif %}
     </td>
     <td>
+        {{ data.puzzle.reward }}
+    </td>
+    <td>
         {% with data.solve_stats as stats %}
         {% if data.full_stats %}
         <a href="{% url 'stats' data.puzzle.slug %}">
         {% endif %}
-        <b>{{ stats.correct }}</b> solve{{ stats.correct|pluralize }}
-        | <b>{{ stats.guesses }}</b> guess{{ stats.guesses|pluralize:"es" }}
+        {{ stats.correct }} / {{ stats.guesses }}
         {% if data.full_stats %}
-        | <b>{{ stats.teams }}</b> team{{ stats.teams|pluralize }}
+        ({{ stats.teams }} team{{ stats.teams|pluralize }})
         </a>
         {% endif %}
         {% endwith %}
@@ -74,6 +99,29 @@
     </td>
 </tr>
 {% endfor %}
+
+{% if round.next %}
+<tr>
+	<td class="preview-next fade1" colspan="6">🔒 <span>{% if round.next.is_meta %}Metapuzzle{% else %}Puzzle{% endif %} unlocks at ✨{{ round.next.deep }}</span> 🔒</td>
+</tr>
+{% if round.second_next %}
+<tr>
+	<td class="preview-next fade2" colspan="6">🔒 <span>{% if round.second_next.is_meta %}Metapuzzle{% else %}Puzzle{% endif %} unlocks at ✨{{ round.second_next.deep }}</span> 🔒</td>
+</tr>
+{% endif %}
+{% elif not round.meta_solved %}
+<tr>
+    <td class="preview-next" colspan="6">Solve the metapuzzle to proceed!</td>
+</tr>
+{% endif %}
 </table>
+{% endif %}
+{% endfor %}
+
+{% if solved_metameta %}
+<p class="victory">
+<a href="{% url 'victory' %}">Congratulations on completing the hunt!</a>
+</p>
+{% endif %}
 
 {% endblock %}

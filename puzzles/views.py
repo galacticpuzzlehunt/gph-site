@@ -851,11 +851,17 @@ def hunt_stats(request):
     total_teams = Team.objects.exclude(is_hidden=True).count()
     total_participants = TeamMember.objects.exclude(team__is_hidden=True).count()
 
+
+    meta_id_map = defaultdict(list) # round id -> meta puzzle ids
+    for puzzle in request.context.all_puzzles:
+        if puzzle.is_meta:
+            meta_id_map[puzzle.round].append(puzzle.id)
+
     def is_forward_solve(puzzle, team_id):
         return puzzle.is_meta or all(
             solve_times[puzzle.id, team_id] <=
-            solve_times[meta.id, team_id] - datetime.timedelta(minutes=5)
-            for meta in puzzle.same_round_metas()
+            solve_times[meta_id, team_id] - datetime.timedelta(minutes=5)
+            for meta_id in meta_id_map[puzzle.round]
         )
 
     total_hints = 0

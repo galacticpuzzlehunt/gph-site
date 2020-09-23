@@ -7,6 +7,9 @@
 {% endblock %}
 
 {% block content %}
+<style>
+.count { text-align: right; }
+</style>
 
 <h1>Open Hints</h1>
 
@@ -25,14 +28,16 @@
         {% for hint in unanswered %}
         <tr>
             <th>
+                {% if hint.claimed_datetime %}
                 <a href="{% url 'hint' hint.id %}">
-                    {% if hint.claimed_datetime %}
                     Claimed {% duration_between hint.claimed_datetime now %} ago
                     by {{ hint.claimer }}
-                    {% else %}
-                    Created {% duration_between hint.submitted_datetime now %} ago
-                    {% endif %}
                 </a>
+                {% else %}
+                <a href="{% url 'hint' hint.id %}?claim=true">
+                    CLAIM: Created {% duration_between hint.submitted_datetime now %} ago
+                </a>
+                {% endif %}
             </th>
             <th>
                 <a href="{% url 'team' hint.team.team_name %}">
@@ -44,10 +49,19 @@
                     {{ hint.puzzle }}
                 </a>
             </th>
+            <th>
+                <a href="/admin/puzzles/answersubmission/?team__id__exact={{ hint.team_id }}&puzzle__id__exact={{ hint.puzzle_id }}">
+                    (guesses)
+                </a>
+            </th>
         </tr>
         {% if not hint.claimed_datetime %}
         <tr>
-            <td></td>
+            <td>
+                <a href="{% url 'hint' hint.id %}">
+                    (view without claiming)
+                </a>
+            </td>
             <td>
                 <a href="/admin/puzzles/hint/?team__id__exact={{ hint.team_id }}">
                     (all from same team)
@@ -58,20 +72,28 @@
                     (all from same puzzle)
                 </a>
             </td>
+            <td>
+                <a href="/admin/puzzles/hint/?team__id__exact={{ hint.team_id }}&puzzle__id__exact={{ hint.puzzle_id }}">
+                    (both)
+                </a>
+            </td>
         </tr>
         <tr>
-            <td colspan="3"><pre class="submitted-text">{{ hint.hint_question }}</pre></td>
+            <td colspan="4"><pre class="submitted-text">{{ hint.hint_question }}</pre></td>
         </tr>
         {% endif %}
         {% endfor %}
-        <tr>
-            <th colspan="3">
-                <hr>
-                <h4>Requested by most teams</h4>
-            </th>
-        </tr>
+    </table>
+    <hr>
+    <h4>Requested by most teams</h4>
+    <table class="hint-table">
         {% for entry in popular %}
         <tr>
+            <td class="count">
+                <a href="/admin/puzzles/hint/?puzzle__id__exact={{ entry.puzzle.id }}">
+                    {{ entry.count }}
+                </a>
+            </td>
             <td>
                 <a href="{% url 'puzzle' entry.puzzle.slug %}">
                     {{ entry.puzzle.name }}
@@ -79,11 +101,6 @@
             </td>
             <td>
                 {{ entry.puzzle.metas.all|join:", " }}
-            </td>
-            <td>
-                <a href="/admin/puzzles/hint/?puzzle__id__exact={{ entry.puzzle.id }}">
-                    {{ entry.count }}
-                </a>
             </td>
         </tr>
         {% endfor %}

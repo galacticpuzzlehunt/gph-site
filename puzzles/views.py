@@ -506,7 +506,9 @@ def puzzle(request):
     }
     try:
         return render(request, template_name, data)
-    except TemplateDoesNotExist:
+    except (TemplateDoesNotExist, IsADirectoryError):
+        # A plausible cause of it being a directory is that the slug
+        # is blank.
         return render(request, 'puzzle.html', data)
 
 

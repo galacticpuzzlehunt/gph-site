@@ -90,30 +90,45 @@ def validate_puzzle(require_team=False):
         return inner
     return decorator
 
+def access_restrictor(check_request):
+    '''
+    Creates a decorator that indicates an endpoint that is sometimes hidden to
+    all regular users. Superusers are always allowed access. Otherwise, the
+    provided check_request function is called on the request first, and if it
+    throws an exception or returns a non-None value, that is returned instead.
+    '''
 
-def restrict_access(after_hunt_end=None):
-    '''
-    Indicates an endpoint that is hidden to all regular users. Superusers are
-    always allowed access. Behavior depends on after_hunt_end:
-    - if None, the page is admin-only.
-    - if True, the page becomes visible when the hunt ends.
-    - if False, the page becomes inaccessible when the hunt closes.
-    '''
     def decorator(f):
         @wraps(f)
         def inner(request, *args, **kwargs):
             if not request.context.is_superuser:
-                if after_hunt_end is None:
-                    raise Http404
-                elif after_hunt_end and not request.context.hunt_is_over:
-                    messages.error(request, 'Sorry, not available until the hunt ends.')
-                    return redirect('index')
-                elif not after_hunt_end and request.context.hunt_is_closed:
-                    messages.error(request, 'Sorry, the hunt is over.')
-                    return redirect('index')
+                check_res = check_request(request)
+                if check_res is not None:
+                    return check_res
             return f(request, *args, **kwargs)
         return inner
     return decorator
+
+@access_restrictor
+def require_admin(request):
+    raise Http404
+
+# So it's absolutely clear, the two following decorators are
+# asymmetric: the hunt can "end" before it "closes", and in the time
+# between, both of these decorators will allow non-superusers.  See
+# the "Timing" section of the README.
+@access_restrictor
+def require_after_hunt_end_or_admin(request):
+    if not request.context.hunt_is_over:
+        messages.error(request, 'Sorry, not available until the hunt ends.')
+        return redirect('index')
+
+@access_restrictor
+def require_before_hunt_closed_or_admin(request):
+    if request.context.hunt_is_closed:
+        messages.error(request, 'Sorry, the hunt is over.')
+        return redirect('index')
+
 
 # These are basically static pages:
 
@@ -137,7 +152,7 @@ def archive(request):
     return render(request, 'archive.html')
 
 
-@restrict_access(after_hunt_end=False)
+@require_before_hunt_closed_or_admin
 def register(request):
     team_members_formset = formset_factory(
         TeamMemberForm,
@@ -194,7 +209,7 @@ def register(request):
     })
 
 
-@restrict_access(after_hunt_end=False)
+@require_before_hunt_closed_or_admin
 def password_change(request):
     if request.method == 'POST':
         form = PasswordChangeForm(user=request.user, data=request.POST)
@@ -211,7 +226,7 @@ def password_change(request):
     return render(request, 'password_change.html', {'form': form})
 
 
-@restrict_access(after_hunt_end=False)
+@require_before_hunt_closed_or_admin
 def password_reset(request):
     if request.method == 'POST':
         form = PasswordResetForm(data=request.POST)
@@ -335,12 +350,12 @@ def teams(request):
     return teams_generic(request, hide_hidden=True)
 
 @require_GET
-@restrict_access()
+@require_admin
 def teams_unhidden(request):
     '''List all teams on the leaderboard, including hidden teams.'''
     return teams_generic(request, hide_hidden=False)
 
-@restrict_access(after_hunt_end=False)
+@require_before_hunt_closed_or_admin
 def edit_team(request):
     team = request.context.team
     if team is None:
@@ -496,7 +511,7 @@ def puzzle(request):
 
 
 @validate_puzzle(require_team=True)
-@restrict_access(after_hunt_end=False)
+@require_before_hunt_closed_or_admin
 def solve(request):
     '''Submit an answer for a puzzle, and check if it's correct.'''
 
@@ -576,7 +591,7 @@ def solve(request):
 
 
 @validate_puzzle(require_team=True)
-@restrict_access(after_hunt_end=False)
+@require_before_hunt_closed_or_admin
 def free_answer(request):
     '''Use a free answer on a puzzle.'''
 
@@ -603,7 +618,7 @@ def free_answer(request):
 
 
 @validate_puzzle()
-@restrict_access(after_hunt_end=True)
+@require_after_hunt_end_or_admin
 def post_hunt_solve(request):
     '''Check an answer client-side for a puzzle after the hunt ends.'''
 
@@ -619,7 +634,7 @@ def post_hunt_solve(request):
 
 @require_GET
 @validate_puzzle()
-@restrict_access()
+@require_admin
 def survey(request):
     '''For admins. See survey reuslts.'''
 
@@ -643,7 +658,7 @@ def survey(request):
 
 
 @require_GET
-@restrict_access()
+@require_admin
 def hint_list(request):
     '''For admins. List popular and outstanding hint requests.'''
 
@@ -669,7 +684,7 @@ def hint_list(request):
 
 
 @validate_puzzle(require_team=True)
-@restrict_access(after_hunt_end=False)
+@require_before_hunt_closed_or_admin
 def hints(request):
     '''List or submit hint requests for a puzzle.'''
 
@@ -725,7 +740,7 @@ def hints(request):
     })
 
 
-@restrict_access()
+@require_admin
 def hint(request, id):
     '''For admins. Handle a particular hint.'''
 
@@ -788,7 +803,7 @@ def hint(request, id):
 
 
 @require_GET
-@restrict_access(after_hunt_end=True)
+@require_after_hunt_end_or_admin
 def hunt_stats(request):
     '''After hunt ends, view stats for the entire hunt.'''
 
@@ -861,7 +876,7 @@ def hunt_stats(request):
 
 @require_GET
 @validate_puzzle()
-@restrict_access(after_hunt_end=True)
+@require_after_hunt_end_or_admin
 def stats(request):
     '''After hunt ends, view stats for a specific puzzle.'''
 
@@ -924,7 +939,7 @@ def stats(request):
 
 @require_GET
 @validate_puzzle()
-@restrict_access(after_hunt_end=True)
+@require_after_hunt_end_or_admin
 def solution(request):
     '''After hunt ends, view a puzzle's solution.'''
 
@@ -937,7 +952,7 @@ def solution(request):
 
 
 @require_GET
-@restrict_access(after_hunt_end=True)
+@require_after_hunt_end_or_admin
 def solution_static(request, path):
     return serve(request, path, document_root=settings.SOLUTION_STATIC_ROOT)
 
@@ -1009,7 +1024,7 @@ def wrapup(request):
 
 
 @require_GET
-@restrict_access(after_hunt_end=True)
+@require_after_hunt_end_or_admin
 def finishers(request):
     teams = OrderedDict()
     solves_by_team = defaultdict(list)
@@ -1067,7 +1082,7 @@ def finishers(request):
     return render(request, 'finishers.html', {'data': data})
 
 @require_GET
-@restrict_access()
+@require_admin
 def bridge(request):
     recipients = TeamMember.objects.values_list('email', flat=True)
     recipients = list(filter(None, recipients))
@@ -1254,17 +1269,17 @@ def bigboard_generic(request, hide_hidden):
     })
 
 @require_GET
-@restrict_access(after_hunt_end=True)
+@require_after_hunt_end_or_admin
 def bigboard(request):
     return bigboard_generic(request, hide_hidden=True)
 
 @require_GET
-@restrict_access()
+@require_admin
 def bigboard_unhidden(request):
     return bigboard_generic(request, hide_hidden=False)
 
 @require_GET
-@restrict_access(after_hunt_end=True)
+@require_after_hunt_end_or_admin
 def guess_csv(request):
     response = HttpResponse(content_type='text/csv')
     fname = 'gph_guesslog_{}.csv'.format(request.context.now.strftime('%Y%m%dT%H%M%S'))
@@ -1286,7 +1301,7 @@ def guess_csv(request):
 
 
 @require_GET
-@restrict_access()
+@require_admin
 def hint_csv(request):
     response = HttpResponse(content_type='text/csv')
     fname = 'gph_hintlog_{}.csv'.format(request.context.now.strftime('%Y%m%dT%H%M%S'))
@@ -1310,14 +1325,14 @@ def hint_csv(request):
 
 
 @require_GET
-@restrict_access()
+@require_admin
 def puzzle_log(request):
     return serve(request, os.path.join(settings.BASE_DIR,
         settings.LOGGING['handlers']['puzzle']['filename']), document_root='/')
 
 
 @require_POST
-@restrict_access()
+@require_admin
 def shortcuts(request):
     response = HttpResponse(content_type='text/html')
     try:

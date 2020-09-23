@@ -178,3 +178,12 @@ Your main tool will be the Django admin panel, at `/admin` on either a local or 
 `manage.py` is a command-line management tool. We've added some custom commands in `puzzles/management/`. If you're running the site in a production environment, you'll need SSH access to the relevant server.
 
 If something goes very wrong, you can try SSHing to the server and editing files or using Git commands directly. We recommend taking regular backups of the database that you can restore from if need be. We also recommend controlling which commits make it to the live site during the hunt, by creating a separate `production` Git branch that lags behind `master`, and verifying all changes on a staging deploy.
+
+# Timing
+
+In addition to the hunt start and end time, there's also a somewhat non-obvious "hunt close time" in `hunt_config.py`. Here's how it works:
+
+- When the hunt *ends*, the leaderboard freezes, hint requests are disabled, and solutions are published, but account signups and progressing through the hunt are still allowed. The idea is to give people extra time to finish the hunt at their own pace if they want, but without any of the maintenance costs of actually staffing the hunt (responding to hint requests, avoiding spoilers for competition fairness).
+- When the hunt *closes*, account registration and log ins are actually disabled.
+
+You can, of course, set the hunt close time to be equal to the hunt end time to skip the in-between stage.

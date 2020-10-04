@@ -291,6 +291,7 @@ def team(request, team_name):
                 'slug': submission.puzzle.slug,
                 'name': submission.puzzle.name,
                 'is_meta': submission.puzzle.is_meta,
+                'reward': submission.puzzle.reward,
                 'answer': submission.submitted_answer,
                 'unlock_time': unlock_time_map.get(submission.puzzle_id),
                 'solve_time': submission.submitted_datetime,
@@ -306,17 +307,25 @@ def team(request, team_name):
         correct[puzzle]['guesses'] = guesses[puzzle]
         submissions.append(correct[puzzle])
     submissions.sort(key=lambda submission: submission['solve_time'])
-    solves = [HUNT_START_TIME] + [s['solve_time'] for s in submissions]
-    if solves[-1] >= HUNT_END_TIME:
-        solves.append(min(request.context.now, HUNT_CLOSE_TIME))
+    solves = [(HUNT_START_TIME, 0)] + [(s['solve_time'], s['reward']) for s in submissions]
+    if solves[-1][0] >= HUNT_END_TIME:
+        solves.append((min(request.context.now, HUNT_CLOSE_TIME), 0))
     else:
-        solves.append(HUNT_END_TIME)
+        solves.append((HUNT_END_TIME, 0))
+
+    solve_intervals = []
+    score = 0
+    for (before_time, before_reward), (after_time, _) in zip(solves, solves[1:]):
+        score += before_reward
+        solve_intervals.append({
+            'before': (before_time - HUNT_START_TIME).total_seconds(),
+            'after': (after_time - HUNT_START_TIME).total_seconds(),
+            'score': score,
+        })
+
     chart = {
-        'hunt_length': (solves[-1] - HUNT_START_TIME).total_seconds(),
-        'solves': [{
-            'before': (solves[i - 1] - HUNT_START_TIME).total_seconds(),
-            'after': (solves[i] - HUNT_START_TIME).total_seconds(),
-        } for i in range(1, len(solves))],
+        'hunt_length': (solves[-1][0] - HUNT_START_TIME).total_seconds(),
+        'solves': solve_intervals,
         'metas': [
             (s['solve_time'] - HUNT_START_TIME).total_seconds()
             for s in submissions if s['is_meta']
@@ -1074,7 +1083,7 @@ def wrapup(request):
 @require_after_hunt_end_or_admin
 def finishers(request):
     teams = OrderedDict()
-    solves_by_team = defaultdict(list)
+    solves_by_team = defaultdict(list) # List[Tuple[datetime, reward]]
     metas_by_team = defaultdict(list)
     unlock_times = defaultdict(lambda: HUNT_END_TIME)
     wrong_times = {}
@@ -1097,8 +1106,9 @@ def finishers(request):
         AnswerSubmission.objects
         .select_related()
         .filter(team__id__in=teams, used_free_answer=False, is_correct=True, submitted_datetime__lt=HUNT_END_TIME)
+        .order_by('submitted_datetime')
     ):
-        solves_by_team[solve.team_id].append(solve.submitted_datetime)
+        solves_by_team[solve.team_id].append((solve.submitted_datetime, solve.puzzle.reward))
         if solve.puzzle.is_meta:
             metas_by_team[solve.team_id].append(solve.submitted_datetime)
         if solve.puzzle.slug == META_META_SLUG:
@@ -1106,11 +1116,17 @@ def finishers(request):
 
     data = []
     for team_id, (team, unlock) in teams.items():
-        solves = [HUNT_START_TIME] + solves_by_team[team_id] + [HUNT_END_TIME]
-        solves = [{
-            'before': (solves[i - 1] - HUNT_START_TIME).total_seconds(),
-            'after': (solves[i] - HUNT_START_TIME).total_seconds(),
-        } for i in range(1, len(solves))]
+        solves = [(HUNT_START_TIME, 0)] + solves_by_team[team_id] + [(HUNT_END_TIME, 0)]
+        solve_intervals = []
+        score = 0
+        for (before_time, before_reward), (after_time, _) in zip(solves, solves[1:]):
+            score += before_reward
+            solve_intervals.append({
+                'before': (before_time - HUNT_START_TIME).total_seconds(),
+                'after': (after_time - HUNT_START_TIME).total_seconds(),
+                'score': score,
+            })
+
         metas = metas_by_team[team_id]
         data.append({
             'team': team,
@@ -1121,7 +1137,7 @@ def finishers(request):
                 (metas[-1] - wrong_times[team_id])
                 .total_seconds() if team_id in wrong_times else None,
             'hunt_length': (HUNT_END_TIME - HUNT_START_TIME).total_seconds(),
-            'solves': solves,
+            'solves': solve_intervals,
             'metas': [(ts - HUNT_START_TIME).total_seconds() for ts in metas],
         })
     if request.context.is_superuser:

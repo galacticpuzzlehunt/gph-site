@@ -124,6 +124,11 @@ class DiscordInterface:
     GUILD = 'FIXME'
     HINT_CHANNEL = 'FIXME'
 
+    # You also need to enable the "Server Members Intent" under the "Privileged
+    # Gateway Intents" section of the "Bot" page of your application from the
+    # Discord Developer Portal. Or you can comment out the code that
+    # initializes `self.avatars` below.
+
     def __init__(self):
         self.client = None
         self.avatars = {}

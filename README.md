@@ -12,11 +12,12 @@ This is a Django app for running puzzlehunts, written by several members of âœˆâ
   - Activate the virtualenv with `source venv/bin/activate`
     - Alternatively use `venv/bin/activate.csh` or `venv/bin/activate.fish` if you're using csh or fish.
     - Use `venv\Scripts\activate` on Windows.
+    - You should run this command each time before you start working on this app.
   - Later, when you're done working on the project and want to leave the virtualenv, run `deactivate`.
 - Install the required packages: `pip install -r requirements.txt`
   - Are you getting `fatal error: Python.h: No such file or directory`? Try installing `python-dev` libraries first (e.g. `sudo apt-get install python3-dev`).
 - Start the development server with `./manage.py runserver`
-  - If you get a warning (red text) about making migrations run `./manage.py migrate`
+  - If you get a warning (red text) about making migrations, stop the server, run `./manage.py migrate`, then start it again.
   - If all went well, the dev server should start, printing its local URL to stdout.
 
 # How Do I...?
@@ -27,9 +28,9 @@ This is a Django app for running puzzlehunts, written by several members of âœˆâ
 
 - ...set up the database?
 
-  + The site is set up to use a `db.sqlite3` file in the root of this repository as its database. If this doesn't exist, Django will create a new empty database. It's perfectly fine to start with this, but you won't have any puzzles populated and you almost certainly want to create a superuser.
+  + The site is set up to use a `db.sqlite3` file in the root of this repository as its database. If this doesn't exist, Django will create a new empty database when you run `./manage.py migrate`. It's perfectly fine to start with this, but you won't have any puzzles populated and you almost certainly want to create a superuser.
 
-    If you just want to try out the website quickly with some sample data, you can run `./manage.py loaddata sample.yaml` to load a sample hunt, an admin account (username and password `admin`), and a test account with a team (username and password `test`). You can view the templates used to render the puzzles in the [puzzles/templates/puzzle_bodies](puzzles/templates/puzzle_bodies) and [puzzles/templates/solution_bodies](puzzles/templates/solution_bodies) folders, which you can also base your puzzles/solutions off of.
+    If you just want to try out the website quickly with some sample data, you can run `./manage.py loaddata sample.yaml` (after `./manage.py migrate`) to load a sample hunt, an admin account (username and password `admin`), and a test account with a team (username and password `test`). You can view the templates used to render the puzzles in the [puzzles/templates/puzzle_bodies](puzzles/templates/puzzle_bodies) and [puzzles/templates/solution_bodies](puzzles/templates/solution_bodies) folders, which you can also base your puzzles/solutions off of.
 
 - ...be a superuser?
 

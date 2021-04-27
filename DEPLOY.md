@@ -98,3 +98,43 @@ In theory, if you now visit `yourappname.herokuapp.com` you should see the prope
 ```
 release: python manage.py migrate
 ```
+
+### Running the Heroku version locally
+
+It's a bit more work to run the Heroku version locally because you'll need to Bring Your Own [PostgreSQL](https://www.postgresql.org/) Database. (As mentioned above, if you don't want to go through this hassle and are feeling adventurous, you could also change the settings modules to use SQLite locally and Heroku's database only on prod, and I've done it in the past, but it's pretty sketchy and I cannot recommend or provide support for it.)
+
+#### One-time setup
+
+You'll need to acquire [PostgreSQL](https://www.postgresql.org/) somehow (depending on your operating system) and make sure the server is running. [Heroku](https://devcenter.heroku.com/articles/heroku-postgresql#local-setup) has some docs.
+
+You might need to create a Postgres user; it will be slightly easier for future tinkering if the username here is the same as your user account, but it doesn't have to be. You'll also want to create a Postgres database. To do those things, run `psql` as some user that already has an account and has create database permissions, most likely `postgres`. On Linux this is:
+
+```
+sudo -u postgres psql
+```
+
+Enter whichever of these two SQL commands you need into the `psql` prompt to create a new user with a password and a database. Fill in the values you want.
+
+```
+CREATE USER yourusername PASSWORD 'yourpassword';
+CREATE DATABASE yourdbname;
+```
+
+Unless you've done something funky to explicitly allow other people to connect to your PostgreSQL server, this is only usable for local development and the password will be lying around in plaintext on your computer anyway, so the password doesn't have to be secure. But I haven't figured out how to not use one and have it work with later steps. After typing that and hitting Enter, if it worked, you can quit `psql` (maybe Ctrl-D).
+
+Back in the `gph-site` directory, create a file called `.env` with these two lines, except in `DATABASE_URL`, replace the username, password, and database name with whatever you used above.
+
+```
+DATABASE_URL=postgres://yourusername:yourpassword@127.0.0.1:5432/yourdbname
+DJANGO_SETTINGS_MODULE=gph.settings.dev
+```
+
+If you don't set the settings module, your local website might try to actually send emails or Discord notifications and such.
+
+#### Every time
+
+You'll always need to make sure the PostgreSQL server is running before trying to run the server.
+
+To set up other things (creating superusers, migrating or making migrations, loading data), you can mostly follow instructions in `README.md`, except that when asked to run `./manage.py something` you should instead run `heroku local:run ./manage.py something`. There is also one additional step because of Heroku's extra handling around static files: the first time you're running the website locally or any time you change the static assets, run `./manage.py collectstatic`.
+
+After everything else is ready, to run the website, just run `heroku local`.

@@ -199,7 +199,7 @@ class Context:
         return tuple(models.Puzzle.objects.prefetch_related('metas').order_by('deep'))
 
     def unclaimed_hints(self):
-        return models.Hint.objects.filter(status=models.Hint.NO_RESPONSE, claimer=None).count()
+        return models.Hint.objects.filter(status=models.Hint.NO_RESPONSE, claimer='').count()
 
     def puzzle(self):
         return None  # set by validate_puzzle

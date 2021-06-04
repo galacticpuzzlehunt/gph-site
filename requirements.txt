@@ -2,7 +2,7 @@ asgiref==3.2.10
 certifi==2020.6.20
 chardet==3.0.4
 disco-py==0.0.14rc1
-Django==3.1.8
+Django==3.1.9
 django-impersonate==1.5.1
 django-ratelimit==3.0.1
 gevent==1.5.0

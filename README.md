@@ -1,4 +1,8 @@
-This is a Django app for running puzzlehunts, written by several members of ✈✈✈ Galactic Trendsetters ✈✈✈ for running the Galactic Puzzle Hunt. The present codebase is primarily based off an export made in February 2020, and reflects some aspects of the 2019 and (originally planned) 2020 GPHs. This repository is not formally maintained, but we're hoping to get it to such a state soon.
+This is a Django app for running puzzlehunts, written by several members of ✈✈✈ Galactic Trendsetters ✈✈✈ for running the [Galactic Puzzle Hunt](https://galacticpuzzlehunt.com/).
+
+This repository is not formally maintained; expect it to be based on an export of the most recently run GPH, with any updates at other times of year being best-effort. In particular, while we've stripped out most of the hunt-specific logic, some fundamental pieces are still in place: GPH 2019 unlocked puzzles sequentially using DEEP (a combination of time and solves), while GPH 2020 had puzzles divided by round, so those conditions are reflected in the model schema and unlocking code. If you want to do something different, say an Australian-style hunt, it should still be possible, but you'll have to do some legwork.
+
+We will try to respond to emails or pull requests when we can, but this isn't guaranteed, especially during the months when we aren't actively working on the current GPH. As several other online hunts have used this codebase, you may be able to direct questions to one of them, although at this time there does not seem to be any listing of such teams.
 
 # Quick Start
 

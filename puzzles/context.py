@@ -198,6 +198,9 @@ class Context:
     def all_puzzles(self):
         return tuple(models.Puzzle.objects.prefetch_related('metas').order_by('deep'))
 
+    def num_puzzles(self):
+        return len(self.all_puzzles)
+
     def unclaimed_hints(self):
         return models.Hint.objects.filter(status=models.Hint.NO_RESPONSE, claimer='').count()
 

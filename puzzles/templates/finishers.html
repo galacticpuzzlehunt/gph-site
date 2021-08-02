@@ -77,7 +77,7 @@ td {
     {% endif %}
     <tr>
         <td colspan="5">
-            <svg class="chart" viewbox="0 0 {{ team.hunt_length }} 41" preserveAspectRatio="none">
+            <svg class="chart" viewbox="0 0 {{ team.hunt_length }} {{ num_puzzles }}" preserveAspectRatio="none">
                 <path d="M {{ team.hunt_length }} 0 L 0 0
                 {% for solve in team.solves %}
                 L {{ solve.before }} {{ forloop.counter }}
@@ -85,7 +85,7 @@ td {
                 {% endfor %}
                 " class="area"></path>
                 {% for meta in team.metas %}
-                <path d="M {{ meta }} 0 L {{ meta }} 41" class="bar"></path>
+                <path d="M {{ meta }} 0 L {{ meta }} {{ num_puzzles }}" class="bar"></path>
                 {% endfor %}
             </svg>
         </td>

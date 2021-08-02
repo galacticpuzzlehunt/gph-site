@@ -107,8 +107,8 @@
     </div>
     {% if submissions|length %}
     {% if view_info_available or hunt_is_over %}
-    <svg class="chart" viewbox="0 0 {{ chart.hunt_length }} 41" preserveAspectRatio="none">
-        <path d="M 0 0 L {{ chart.end }} 0 L {{ chart.end }} 41 L 0 41" class="baz"></path>
+    <svg class="chart" viewbox="0 0 {{ chart.hunt_length }} {{ num_puzzles }}" preserveAspectRatio="none">
+        <path d="M 0 0 L {{ chart.end }} 0 L {{ chart.end }} {{ num_puzzles }} L 0 {{ num_puzzles }}" class="baz"></path>
         <path d="M {{ chart.hunt_length }} 0 L 0 0
         {% for solve in chart.solves %}
         L {{ solve.before }} {{ forloop.counter }}
@@ -116,7 +116,7 @@
         {% endfor %}
         " class="area"></path>
         {% for meta in chart.metas %}
-        <path d="M {{ meta }} 0 L {{ meta }} 41" class="bar"></path>
+        <path d="M {{ meta }} 0 L {{ meta }} {{ num_puzzles }}" class="bar"></path>
         {% endfor %}
     </svg>
     <table class="sortable gph-list-table">

@@ -24,6 +24,12 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
   - If you get a warning (red text) about making migrations, stop the server, run `./manage.py migrate`, then start it again.
   - If all went well, the dev server should start, printing its local URL to stdout.
 
+# Areas for Improvement
+
+- We rely on Redis, specifically for WebSocket support and rate limiting. Unfortunately, our deploy configuration doesn't do a good job of ensuring a compatible Redis environment. This could use some attention from someone who understands Ansible.
+- Our database writes are not atomic; if a request handler loads a model instance, does some other stuff, then calls `.save()`, that will save all the fields of the object and possibly overwrite some other handler that ran in the meantime. Our schema so happens to be set up so that (apart from Hints) we don't often have to update existing objects at all, let alone within fractions of a second of each other in a non-idempotent way. But we could address this with transactions, shortening the time between read and write, and/or limiting the fields written.
+- In production we use gunicorn. It does not appear that gunicorn has a rolling restart mechanism. That is, even though it uses many worker processes, all of those workers die and restart at the same time when redeploying the server, which leads to many noticeable seconds of downtime. It would be nice to fix this.
+
 # How Do I...?
 
 - ...even?
@@ -54,7 +60,7 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
 
 - ...see some other team's view of the hunt?
 
-  + As a superuser, go to `/teams` and click on any `Impersonate` button.
+  + As a superuser, go to `/teams` and click on any `Impersonate` button. Be careful with this, as you don't want to accidentally perform any actions on behalf of the team.
 
 - ...add a "keep going" message? give a team more guesses? delete a team? etc.
 
@@ -66,7 +72,9 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
 
 - ...postprod a puzzle?
 
-  + You'll need both a prerelease testsolver team, and a database Puzzle object (either create one or obtain a `db.sqlite3` with the puzzles set up) for your puzzle. The `body_template` field on the Puzzle defines which template file will be used (this doesn't have to match the `slug` field, though it may be nice if it does). Put the body of the puzzle in a file under `puzzles/templates/puzzle_bodies`. Put required static resources under `puzzles/static/puzzle_resources/$PUZZLE`. Put solutions and their resources under `puzzles/templates/solution_bodies`. See the sample files there as guides. Puzzles and solutions (but not other templates) support Markdown (though the library may or may not have some bugs).
+  + You'll need both a prerelease testsolver team, and a database Puzzle object (either create one or obtain a `db.sqlite3` with the puzzles set up) for your puzzle. The `body_template` field on the Puzzle defines which template file will be used (this doesn't have to match the `slug` field, though it may be nice if it does). Put the body of the puzzle in a file under `puzzles/templates/puzzle_bodies`. Put required static resources under `puzzles/static/puzzle_resources/$PUZZLE`. Put solutions and their resources under `puzzles/templates/solution_bodies`. See the sample files there as guides.
+
+    Puzzles and solutions (but not other templates) support Markdown (though the library may or may not have some bugs). You'll override either `puzzle-body-md` or `puzzle-body-html` depending on whether you'd like to write Markdown or HTML. The same applies to solution bodies, author notes, and appendices.
 
 - ...edit an email template?
 
@@ -104,21 +112,33 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
 
   + The unlock threshold for each puzzle is defined in its database entry. Most other parameters and logic are in `hunt_config.py`. You will probably just have to edit these case by case, but note that e.g. it is not necessary to make code changes in order to update puzzle unlock thresholds.
 
-- ...enable the story / updates / wrapup page?
+- ...enable the story or wrapup page?
 
   + In addition to making the necessary template changes, in order to make these pages visible, you have to set the `*_PAGE_VISIBLE` flags in `hunt_config.py` to true.
 
 - ...do analysis of what teams do during the hunt?
 
-  + Go to `/bridge` to download a hint log, guess log, and puzzle log. The first two are generated from the database; the latter from whatever calls `messaging.log_puzzle_info`. For example, if you have a puzzle that's a game, you can set up an endpoint to log whenever a team wins. You can also set up whatever additional logs you wish (and if you want, expose them using a new view over the bridge). Then you can write your own scripts or spreadsheets to analyze them.
+  + Use the shortcuts menu to download a hint log, guess log, and puzzle log. The first two are generated from the database; the latter from whatever calls `messaging.log_puzzle_info`. For example, if you have a puzzle that's a game, you can set up an endpoint to log whenever a team wins. You can also set up whatever additional logs you wish (and if you want, expose them using a new view over the bridge). Then you can write your own scripts or spreadsheets to analyze them.
 
 - ...time zones?
 
   + For reasons that I'm sure made sense at the time (heh), Django stores timestamps as UTC in the database and converts them to the currently set time zone (i.e. Eastern) when _rendering templates_. This means that you don't need to worry if you include a timestamp in a template file, but if you're trying to render it in Python (_including_ in `templatetags/`), you may have to adjust its time zone explicitly to prevent it from showing as UTC.
 
+- ...issue errata?
+
+  + Errata are stored in the database. You can go to `/errata` as a superuser to create one. Errata can be shown on the puzzle page, the top-level updates page, or both; you can also create a general announcement that's not associated with a puzzle. If you save an erratum as unpublished, you can see how it looks before revealing it to solvers. The updates page won't be available to solvers until there's something they can see there.
+
+- ...answer hints?
+
+  + You can find the hint interface at `/hints`, through links in Discord hint messages, or via the red hint icon that appears for superusers browsing the site when there are unanswered hints. The interface lets you claim a hint, write a response, and send it off to the team. If a hint is marked as obsolete, that means the team solved the puzzle while it was open; if refunded, then the responder decided not to charge them a hint token. If a hint is a followup, that means it's part of a conversation thread with the team and doesn't cost a token either.
+
+- ... use websockets?
+
+  + We now have somewhat experimental websocket support! Take a look at the consumer classes in `messaging.py`; there are prototypes for two-way communication with a single browser tab, or for broadcasting to all members of a team or all logged-in admins. If you want something different, say for a "Teamwork Time" puzzle where team members interact with each other, it shouldn't be hard to add. Then add your consumer to `routing.py` and use `openSocket` in JS to connect to it.
+
 # Repository Details
 
-The GPH server is built on Django. We use Ansible to manage deploys to our cloud VMs and nginx as the web server in production, but you're free to use whatever web server setup makes sense for you. In the past, we have also used Redis for high-performance caching.
+The GPH server is built on Django. We use Ansible to manage deploys to our cloud VMs and nginx as the web server in production, but you're free to use whatever web server setup makes sense for you.
 
 - `db.sqlite3`: This is the database used by Django. An empty one is automatically created if you start the server without it, but for testing many features, you may wish to get one with teams, puzzles, etc. populated.
 - `manage.py`: This is Django's way of administering the server from the command line. It includes help features that will tell you the things it can do. Common commands are `createsuperuser`, `shell`/`dbshell`, `migrate`/`makemigrations`, and `runserver`. There are also custom commands, defined in `puzzles/management/commands`.

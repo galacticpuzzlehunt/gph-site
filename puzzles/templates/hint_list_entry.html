@@ -1,0 +1,62 @@
+{% load puzzle_tags %}
+
+<tbody id="h{{ hint.id }}" style="background-color: #{{ hint.hint_question|hash|slice:':6' }}20">
+    <tr>
+        <th>
+            {% if hint.is_followup %}<em>(followup){% endif %}
+            {% if hint.claimed_datetime %}
+            <a href="{% url 'hint' hint.id %}">
+                Claimed {% format_time_since hint.claimed_datetime now %} ago
+                by {{ hint.claimer }}
+            </a>
+            {% else %}
+            <a href="{% url 'hint' hint.id %}?claim=true">
+                CLAIM: Created {% format_time_since hint.submitted_datetime now %} ago
+            </a>
+            {% endif %}
+            {% if hint.is_followup %}</em>{% endif %}
+        </th>
+        <th>
+            <a href="{% url 'team' hint.team.team_name %}">
+                {{ hint.team }}
+            </a>
+        </th>
+        <th>
+            <a href="{% url 'solution' hint.puzzle.slug %}">
+                {{ hint.puzzle }}
+            </a>
+        </th>
+        <th>
+            <a href="/admin/puzzles/answersubmission/?team__id__exact={{ hint.team_id }}&puzzle__id__exact={{ hint.puzzle_id }}">
+                (guesses)
+            </a>
+        </th>
+    </tr>
+    {% if not hint.claimed_datetime %}
+    <tr>
+        <td>
+            <a href="{% url 'hint' hint.id %}">
+                (view without claiming)
+            </a>
+        </td>
+        <td>
+            <a href="{% url 'hint-list' %}?team={{ hint.team_id }}">
+                (all from same team)
+            </a>
+        </td>
+        <td>
+            <a href="{% url 'hint-list' %}?puzzle={{ hint.puzzle_id }}">
+                (all from same puzzle)
+            </a>
+        </td>
+        <td>
+            <a href="{% url 'hint-list' %}?team={{ hint.team_id }}&puzzle={{ hint.puzzle_id }}">
+                (both)
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4"><pre class="submitted-text">{{ hint.hint_question }}</pre></td>
+    </tr>
+    {% endif %}
+</tbody>

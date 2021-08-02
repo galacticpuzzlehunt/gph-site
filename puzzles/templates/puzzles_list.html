@@ -1,0 +1,57 @@
+<div class="puzzles-list">
+    {% for data in round.puzzles %}
+    <div class="puzzles-entry{% if data.puzzle.is_meta %} puzzles-meta{% endif %}">
+        <a class="puzzles-link" href="{% url 'puzzle' data.puzzle.slug %}">
+            <b {% if data.puzzle.name|length > 30 %}style="font-size: 82%"{% endif %}>{{ data.puzzle.name }}</b>
+        </a>
+        {% if data.puzzle.is_meta %}
+        <div class="puzzles-new">meta</div>
+        {% elif data.new %}
+        <div class="puzzles-new">new!</div>
+        {% endif %}
+        {% if 'answer' in data %}
+        <div class="puzzles-answer solved-title-answer">
+            <b>{{ data.answer }}</b>
+        </div>
+        {% endif %}
+        {% if data.full_stats %}
+        <div class="{% if team %}puzzles-solution{% else %}puzzles-answer{% endif %}">
+            <a href="{% url 'solution' data.puzzle.slug %}">Solution</a>
+        </div>
+        {% elif 'hints' in data %}
+        <div class="puzzles-solution">
+            <a href="{% url 'hints' data.puzzle.slug %}">Hints: {{ data.hints }}</a>
+        </div>
+        {% endif %}
+        {% if 'solve_stats' in data %}
+        <div class="puzzles-inner">
+            {% if data.full_stats %}
+            <a href="{% url 'stats' data.puzzle.slug %}">
+            {% endif %}
+            <b>{{ data.solve_stats.correct }}</b> solve{{ data.solve_stats.correct|pluralize }}
+            | <b>{{ data.solve_stats.guesses }}</b> guess{{ data.solve_stats.guesses|pluralize:"es" }}
+            {% if data.full_stats %}
+            | <b>{{ data.solve_stats.teams }}</b> team{{ data.solve_stats.teams|pluralize }}
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if 'survey_stats' in data %}
+        <div class="puzzles-inner">
+            {% if is_superuser %}
+            <a href="{% url 'survey' data.puzzle.slug %}">
+            {% endif %}
+            {% for stat in data.survey_stats %}
+            <b>{{ stat.average|floatformat:2 }}</b> / {{ stat.max_rating }} {{ stat.adjective }}
+            {% if not forloop.last %}|{% endif %}
+            {% endfor %}
+            {% if is_superuser %}
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    <div class="puzzles-spacer"></div>
+    <div class="puzzles-spacer"></div>
+</div>

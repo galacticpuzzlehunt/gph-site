@@ -10,6 +10,10 @@
     <title>{{ hunt_title }}</title>
     {% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=0.5">
+    <meta property="og:title" content="FIXME">
+    <meta property="og:description" content="Registration for this year's {{ hunt_title }} is now open!">
+    <meta property="og:image" content="{{ domain|slice:'-1' }}FIXME">
+    <meta property="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="{% static "css/skeleton.css" %}">
@@ -20,8 +24,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2.2/jquery.formset.min.js"></script>
     <script src="{% static "js/sorttable.js" %}"></script>
     <script src="{% static "js/tray.js" %}"></script>
+    <script src="{% static "js/notify.js" %}"></script>
+    <script src="{% static "js/time.js" %}"></script>
     <link rel="icon" sizes="16x16 32x32 48x48 64x64" href="{% static "images/favicon.ico" %}" type="image/vnd.microsoft.icon">
-    {% ga_code %}
+    {{ ga_code|safe }}
 </head>
 <body>
     {% if is_superuser %}
@@ -36,7 +42,7 @@
                 <a{% if request.path == '/rules' %} class="selected-tab"{% endif %} href="{% url 'rules' %}">
                     Rules
                 </a>
-                {% if is_story_page_visible %}
+                {% if story_page_visible %}
                 <a{% if request.path == '/story' %} class="selected-tab"{% endif %} href="{% url 'story' %}">
                     Story
                 </a>
@@ -52,17 +58,17 @@
                 <a{% if request.path == '/faq' %} class="selected-tab"{% endif %} href="{% url 'faq' %}">
                     FAQ
                 </a>
-                {% if is_errata_page_visible %}
+                {% if errata_page_visible %}
                 <a{% if request.path == '/errata' %} class="selected-tab"{% endif %} href="{% url 'errata' %}">
                     Updates
                 </a>
                 {% endif %}
-                {% if is_wrapup_page_visible %}
+                {% if wrapup_page_visible %}
                 <a{% if '/wrapup' in request.path %} class="selected-tab"{% endif %} href="{% url 'wrapup' %}">
                     Wrap-Up
                 </a>
                 {% endif %}
-                <a{% if request.path == '/archive' %} class="selected-tab"{% endif %} href="{% url 'archive' %}">
+                <a{% if request.path == '/archive' %} class="selected-tab"{% endif %} href="{{ archive_link }}">
                     Archive
                 </a>
             </div>
@@ -84,16 +90,9 @@
             </span>
             {% endif %}
             {% if team and num_hints_remaining > 0 %}
-            <span class="current-stat" title="Hints: {{ num_hints_remaining }}">
+            <span class="current-stat" title="Available hints: {{ num_hints_remaining }}">
                 {% include 'icon-hint.svg' %}
                 <span class="current-stat-label">{{ num_hints_remaining }}</span>
-            </span>
-            {% endif %}
-            {% if team and hunt_has_started %}
-            {# FIXME if DEEP ends up not equalling number of solved puzzles #}
-            <span class="current-stat" title="Solved: {{ display_deep|intcomma }}">
-                {% include 'icon-solved.svg' %}
-                <span class="current-stat-label">{{ display_deep|intcomma }}</span>
             </span>
             {% endif %}
             {% if team and num_free_answers_remaining > 0 %}
@@ -140,14 +139,11 @@
         </form>
     </main>
     {% endif %}
-    <div class="content">
-        {% block content %}{% endblock %}
-    </div>
-    <footer>
-        Powered by <a href="https://github.com/galacticpuzzlehunt/gph-site">gph-site</a>
-    </footer>
-    {% if messages %}
     <script>
+    {% if team %}
+        openSocket('/ws/team', showNotify);
+    {% endif %}
+    {% if messages %}
     {% for message in messages %}
         {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
         toastr.error("{{ message|escapejs }}");
@@ -156,10 +152,16 @@
         {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
         toastr.success("{{ message|escapejs }}");
         {% else %}
-        toastr.info("{{ message|escapejs }}");
+        showNotify("{{ message|escapejs }}");
         {% endif %}
     {% endfor %}
-    </script>
     {% endif %}
+    </script>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+    <footer>
+        Powered by <a href="https://github.com/galacticpuzzlehunt/gph-site">gph-site</a>
+    </footer
 </body>
 </html>

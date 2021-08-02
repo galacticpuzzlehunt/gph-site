@@ -3,8 +3,11 @@
 # non-unique, just try again.
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from datetime import datetime
+from django.utils import timezone
+from datetime import datetime, timedelta
 from puzzles.models import Team, Puzzle, AnswerSubmission, Survey
+from puzzles.hunt_config import HUNT_START_TIME
+from unittest import mock
 import random
 
 # for flavor, and to test unicode // http://racepics.weihwa.com/
@@ -25,6 +28,15 @@ def random_team_name():
         random.choice(emoji),
     )
 
+def random_datetime_since(start):
+    now = timezone.make_aware(datetime.now())
+    if start > now: return now
+
+    delta = now - start
+    ret = start + timedelta(seconds=random.randint(0, int(delta.total_seconds())))
+    print(start, now, delta, ret)
+    return ret
+
 class Command(BaseCommand):
     help = 'Randomly generate n teams for testing, complete with solves and surveys'
 
@@ -44,12 +56,14 @@ class Command(BaseCommand):
             user = User.objects.create_user(
                 username=username, email=username + "@example.com", password="password"
             )
-            team = Team(
-                user=user,
-                team_name=random_team_name(),
-                creation_time=datetime.now(),
-            )
-            team.save()
+            with mock.patch("django.utils.timezone.now") as mock_now:
+                mock_now.return_value = random_datetime_since(HUNT_START_TIME)
+                team = Team(
+                    user=user,
+                    team_name=random_team_name(),
+                    creation_time=random_datetime_since(HUNT_START_TIME),
+                )
+                team.save()
             # Teams have a wider range of skill than puzzles.
             teams.append((team, random.random() * 2 + 0.05))
 
@@ -62,32 +76,41 @@ class Command(BaseCommand):
 
                 if success_prob < 0: continue
 
+                cur_time = team.creation_time
+
                 for i in range(random.randint(0, 10)):
                     if random.random() < success_prob:
                         break
-                    AnswerSubmission(
-                        team=team,
-                        puzzle=puzzle,
-                        submitted_answer=wrong_answers[i],
-                        is_correct=False,
-                        used_free_answer=False,
-                    ).save()
-
-                if random.random() < success_prob:
-                    AnswerSubmission(
-                        team=team,
-                        puzzle=puzzle,
-                        submitted_answer=puzzle.normalized_answer,
-                        is_correct=True,
-                        used_free_answer=False,
-                    ).save()
-
-                    if random.random() < 0.75:
-                        Survey(
+                    cur_time = random_datetime_since(cur_time)
+                    with mock.patch("django.utils.timezone.now") as mock_now:
+                        mock_now.return_value = cur_time
+                        AnswerSubmission(
                             team=team,
                             puzzle=puzzle,
-                            fun=random.randint(1, 6),
-                            difficulty=random.randint(1, 6),
+                            submitted_answer=wrong_answers[i],
+                            is_correct=False,
+                            used_free_answer=False,
                         ).save()
+
+                if random.random() < success_prob:
+                    cur_time = random_datetime_since(cur_time)
+                    with mock.patch("django.utils.timezone.now") as mock_now:
+                        mock_now.return_value = cur_time
+                        AnswerSubmission(
+                            team=team,
+                            puzzle=puzzle,
+                            submitted_answer=puzzle.normalized_answer,
+                            is_correct=True,
+                            used_free_answer=False,
+                            submitted_datetime=cur_time,
+                        ).save()
+
+                        if random.random() < 0.75:
+                            Survey(
+                                team=team,
+                                puzzle=puzzle,
+                                fun=random.randint(1, 6),
+                                difficulty=random.randint(1, 6),
+                            ).save()
 
         self.stdout.write(self.style.SUCCESS('Randomly generated {} teams'.format(n)))

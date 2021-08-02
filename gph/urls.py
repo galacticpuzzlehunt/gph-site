@@ -21,8 +21,8 @@ from django.urls import path, re_path, include, register_converter
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
-import puzzles.views as views
-import puzzles.puzzlehandlers as puzzlehandlers
+from puzzles import puzzlehandlers
+from puzzles import views
 
 class QuotedStringConverter:
     regex = '[^/]+'
@@ -71,6 +71,7 @@ urlpatterns = [
     path('edit-team', views.edit_team, name='edit-team'),
 
     path('puzzles', views.puzzles, name='puzzles'),
+    path('round/<slug:slug>', views.round, name='round'),
     path('puzzle/<slug:slug>', views.puzzle, name='puzzle'),
     path('solve/<slug:slug>', views.solve, name='solve'),
     path('free-answer/<slug:slug>', views.free_answer, name='free-answer'),
@@ -93,11 +94,10 @@ urlpatterns = [
     path('bridge', views.bridge, name='bridge'),
     path('bigboard', views.bigboard, name='bigboard'),
     path('bigboard/unhidden', views.bigboard_unhidden, name='bigboard-unhidden'),
+    path('biggraph', views.biggraph, name='biggraph'),
     path('bridge/guess.csv', views.guess_csv, name='guess-csv'),
     path('bridge/hint.csv', views.hint_csv, name='hint-csv'),
     path('bridge/puzzle.log', views.puzzle_log, name='puzzle-log'),
     path('shortcuts', views.shortcuts, name='shortcuts'),
+    path('robots.txt', views.robots),
 ]
-
-if settings.DEBUG:
-    urlpatterns.append(path('robots.txt', views.robots))

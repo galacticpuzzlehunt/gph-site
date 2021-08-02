@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+
+{% block page-title %}
+<title>{{ round.round.name }}</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'puzzles' %}" class="btn">All puzzles</a>
+{% endblock %}
+
+{% block content %}
+
+{% block round-title-override %}
+<h1>{{ round.round.name }}</h1>
+{% endblock %}
+
+{% if hunt_is_prereleased %}
+<h3 style="text-align: center">
+    You are a pre-release testsolver, so you may be seeing puzzles that are
+    locked for the general public. Please be careful!
+</h3>
+{% endif %}
+
+{% block round-body %}
+<p style="text-align: center">Imagine some cool art goes here.</p>
+{% endblock %}
+
+{% include 'puzzles_list.html' with round=round %}
+
+{% endblock %}

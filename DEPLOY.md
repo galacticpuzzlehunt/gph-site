@@ -2,6 +2,8 @@
 
 **Draft** instructions for setting this website up on some relatively easy platforms. If you have any experience with deploying, you probably don't need to read this document.
 
+(This doc has not been updated for 2021.)
+
 ## PythonAnywhere
 
 PythonAnywhere is a Python hosting service that has a reasonably powerful free tier, and is overall pretty beginner-friendly, but if you do know your way around computers you might have a bit more trouble. (For example, being able to SSH from your own computer appears to be a paid feature.) The instructions below are mostly cribbed from:

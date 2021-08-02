@@ -7,6 +7,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         teams = Team.objects.all()
         for team in teams:
-            team.total_hints_awarded -= team.num_awarded_hints_remaining
+            team.total_hints_awarded = team.num_hints_used
             team.save()
         self.stdout.write(self.style.SUCCESS('Successfully taken away hints'))

@@ -1,9 +1,23 @@
 import json
 from functools import wraps
+
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
+
 from ratelimit.decorators import ratelimit
 from ratelimit.utils import get_usage_count
+
+
+# django-ratelimit needs to see REMOTE_ADDR for user_or_ip to work for
+# logged-out people
+def reverse_proxy_middleware(get_response):
+    def process_request(request):
+        # Set by nginx
+        if 'REMOTE_ADDR' not in request.META and 'HTTP_X_REAL_IP' in request.META:
+            request.META['REMOTE_ADDR'] = request.META['HTTP_X_REAL_IP']
+        return get_response(request)
+    return process_request
+
 
 def simple_ratelimit(handler, rate):
     'A handler that silently drops requests over the rate limit.'
@@ -15,6 +29,7 @@ def simple_ratelimit(handler, rate):
     return rate_limiter
 
 # Usage: mypuzzle_submit = simple_ratelimit(mypuzzle.submit, '10/s')
+
 
 def check_ratelimit(request, rate):
     data = get_usage_count(request, group=request.path, rate=rate, key='user_or_ip')

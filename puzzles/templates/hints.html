@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load puzzle_tags %}
 
 {% block page-title %}
 <title>Hints: {{ puzzle.name }}</title>
@@ -9,92 +10,171 @@
 {% endblock %}
 
 {% block content %}
-
 <style>
-label {
-    text-align: left;
+.hint-error { margin-bottom: 4rem; }
+.hint-hidden { display: none; }
+.hint-table td {
+    white-space: nowrap;
+    vertical-align: top;
+    padding: 0 0 3rem;
 }
-
-.nr, .obs {
+.hint-table td:last-child {
+    width: 0;
+}
+.hint-table b {
+    margin-right: 1ch;
+}
+.hint-table pre {
+    margin: 0 5rem 2rem 0;
+    white-space: pre-wrap;
+    display: inline-block;
+    vertical-align: text-top;
+}
+.hint-info {
     color: #999;
+    white-space: initial;
 }
 </style>
 
 <h1>Hints for {{ puzzle.name }}</h1>
 
 <main>
-    {% if puzzle_answer != None %}
-    <p style="margin-bottom: 4rem">You have already solved this puzzle!</p>
-    {% elif hunt_is_over %}
-    <p>Sorry, hints are closed.</p>
-    {% elif num_hints_remaining > 0 or num_free_answers_remaining > 0 %}
+    {% if not hunt_is_over %}
+    <ul>
+    {% if team.num_intro_hints_remaining > 0 %}
+        <li>You have <b>{{ team.num_intro_hints_remaining }}
+            hint{{ team.num_intro_hints_remaining|pluralize }}
+            {% include 'icon-hint.svg' %}</b> that you may use to ask for
+            a hint on <b>any of the first {{ intro_count }} puzzles</b>.
+    {% endif %}
+    {% if team.num_nonintro_hints_remaining > 0 %}
+    {% if team.num_intro_hints_remaining > 0 %}
+        <li>Your remaining <b>{{ team.num_nonintro_hints_remaining }}
+            hint{{ team.num_nonintro_hints_remaining|pluralize }}
+            {% include 'icon-hint.svg' %}</b> can be used on
+            <b>any puzzle in the hunt</b>.
+    {% else %}
+        <li>You have <b>{{ team.num_nonintro_hints_remaining }}
+            hint{{ team.num_nonintro_hints_remaining|pluralize }}
+            {% include 'icon-hint.svg' %}</b> that you may use to ask for
+            a hint on any puzzle.
+    {% endif %}
+    {% endif %}
+    {% if team.num_free_answers_remaining > 0 %}
+    {% if relevant_hints_remaining > 0 %}
+        <li>You can also use your <b>{{ team.num_free_answers_remaining }}
+            free answer{{ team.num_free_answers_remaining|pluralize }}
+            {% include 'icon-answer.svg' %}</b> as a hint if you run out of
+            hints.
+    {% else %}
+        <li>You have no usable hints, but you do have
+            <b>{{ team.num_free_answers_remaining }}
+            free answer{{ team.num_free_answers_remaining|pluralize }}
+            {% include 'icon-answer.svg' %}</b> that you may use as a hint.
+    {% endif %}
+    {% endif %}
+    {% if one_hint_at_a_time %}
+        <li>You may have <b>one hint</b> open at a time. You must wait until
+            that hint is answered to ask another.
+    {% endif %}
+        <li>See the <a href="{% url 'rules' %}#Hints">rules page</a> for
+            details on when hints will be released.
+    </ul>
+    {% endif %}
+
     <h4>Request a hint</h4>
+    {% if error %}
+    <p class="hint-error">{{ error }}</p>
+    {% endif %}
 
-    <form method="post" class="call-in-answer-panel">
-        <p>
-            {% if num_hints_remaining > 0 %}
-            You have <b>
-            {{ num_hints_remaining }}
-            hint{{ num_hints_remaining|pluralize }}
-            {% include 'icon-hint.svg' %}
-            </b> that you may use to ask for a hint on any puzzle.
-            {% if num_free_answers_remaining > 0 %}
-            You may also use free answers
-            {% include 'icon-answer.svg' %}
-            as hints if you run out of hints.
-            {% endif %}
-            {% else %}
-            You have no hints
-            {% include 'icon-hint.svg' %}
-            remaining, but you do have <b>
-            {{ num_free_answers_remaining }}
-            free answer{{ num_free_answers_remaining|pluralize }}
-            {% include 'icon-answer.svg' %}
-            </b> that you may <i>convert to hints</i> to request a hint.
-            {% endif %}
-        </p>
+    {% if not error or can_followup %}
+    {% if puzzle_answer is not None %}
+    <div class="note">
+        You&rsquo;ve already solved this puzzle, but you can ask for a hint
+        anyway if you&rsquo;d like (for example, if you&rsquo;re not sure about
+        a step or you backsolved it). The restrictions above still apply.
+    </div>
+    {% endif %}
+    <form method="post" class="call-in-answer-panel{% if error %} hint-hidden{% endif %}">
         {% csrf_token %}
-
         {{ form.non_field_errors }}
-
         {% for field in form %}
         <div class="row">{{ field.label_tag }}</div>
         <div class="row">{{ field }} {{ field.errors }}</div>
         {% endfor %}
+
+        {% if can_followup %}
+        <input type="hidden" name="is_followup" value="">
+        <div class="note hint-hidden">
+            You&rsquo;re asking us for a follow-up to your last hint. This
+            won&rsquo;t consume one of your hints; we&rsquo;ll see if we can be
+            more helpful based on your submission, but we may ask you to use
+            a new regular hint instead.
+        </div>
+        <script>
+        function markFollowup() {
+            $('.hint-hidden').removeClass('hint-hidden');
+            $('.hint-error').addClass('hint-hidden');
+            $('[name=is_followup]').val(true);
+            $('[name=hint_question]').focus();
+            $('h4')[0].scrollIntoView();
+            $('#hint-cost').text(0);
+        }
+        $(function() {
+            $('.hint-response').each(function(i, pre) {
+                pre.innerHTML = pre.innerHTML.replace(
+                    /(ask|ask for|request) (a|another) follow-?up( hint)?/ig,
+                    '<button class="btn" onclick="markFollowup()">$&</button>');
+            });
+        });
+        </script>
+        {% endif %}
+
         <div class="row">
-            <button class="btn" type="submit">Submit</button>
+            <button class="btn" type="submit">
+                Submit (&minus; <span id="hint-cost">1</span> {% include 'icon-hint.svg' %})
+            </button>
         </div>
     </form>
-
-    {% else %}
-    <p style="margin-bottom: 4rem">You have no hints available.</p>
     {% endif %}
 
     {% if hints %}
     <h4>Previously requested hints</h4>
-    {% for hint in hints %}
-    <div class="row" style="margin-bottom: 3rem">
-        <div class="eight columns">
-            <p><b>Q:</b> {{ hint.hint_question }}</p>
-            {% if hint.status == 'NR' %}
-            <p class="nr">No response yet.</p>
-            {% elif hint.status == 'ANS' %}
-            <p><b>A: </b>{{ hint.response }}</p>
-            {% elif hint.status == 'REF' %}
-            <p><b>A: </b>{{ hint.response }}</p>
-            <p>(Your use of the hint was refunded.)</p>
-            {% elif hint.status == 'OBS' %}
-            <p class="obs">Looks like you solved this puzzle before we could send you a response, nice! Your use of the hint was refunded.</p>
-            {% endif %}
-        </div>
-        <div class="four columns" style="text-align: right">
-            Asked {{ hint.submitted_datetime }}
-        </div>
-    </div>
-    {% endfor %}
-    {% elif puzzle_answer == None and not hunt_is_over %}
-    <p>You have not asked for any hints on this puzzle yet.</p>
+    {% if can_followup %}
+    <button class="btn" onclick="markFollowup()">This wasn&rsquo;t helpful</button>
+    {% endif %}
+    <table class="hint-table">
+        {% for hint in hints %}
+        <tr class="submitted-text">
+            <td>
+                <b>Q:</b><pre>{{ hint.hint_question }}</pre><br>
+                {% if hint.status == 'NR' %}
+                <b>A:</b><pre class="hint-info">No response yet.</pre>
+                {% elif hint.response %}
+                <b>A:</b><pre class="hint-response">{{ hint.response }}</pre>
+                {% endif %}
+            </td>
+            <td>
+                <p>
+                    Asked {% format_time hint.submitted_datetime '%A, %B %-d at %-I:%M %p %Z' %}
+                    {% if hint.answered_datetime and hint.status != 'OBS' %}
+                    <br>Answered {% format_time hint.answered_datetime '%A, %B %-d at %-I:%M %p %Z' %}
+                    {% endif %}
+                </p>
+                <p class="hint-info">
+                    {% if hint.status == 'OBS' %}
+                    Looks like you solved this puzzle before we could send you
+                    a response! Your use of the hint was refunded.
+                    {% elif hint.is_followup %}
+                    This was a follow-up hint.
+                    {% elif hint.status == 'REF' %}
+                    Your use of the hint was refunded.
+                    {% endif %}
+                </p>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
     {% endif %}
 </main>
-
 {% endblock %}

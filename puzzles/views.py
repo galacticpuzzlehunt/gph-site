@@ -1,7 +1,10 @@
 import csv
 import datetime
+import itertools
 import json
+import logging
 import os
+import requests
 from collections import defaultdict, OrderedDict, Counter
 from functools import wraps
 from urllib.parse import unquote
@@ -21,10 +24,12 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.html import escape
 from django.utils.http import urlsafe_base64_encode
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET, require_POST
 from django.views.static import serve
 
 from puzzles.models import (
+    Round,
     Puzzle,
     Team,
     TeamMember,
@@ -49,15 +54,15 @@ from puzzles.forms import (
 
 from puzzles.hunt_config import (
     STORY_PAGE_VISIBLE,
-    ERRATA_PAGE_VISIBLE,
     WRAPUP_PAGE_VISIBLE,
+    INITIAL_STATS_AVAILABLE,
     SURVEYS_AVAILABLE,
     HUNT_START_TIME,
     HUNT_END_TIME,
     HUNT_CLOSE_TIME,
     MAX_MEMBERS_PER_TEAM,
-    DEEP_MAX,
-    INTRO_META_SLUG,
+    ONE_HINT_AT_A_TIME,
+    INTRO_ROUND_SLUG,
     META_META_SLUG,
 )
 
@@ -75,10 +80,15 @@ def validate_puzzle(require_team=False):
         @wraps(f)
         def inner(request, slug):
             puzzle = Puzzle.objects.filter(slug=slug).first()
-            if not puzzle or puzzle.id not in request.context.unlocks['ids']:
+            if not puzzle or puzzle not in request.context.unlocks:
                 messages.error(request, 'Invalid puzzle name.')
                 return redirect('puzzles')
-            if require_team and not request.context.team:
+            if request.context.team:
+                unlock = request.context.team.db_unlocks.get(puzzle.id)
+                if unlock and not unlock.view_datetime:
+                    unlock.view_datetime = request.context.now
+                    unlock.save()
+            elif require_team:
                 messages.error(
                     request,
                     'You must be signed in and have a registered team to '
@@ -152,6 +162,8 @@ def archive(request):
     return render(request, 'archive.html')
 
 
+recaptcha_logger = logging.getLogger('puzzles.recaptcha')
+
 @require_before_hunt_closed_or_admin
 def register(request):
     team_members_formset = formset_factory(
@@ -166,6 +178,21 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         formset = team_members_formset(request.POST)
+
+        # The below only logs the response and doesn't do anything with it.
+        # If you have spam problems, you can reject when the score is low.
+        if 'g-recaptcha-response' in request.POST:
+            url = 'https://www.google.com/recaptcha/api/siteverify'
+            token = request.POST['g-recaptcha-response']
+            try:
+                response = requests.post(url, data={
+                    'secret': settings.RECAPTCHA_SECRETKEY,
+                    'response': token,
+                }).json()
+                recaptcha_logger.info('team [%s] token [%s]\n%s' % (
+                    request.POST['team_id'], token, response))
+            except Exception:
+                pass
 
         if form.is_valid() and formset.is_valid():
             data = form.cleaned_data
@@ -278,22 +305,17 @@ def team(request, team_name):
 
     guesses = defaultdict(int)
     correct = {}
-    team_solves = {}
     unlock_time_map = {
-        unlock.puzzle_id: unlock.unlock_datetime
-        for unlock in team.db_unlocks
+        puzzle_id: unlock.unlock_datetime
+        for (puzzle_id, unlock) in team.db_unlocks.items()
     }
+
     for submission in team.submissions:
         if submission.is_correct:
-            team_solves[submission.puzzle_id] = submission.puzzle
             correct[submission.puzzle_id] = {
-                'slug': submission.puzzle.slug,
-                'name': submission.puzzle.name,
-                'is_meta': submission.puzzle.is_meta,
-                'answer': submission.submitted_answer,
+                'submission': submission,
                 'unlock_time': unlock_time_map.get(submission.puzzle_id),
                 'solve_time': submission.submitted_datetime,
-                'used_free_answer': submission.used_free_answer,
                 'open_duration':
                     (submission.submitted_datetime - unlock_time_map[submission.puzzle_id])
                     .total_seconds() if submission.puzzle_id in unlock_time_map else None,
@@ -304,7 +326,7 @@ def team(request, team_name):
     for puzzle in correct:
         correct[puzzle]['guesses'] = guesses[puzzle]
         submissions.append(correct[puzzle])
-    submissions.sort(key=lambda submission: submission['solve_time'])
+    submissions.sort(key=lambda s: s['solve_time'])
     solves = [HUNT_START_TIME] + [s['solve_time'] for s in submissions]
     if solves[-1] >= HUNT_END_TIME:
         solves.append(min(request.context.now, HUNT_CLOSE_TIME))
@@ -318,17 +340,16 @@ def team(request, team_name):
         } for i in range(1, len(solves))],
         'metas': [
             (s['solve_time'] - HUNT_START_TIME).total_seconds()
-            for s in submissions if s['is_meta']
+            for s in submissions if s['submission'].puzzle.is_meta
         ],
         'end': (HUNT_END_TIME - HUNT_START_TIME).total_seconds(),
     }
-    team.solves = team_solves
 
     return render(request, 'team.html', {
         'view_team': team,
         'submissions': submissions,
         'chart': chart,
-        'solves': sum(1 for s in submissions if not s['used_free_answer']),
+        'solves': sum(1 for s in submissions if not s['submission'].used_free_answer),
         'modify_info_available': is_own_team and not request.context.hunt_is_closed,
         'view_info_available': can_view_info,
         'rank': rank,
@@ -421,39 +442,57 @@ def puzzles(request):
     Most teams will visit this page a lot.'''
 
     if request.context.hunt_has_started:
-        pass
+        return render(request, 'puzzles.html', {'rounds': render_puzzles(request)})
     elif request.context.hunt_has_almost_started:
         return render(request, 'countdown.html', {'start': request.context.start_time})
     else:
         raise Http404
-    team = request.context.team
 
+
+@require_GET
+def round(request, slug):
+    round = Round.objects.filter(slug=slug).first()
+    if round:
+        rounds = render_puzzles(request)
+        if slug in rounds:
+            request.context.round = round
+            template_name = 'round_bodies/{}.html'.format(slug)
+            try:
+                return render(request, template_name, {'round': rounds[slug]})
+            except (TemplateDoesNotExist, IsADirectoryError):
+                # A plausible cause of it being a directory is that the slug
+                # is blank.
+                return redirect('puzzles')
+    messages.error(request, 'Invalid round name.')
+    return redirect('puzzles')
+
+
+def render_puzzles(request):
+    team = request.context.team
     solved = {}
     hints = {}
     if team is not None:
         solved = team.solves
-        hints = Counter(team.hint_set.values_list('puzzle__id', flat=True))
+        hints = Counter(hint.puzzle_id for hint in team.asked_hints)
 
     correct = defaultdict(int)
     guesses = defaultdict(int)
     teams = defaultdict(set)
     full_stats = request.context.is_superuser or request.context.hunt_is_over
-    for puzzle_id, is_correct, team_id in (
-        AnswerSubmission.objects
-        .filter(used_free_answer=False, team__is_hidden=False, submitted_datetime__lt=HUNT_END_TIME)
-        .values_list('puzzle_id', 'is_correct', 'team_id')
-    ):
-        if is_correct:
-            correct[puzzle_id] += 1
-        guesses[puzzle_id] += 1
-        teams[puzzle_id].add(team_id)
+    if full_stats or INITIAL_STATS_AVAILABLE:
+        for submission in AnswerSubmission.objects.filter(
+            used_free_answer=False,
+            team__is_hidden=False,
+            submitted_datetime__lt=HUNT_END_TIME,
+        ):
+            if submission.is_correct:
+                correct[submission.puzzle_id] += 1
+            guesses[submission.puzzle_id] += 1
+            teams[submission.puzzle_id].add(submission.team_id)
 
     fields = Survey.fields()
     survey_averages = dict() # puzzle.id -> [average rating for field in fields]
-    if SURVEYS_AVAILABLE:
-        # We can consider adding a threshold for e.g. only showing these
-        # results once at least N teams have filled out the survey. That would
-        # just be a Count('survey') annotation.
+    if request.context.is_superuser:
         surveyed_puzzles = Puzzle.objects.annotate(**{
             field.name: Avg('survey__' + field.name)
             for field in fields
@@ -462,27 +501,39 @@ def puzzles(request):
             if all(a is not None for a in sp[1:]):
                 survey_averages[sp[0]] = sp[1:]
 
-    unlocks = request.context.unlocks
-    for data in unlocks['puzzles']:
-        puzzle_id = data['puzzle'].id
-        if puzzle_id in solved:
-            data['answer'] = solved[puzzle_id].normalized_answer
-        if puzzle_id in hints:
-            data['hints'] = hints[puzzle_id]
+    rounds = OrderedDict()
+    for puzzle in request.context.unlocks:
+        if puzzle.round.slug not in rounds:
+            rounds[puzzle.round.slug] = {
+                'round': puzzle.round,
+                'puzzles': [],
+                'unlocked_slugs': [],
+            }
+        rounds[puzzle.round.slug]['unlocked_slugs'].append(puzzle.slug)
+        data = {'puzzle': puzzle}
+        if puzzle.id in solved:
+            data['answer'] = puzzle.answer
+            if puzzle.is_meta:
+                rounds[puzzle.round.slug]['meta_answer'] = puzzle.answer
+        if puzzle.id in hints:
+            data['hints'] = hints[puzzle.id]
         data['full_stats'] = full_stats
-        data['solve_stats'] = {
-            'correct': correct[puzzle_id],
-            'guesses': guesses[puzzle_id],
-            'teams': len(teams[puzzle_id]),
-        }
-        if puzzle_id in survey_averages:
+        if puzzle.id in guesses:
+            data['solve_stats'] = {
+                'correct': correct[puzzle.id],
+                'guesses': guesses[puzzle.id],
+                'teams': len(teams[puzzle.id]),
+            }
+        if puzzle.id in survey_averages:
             data['survey_stats'] = [{
                 'average': average,
                 'adjective': field.adjective,
                 'max_rating': field.max_rating,
-            } for (field, average) in zip(fields, survey_averages[puzzle_id])]
-
-    return render(request, 'puzzles.html')
+            } for (field, average) in zip(fields, survey_averages[puzzle.id])]
+        data['new'] = (team and puzzle.id in team.db_unlocks and
+            not team.db_unlocks[puzzle.id].view_datetime)
+        rounds[puzzle.round.slug]['puzzles'].append(data)
+    return rounds
 
 
 @require_GET
@@ -492,7 +543,6 @@ def puzzle(request):
     team = request.context.team
     template_name = 'puzzle_bodies/{}'.format(request.context.puzzle.body_template)
     data = {
-        'template_name': template_name,
         'can_view_hints':
             team and not request.context.hunt_is_closed and (
                 team.num_hints_total > 0 or
@@ -509,6 +559,7 @@ def puzzle(request):
     except (TemplateDoesNotExist, IsADirectoryError):
         # A plausible cause of it being a directory is that the slug
         # is blank.
+        data['template_name'] = template_name
         return render(request, 'puzzle.html', data)
 
 
@@ -565,10 +616,12 @@ def solve(request):
                 if not request.context.hunt_is_over:
                     team.last_solve_time = request.context.now
                     team.save()
+                messages.success(request, '%s is correct!' % puzzle.answer)
                 if puzzle.slug == META_META_SLUG:
+                    dispatch_victory_alert(
+                        'Team %s has finished the hunt!' % team +
+                        '\n**Emails:** <%s>' % request.build_absolute_uri(reverse('finishers')))
                     return redirect('victory')
-                else:
-                    messages.success(request, '%s is correct!' % normalized_answer)
             else:
                 messages.error(request, '%s is incorrect.' % normalized_answer)
             return redirect('solve', puzzle.slug)
@@ -638,7 +691,7 @@ def post_hunt_solve(request):
 @validate_puzzle()
 @require_admin
 def survey(request):
-    '''For admins. See survey reuslts.'''
+    '''For admins. See survey results.'''
 
     surveys = [
         {'survey': survey, 'ratings': []} for survey in
@@ -662,27 +715,54 @@ def survey(request):
 @require_GET
 @require_admin
 def hint_list(request):
-    '''For admins. List popular and outstanding hint requests.'''
+    '''For admins. By default, list popular and outstanding hint requests.
+    With query options, list hints satisfying some query.'''
 
-    unanswered = (
-        Hint.objects
-        .select_related()
-        .filter(status=Hint.NO_RESPONSE)
-        .order_by('submitted_datetime')
-    )
-    popular = list(
-        Hint.objects
-        .values('puzzle_id')
-        .annotate(count=Count('team_id', distinct=True))
-        .order_by('-count')
-    )
-    puzzles = {puzzle.id: puzzle for puzzle in request.context.all_puzzles}
-    for aggregate in popular:
-        aggregate['puzzle'] = puzzles[aggregate['puzzle_id']]
-    return render(request, 'hint_list.html', {
-        'popular': popular,
-        'unanswered': unanswered,
-    })
+    if 'team' in request.GET or 'puzzle' in request.GET:
+        hints = (
+            Hint.objects
+            .select_related()
+            .order_by('-submitted_datetime')
+        )
+        query_description = "Hints"
+        if 'team' in request.GET:
+            team = Team.objects.get(id=request.GET['team'])
+            hints = hints.filter(team=team)
+            query_description += " from " + team.team_name
+        if 'puzzle' in request.GET:
+            puzzle = Puzzle.objects.get(id=request.GET['puzzle'])
+            hints = hints.filter(puzzle=puzzle)
+            query_description += " on " + puzzle.name
+        return render(request, 'hint_list_query.html', {
+            'query_description': query_description,
+            'hints': hints,
+        })
+    else:
+        unanswered = (
+            Hint.objects
+            .select_related()
+            .filter(status=Hint.NO_RESPONSE)
+            .order_by('submitted_datetime')
+        )
+        popular = list(
+            Hint.objects
+            .values('puzzle_id')
+            .annotate(count=Count('team_id', distinct=True))
+            .order_by('-count')
+        )
+        claimers = list(
+            Hint.objects
+            .values('claimer')
+            .annotate(count=Count('*'))
+            .order_by('-count')
+        )
+        puzzles = {puzzle.id: puzzle for puzzle in request.context.all_puzzles}
+        for aggregate in popular:
+            aggregate['puzzle'] = puzzles[aggregate['puzzle_id']]
+        return render(request, 'hint_list.html', {
+            'unanswered': unanswered,
+            'stats': itertools.zip_longest(popular, claimers),
+        })
 
 
 @validate_puzzle(require_team=True)
@@ -692,42 +772,46 @@ def hints(request):
 
     puzzle = request.context.puzzle
     team = request.context.team
+    open_hints = []
+    if ONE_HINT_AT_A_TIME:
+        open_hints = [hint for hint in team.asked_hints if hint.status == Hint.NO_RESPONSE]
+    relevant_hints_remaining = (team.num_hints_remaining
+        if puzzle.round.slug == INTRO_ROUND_SLUG
+        else team.num_nonintro_hints_remaining)
+    puzzle_hints = [hint for hint in reversed(team.asked_hints) if hint.puzzle == puzzle]
+    can_followup = bool(puzzle_hints) and puzzle_hints[0].status == Hint.ANSWERED
+
+    error = None
+    if request.context.hunt_is_over:
+        error = 'Sorry, hints are closed.'
+        can_followup = False
+    elif team.num_hints_remaining <= 0 and team.num_free_answers_remaining <= 0:
+        error = 'You have no hints available!'
+    elif relevant_hints_remaining <= 0 and team.num_free_answers_remaining <= 0:
+        error = 'You have no hints that can be used on this puzzle.'
+    elif open_hints:
+        error = ('You already have a hint open (on %s)! '
+            'You can have one hint open at a time.' % open_hints[0].puzzle)
+        can_followup = False
 
     if request.method == 'POST':
-        if request.context.puzzle_answer is not None:
-            messages.error(request, 'You have already solved this puzzle!')
-            return redirect('hints', puzzle.slug)
-        if team.num_hints_remaining <= 0 and team.num_free_answers_remaining <= 0:
-            messages.error(request, 'You have no more hints available!')
+        is_followup = can_followup and bool(request.POST.get('is_followup'))
+        if error and not is_followup:
+            messages.error(request, error)
             return redirect('hints', puzzle.slug)
         form = RequestHintForm(team, request.POST)
-
         if form.is_valid():
-            hint_question = form.cleaned_data['hint_question']
-            notify_emails = form.cleaned_data['notify_emails']
-
-            if Hint.objects.filter(
-                    team=team,
-                    puzzle=puzzle,
-                    hint_question=hint_question).exists():
-                messages.error(
-                    request,
-                    'You\u2019ve already asked the exact same hint question!',
-                )
-                return redirect('hints', puzzle.slug)
-
-            if team.num_hints_remaining <= 0:
+            if relevant_hints_remaining <= 0 and not is_followup:
                 team.total_hints_awarded += 1
                 team.total_free_answers_awarded -= 1
                 team.save()
-
             Hint(
                 team=team,
                 puzzle=puzzle,
-                hint_question=hint_question,
-                notify_emails=notify_emails,
+                hint_question=form.cleaned_data['hint_question'],
+                notify_emails=form.cleaned_data['notify_emails'],
+                is_followup=is_followup,
             ).save()
-
             messages.success(request, (
                 'Your request for a hint has been submitted and the puzzle '
                 'hunt staff has been notified\u2014we will respond to it soon!'
@@ -737,8 +821,12 @@ def hints(request):
         form = RequestHintForm(team)
 
     return render(request, 'hints.html', {
-        'hints': Hint.objects.filter(team=team, puzzle=puzzle),
+        'hints': puzzle_hints,
+        'error': error,
         'form': form,
+        'intro_count': sum(1 for p in request.context.all_puzzles if p.round.slug == INTRO_ROUND_SLUG),
+        'relevant_hints_remaining': relevant_hints_remaining,
+        'can_followup': can_followup,
     })
 
 
@@ -761,7 +849,11 @@ def hint(request, id):
         return redirect('hint-list')
     elif request.method == 'POST':
         form = AnswerHintForm(request.POST)
-        if form.is_valid():
+        if hint.status != request.POST.get('initial_status'):
+            form.add_error(None, 'Oh no! The status of this hint changed. '
+                'Likely either someone else answered it, or the team solved '
+                'the puzzle. You may wish to copy your text and reload.')
+        elif form.is_valid():
             hint.answered_datetime = request.context.now
             hint.status = form.cleaned_data['status']
             hint.response = form.cleaned_data['response']
@@ -769,37 +861,48 @@ def hint(request, id):
             messages.success(request, 'Hint saved.')
             return redirect('hint-list')
 
-    if request.GET.get('claim'):
-        claimer = request.COOKIES.get('claimer')
+    claimer = request.COOKIES.get('claimer')
+    if claimer:
+        claimer = unquote(claimer)
+    if hint.status != Hint.NO_RESPONSE:
+        form.add_error(None, 'This hint has been answered{}!'.format(
+            ' by ' + hint.claimer if hint.claimer else ''))
+    elif hint.claimed_datetime:
+        if hint.claimer != claimer:
+            form.add_error(None, 'This hint is currently claimed{}!'.format(
+                ' by ' + hint.claimer if hint.claimer else ''))
+    elif request.GET.get('claim'):
         if claimer:
-            claimer = unquote(claimer)
-            if hint.status != Hint.NO_RESPONSE:
-                form.add_error(None, 'This hint has been answered{}!'.format(
-                    ' by ' + hint.claimer if hint.claimer else ''))
-            elif hint.claimed_datetime:
-                if hint.claimer != claimer:
-                    form.add_error(None, 'This hint is currently claimed{}!'.format(
-                        ' by ' + hint.claimer if hint.claimer else ''))
-            else:
-                hint.claimed_datetime = request.context.now
-                hint.claimer = claimer
-                hint.save()
-                messages.success(request, 'You have claimed this hint!')
+            hint.claimed_datetime = request.context.now
+            hint.claimer = claimer
+            hint.save()
+            messages.success(request, 'You have claimed this hint!')
         else:
-            messages.error(request, 'Please set your name before claiming hints! (If you just set your name, you can refresh or click Claim.)')
+            messages.error(request, 'Please set your name before claiming hints! '
+                '(If you just set your name, you can refresh or click Claim.)')
 
     limit = request.META.get('QUERY_STRING', '')
     limit = int(limit) if limit.isdigit() else 20
-    previous = (
+    previous_same_team = (
         Hint.objects
         .select_related()
-        .filter(puzzle=hint.puzzle, status=Hint.ANSWERED)
+        .filter(team=hint.team, puzzle=hint.puzzle, status__in=(Hint.ANSWERED, Hint.REFUNDED))
+        .exclude(id=hint.id)
+        .order_by('answered_datetime')
+    )
+    previous_all_teams = (
+        Hint.objects
+        .select_related()
+        .filter(puzzle=hint.puzzle, status__in=(Hint.ANSWERED, Hint.REFUNDED))
+        .exclude(team=hint.team)
         .order_by('-answered_datetime')
     )[:limit]
+    form['status'].field.widget.is_followup = hint.is_followup
     request.context.puzzle = hint.puzzle
     return render(request, 'hint.html', {
         'hint': hint,
-        'previous': previous,
+        'previous_same_team': previous_same_team,
+        'previous_all_teams': previous_all_teams,
         'form': form,
     })
 
@@ -813,11 +916,9 @@ def hunt_stats(request):
     total_participants = TeamMember.objects.exclude(team__is_hidden=True).count()
 
     def is_forward_solve(puzzle, team_id):
-        return puzzle.is_meta or all(
+        return (puzzle.is_meta or
             solve_times[puzzle.id, team_id] <=
-            solve_times[meta.id, team_id] - datetime.timedelta(minutes=5)
-            for meta in puzzle.metas.all()
-        )
+            solve_times[puzzle.round.meta_id, team_id] - datetime.timedelta(minutes=5))
 
     total_hints = 0
     hints_by_puzzle = defaultdict(int)
@@ -825,7 +926,7 @@ def hunt_stats(request):
     for hint in Hint.objects.exclude(team__is_hidden=True):
         total_hints += 1
         hints_by_puzzle[hint.puzzle_id] += 1
-        if hint.status != Hint.OBSOLETE:
+        if hint.consumes_hint:
             hint_counts[hint.puzzle_id, hint.team_id] += 1
 
     total_guesses = 0
@@ -946,11 +1047,10 @@ def solution(request):
     '''After hunt ends, view a puzzle's solution.'''
 
     template_name = 'solution_bodies/{}'.format(request.context.puzzle.body_template)
-    data = {'template_name': template_name}
     try:
-        return render(request, template_name, data)
+        return render(request, template_name, {})
     except TemplateDoesNotExist:
-        return render(request, 'solution.html', data)
+        return render(request, 'solution.html', {'template_name': template_name})
 
 
 @require_GET
@@ -967,26 +1067,22 @@ def story(request):
     # at all.
     if not STORY_PAGE_VISIBLE:
         raise Http404
-    story_points = {
-        'show_prehunt': STORY_PAGE_VISIBLE,
-        'show_started': False,
-        'meta0_open': False, 'meta0_done': False,
-        'meta1_open': False, 'meta1_done': False,
-    }
+    story_points = OrderedDict((
+        ('pre_hunt', not request.context.hunt_has_almost_started),
+        ('round1_open', request.context.hunt_has_almost_started), ('meta1_done', False),
+        ('round2_open', False), ('meta2_done', False),
+    ))
     if request.context.hunt_has_started:
-        story_points['show_started'] = True
-        metas = [INTRO_META_SLUG, META_META_SLUG]
-        team = request.context.team
-        for data in request.context.unlocks['puzzles']:
-            slug = data['puzzle'].slug
-            if slug in metas:
-                story_points['meta%d_open' % metas.index(slug)] = True
-        if team:
-            for submission in team.submissions:
-                slug = submission.puzzle.slug
-                if submission.is_correct and slug in metas:
-                    story_points['meta%d_done' % metas.index(slug)] = True
-    return render(request, 'story.html', story_points)
+        for puzzle in request.context.unlocks:
+            story_points['round%d_open' % puzzle.round.order] = True
+        if request.context.team:
+            for puzzle in request.context.team.solves.values():
+                if puzzle.is_meta:
+                    story_points['meta%d_done' % puzzle.round.order] = True
+    story_points = [key for (key, visible) in story_points.items() if visible]
+    if not request.context.hunt_is_over:
+        story_points.reverse()
+    return render(request, 'story.html', {'story_points': story_points})
 
 
 @require_GET
@@ -994,26 +1090,18 @@ def victory(request):
     '''View your team's victory page, if you've finished the hunt.'''
 
     team = request.context.team
-    if request.context.hunt_is_over:
-        return render(request, 'victory.html', {'hunt_finished': True})
-    if not team or not request.context.hunt_has_started:
-        raise Http404
-    solved_metameta = any(
-        submission.puzzle.slug == META_META_SLUG and submission.is_correct
-        for submission in team.submissions
-    )
-    if solved_metameta:
-        dispatch_victory_alert(
-            'Team %s has finished the hunt!' % team +
-            '\n**Emails:** ' + request.build_absolute_uri(reverse('finishers')))
-    return render(request, 'victory.html', {
-        'hunt_finished': request.context.is_superuser or solved_metameta,
-    })
+    if not request.context.hunt_is_over and not request.context.is_superuser:
+        if not team or not request.context.hunt_has_started:
+            raise Http404
+        finished = any(puzzle.slug == META_META_SLUG for puzzle in team.solves.values())
+        if not finished:
+            raise Http404
+    return render(request, 'victory.html')
 
 
 @require_GET
 def errata(request):
-    if not ERRATA_PAGE_VISIBLE:
+    if not request.context.errata_page_visible:
         raise Http404
     return render(request, 'errata.html')
 
@@ -1028,53 +1116,58 @@ def wrapup(request):
 @require_GET
 @require_after_hunt_end_or_admin
 def finishers(request):
-    teams = OrderedDict()
+    unlocks = OrderedDict()
     solves_by_team = defaultdict(list)
     metas_by_team = defaultdict(list)
-    unlock_times = defaultdict(lambda: HUNT_END_TIME)
     wrong_times = {}
 
-    for submission in (
-        AnswerSubmission.objects
-        .filter(puzzle__slug=META_META_SLUG, team__is_hidden=False, submitted_datetime__lt=HUNT_END_TIME)
-        .order_by('submitted_datetime')
-    ):
+    for submission in AnswerSubmission.objects.filter(
+        puzzle__slug=META_META_SLUG,
+        team__is_hidden=False,
+        submitted_datetime__lt=HUNT_END_TIME,
+    ).order_by('submitted_datetime'):
         if submission.is_correct:
-            teams[submission.team_id] = None
+            unlocks[submission.team_id] = None
         else:
             wrong_times[submission.team_id] = submission.submitted_datetime
-    for unlock in (
-        PuzzleUnlock.objects
-        .filter(team__id__in=teams, puzzle__slug=META_META_SLUG)
+    for unlock in PuzzleUnlock.objects.select_related().filter(
+        team__id__in=unlocks,
+        puzzle__slug=META_META_SLUG,
     ):
-        unlock_times[unlock.team_id] = unlock.unlock_datetime
-    for solve in (
-        AnswerSubmission.objects
-        .select_related()
-        .filter(team__id__in=teams, used_free_answer=False, is_correct=True, submitted_datetime__lt=HUNT_END_TIME)
+        unlocks[unlock.team_id] = unlock
+    for solve in AnswerSubmission.objects.select_related().filter(
+        team__id__in=unlocks,
+        used_free_answer=False,
+        is_correct=True,
+        submitted_datetime__lt=HUNT_END_TIME,
     ):
         solves_by_team[solve.team_id].append(solve.submitted_datetime)
         if solve.puzzle.is_meta:
             metas_by_team[solve.team_id].append(solve.submitted_datetime)
-        if solve.puzzle.slug == META_META_SLUG:
-            teams[solve.team_id] = (solve.team, unlock_times[solve.team_id])
 
     data = []
-    for team_id, (team, unlock) in teams.items():
+    for team_id, unlock in unlocks.items():
         solves = [HUNT_START_TIME] + solves_by_team[team_id] + [HUNT_END_TIME]
         solves = [{
             'before': (solves[i - 1] - HUNT_START_TIME).total_seconds(),
             'after': (solves[i] - HUNT_START_TIME).total_seconds(),
         } for i in range(1, len(solves))]
         metas = metas_by_team[team_id]
+        times = [unlock.unlock_datetime, wrong_times.get(team_id), metas[-1]]
+        last_time = times[0]
+        milestones = []
+        for i in range(1, len(times)):
+            if times[i]:
+                milestones.append((times[i], (times[i] - last_time).total_seconds()))
+                last_time = times[i]
+            else:
+                milestones.append((times[i], None))
         data.append({
-            'team': team,
-            'mm1_time': unlock,
-            'mm2_time': metas[-1],
-            'duration': (metas[-1] - unlock).total_seconds(),
-            'wrong_duration':
-                (metas[-1] - wrong_times[team_id])
-                .total_seconds() if team_id in wrong_times else None,
+            'team': unlock.team,
+            'unlock_time': times[0],
+            'solve_time': times[-1],
+            'milestones': milestones,
+            'total_time': (times[-1] - times[0]).total_seconds(),
             'hunt_length': (HUNT_END_TIME - HUNT_START_TIME).total_seconds(),
             'solves': solves,
             'metas': [(ts - HUNT_START_TIME).total_seconds() for ts in metas],
@@ -1089,7 +1182,7 @@ def bridge(request):
     recipients = TeamMember.objects.values_list('email', flat=True)
     recipients = list(filter(None, recipients))
     recipient_count = len(recipients)
-    recipients_list = "\n".join(recipients)
+    recipients_list = '\n'.join(recipients)
     return render(request, 'bridge.html', {
         'recipient_count': recipient_count,
         'recipients_list': recipients_list,
@@ -1098,18 +1191,14 @@ def bridge(request):
 def bigboard_generic(request, hide_hidden):
     puzzles = request.context.all_puzzles
     puzzle_map = {}
-    puzzle_metas = defaultdict(set)
-    intro_meta_id = None
+    puzzle_metas = {}
     meta_meta_id = None
     for puzzle in puzzles:
         puzzle_map[puzzle.id] = puzzle
-        if puzzle.slug == INTRO_META_SLUG:
-            intro_meta_id = puzzle.id
         if puzzle.slug == META_META_SLUG:
             meta_meta_id = puzzle.id
         if not puzzle.is_meta:
-            for meta in puzzle.metas.all():
-                puzzle_metas[puzzle.id].add(meta.id)
+            puzzle_metas[puzzle.id] = puzzle.round.meta_id
 
     wrong_guesses_map = defaultdict(int) # key (team, puzzle)
     wrong_guesses_by_team_map = defaultdict(int) # key team
@@ -1120,8 +1209,6 @@ def bigboard_generic(request, hide_hidden):
     used_hints_by_team_map = defaultdict(int) # team -> number of hints
     used_hints_by_puzzle_map = defaultdict(int) # puzzle -> number of hints
     solves_map = defaultdict(dict) # team -> {puzzle id -> puzzle}
-    intro_solves_map = defaultdict(int) # team -> number of puzzle solves
-    jungle_solves_map = defaultdict(int) # team -> number of puzzle solves
     meta_solves_map = defaultdict(int) # team -> number of meta solves
     solve_time_map = defaultdict(dict) # team -> {puzzle id -> solve time}
     during_hunt_solve_time_map = defaultdict(dict) # team -> {puzzle id -> solve time}
@@ -1153,10 +1240,6 @@ def bigboard_generic(request, hide_hidden):
         solves_map[team_id][puzzle_id] = puzzle_map[puzzle_id]
         if puzzle_id not in puzzle_metas:
             meta_solves_map[team_id] += 1
-        elif intro_meta_id in puzzle_metas[puzzle_id]:
-            intro_solves_map[team_id] += 1
-        else:
-            jungle_solves_map[team_id] += 1
 
     for aggregate in (
         AnswerSubmission.objects
@@ -1172,7 +1255,7 @@ def bigboard_generic(request, hide_hidden):
 
     for aggregate in (
         Hint.objects
-        .filter(status=Hint.ANSWERED)
+        .filter(status=Hint.ANSWERED, is_followup=False)
         .values('team_id', 'puzzle_id')
         .annotate(count=Count('*'))
     ):
@@ -1218,23 +1301,13 @@ def bigboard_generic(request, hide_hidden):
             yield 'H' # hinted
         if solve_time and solve_time > HUNT_END_TIME:
             yield 'P' # post-hunt solve
-        if solve_time and puzzle_metas.get(puzzle_id):
-            metas_before = 0
-            metas_after = 0
-            for meta_id in puzzle_metas[puzzle_id]:
-                meta_time = solve_time_map[team_id].get(meta_id)
-                if meta_time and solve_time > meta_time - datetime.timedelta(minutes=5):
-                    metas_before += 1
-                else:
-                    metas_after += 1
-            if metas_after == 0:
-                yield 'B' # backsolved from all metas
-            elif metas_before != 0:
-                yield 'b' # backsolved from some metas
+        if solve_time and puzzle_id in puzzle_metas:
+            meta_time = solve_time_map[team_id].get(puzzle_metas[puzzle_id])
+            if meta_time and solve_time > meta_time - datetime.timedelta(minutes=5):
+                yield 'B' # backsolved
 
     board = []
     for team in leaderboard:
-        team.solves = solves_map[team.id]
         board.append({
             'team': team,
             'last_solve_time': max([team.creation_time, *solve_time_map[team.id].values()]),
@@ -1242,11 +1315,7 @@ def bigboard_generic(request, hide_hidden):
             'free_solves': len(free_answer_map[team.id]),
             'wrong_guesses': wrong_guesses_by_team_map[team.id],
             'used_hints': used_hints_by_team_map[team.id],
-            'total_hints': team.num_hints_total,
             'finished': solve_position_map.get((team.id, meta_meta_id)),
-            'deep': team.display_deep,
-            'intro_solves': intro_solves_map[team.id],
-            'jungle_solves': jungle_solves_map[team.id],
             'meta_solves': meta_solves_map[team.id],
             'entries': [{
                 'wrong_guesses': wrong_guesses_map[(team.id, puzzle.id)],
@@ -1279,6 +1348,61 @@ def bigboard(request):
 @require_admin
 def bigboard_unhidden(request):
     return bigboard_generic(request, hide_hidden=False)
+
+@require_GET
+@require_after_hunt_end_or_admin
+def biggraph(request):
+    puzzles = request.context.all_puzzles
+    puzzle_map = {}
+    meta_meta_id = None
+    for puzzle in puzzles:
+        puzzle_map[puzzle.id] = puzzle
+        if puzzle.slug == META_META_SLUG:
+            meta_meta_id = puzzle.id
+
+    during_hunt_solve_time_map = defaultdict(dict) # team -> {puzzle id -> solve time}
+    team_point_changes = defaultdict(list)
+    team_score = defaultdict(int) # ???
+
+    for team_id, puzzle_id, submitted_datetime in (
+        AnswerSubmission.objects
+        .filter(is_correct=True, team__is_hidden=False, used_free_answer=False)
+        .order_by('submitted_datetime')
+        .values_list('team_id', 'puzzle_id', 'submitted_datetime')
+    ):
+        team_score[team_id] += 1
+        puzzle = puzzle_map[puzzle_id]
+        team_point_changes[team_id].append((
+            submitted_datetime.timestamp() * 1000,
+            team_score[team_id],
+            puzzle.name,
+            puzzle.is_meta,
+        ))
+        if submitted_datetime < HUNT_END_TIME:
+            during_hunt_solve_time_map[team_id][puzzle_id] = submitted_datetime
+
+    teams = Team.objects.filter(is_hidden=False)
+    leaderboard = sorted(teams, key=lambda team: (
+        during_hunt_solve_time_map[team.id].get(meta_meta_id, HUNT_END_TIME),
+        -len(during_hunt_solve_time_map[team.id]),
+        team.last_solve_time or team.creation_time,
+    ))
+
+    limit = request.META.get('QUERY_STRING', '')
+    limit = int(limit) if limit.isdigit() else 30
+    if limit:
+        leaderboard = leaderboard[:limit]
+
+    for team in leaderboard:
+        nh = 0
+        for c in team.team_name:
+            nh = (31 * nh + ord(c)) & 0xffffffff;
+        team.color = 'hsl({}, {}%, {}%)'.format(nh % 360, 77 + nh % 23, 41 + nh % 19)
+        team.graph_data = team_point_changes[team.id]
+
+    return render(request, 'biggraph.html', {
+        'teams': leaderboard
+    })
 
 @require_GET
 @require_after_hunt_end_or_admin
@@ -1335,6 +1459,7 @@ def puzzle_log(request):
 
 @require_POST
 @require_admin
+@xframe_options_sameorigin
 def shortcuts(request):
     response = HttpResponse(content_type='text/html')
     try:
@@ -1349,5 +1474,8 @@ def shortcuts(request):
 
 def robots(request):
     response = HttpResponse(content_type='text/plain')
-    response.write('User-agent: *\nDisallow: /\n')
+    if settings.DEBUG:
+        response.write('User-agent: *\nDisallow: /\n')
+    else:
+        response.write('User-agent: *\nDisallow: /solution/\n')
     return response

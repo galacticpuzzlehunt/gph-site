@@ -1,23 +1,22 @@
+import hashlib
 import markdown
 import os
 import re
 
 from django import template
-from django.conf import settings
+from django.template.base import NodeList
+from django.template.loader_tags import BlockNode
 from django.utils import timezone
+from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
 
 register = template.Library()
 
 @register.simple_tag
-def ga_code():
-    return mark_safe(settings.GA_CODE)
-
-@register.simple_tag
 def format_duration(secs):
     if secs is None:
         return ''
-    secs = max(float(secs), 0)
+    secs = max(int(secs), 0)
     hours = int(secs / (60 * 60))
     secs -= hours * 60 * 60
     mins = int(secs / 60)
@@ -25,15 +24,15 @@ def format_duration(secs):
     if hours > 0:
         return '{}h{}m'.format(hours, mins)
     elif mins > 0:
-        return '{}m{:.0f}s'.format(mins, secs)
-    elif secs > 0:
-        return '{:.1f}s'.format(secs)
+        return '{}m{}s'.format(mins, secs)
     else:
-        return '0s'
+        return '{}s'.format(secs)
 
 @register.simple_tag
-def duration_between(before, after):
-    return format_duration((after - before).total_seconds())
+def format_time_since(timestamp, now):
+    text = format_duration((now - timestamp).total_seconds())
+    return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
+        % (timestamp.isoformat(), '%A, %B %-d at %-I:%M %p %Z', text))
 
 @register.simple_tag
 def days_between(before, after):
@@ -45,30 +44,51 @@ def unix_time(timestamp):
 
 @register.simple_tag
 def format_time(timestamp, format='%b %-d, %H:%M'):
-    return timestamp.astimezone(timezone.get_default_timezone()).strftime(format) if timestamp else ''
+    if not timestamp:
+        return ''
+    timestamp2 = timestamp.astimezone(timezone.get_default_timezone())
+    try:
+        text = timestamp2.strftime(format)
+    except ValueError:
+        text = timestamp2.strftime(format.replace('%-', '%'))
+    return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
+        % (timestamp.isoformat(), format, text))
 
 @register.simple_tag
 def percentage(a, b):
     return '' if b == 0 else '%s%%' % (100 * a // b)
 
-@register.tag
-def captureas(parser, token):
-    try:
-        tag_name, args = token.contents.split(None, 1)
-    except ValueError:
-        raise template.TemplateSyntaxError('`captureas` node requires a variable name.')
-    nodelist = parser.parse(('endcaptureas',))
-    parser.delete_first_token()
-    return CaptureasNode(nodelist, args)
+@register.filter
+def hash(obj):
+    return hashlib.md5(str(obj).encode('utf8')).hexdigest()
 
-class CaptureasNode(template.Node):
-    def __init__(self, nodelist, varname):
-        self.nodelist = nodelist
-        self.varname = varname
+@register.tag
+class puzzleblock(template.Node):
+    def __init__(self, parser, token):
+        args = token.contents.split()
+        if len(args) not in (2, 3):
+            raise template.TemplateSyntaxError('Usage: {% puzzleblock block-name [variant] %}')
+        self.name = args[1]
+        self.variant = args[2] if len(args) > 2 else None
+
+    def render_actual(self, context, name):
+        return BlockNode(name, NodeList()).render_annotated(context)
+
+    def render_real(self, context):
+        html = self.render_actual(context, self.name + '-html')
+        if html:
+            return html
+        md = self.render_actual(context, self.name + '-md')
+        if md:
+            return markdown.markdown(strip_spaces_between_tags(md), extensions=['extra'])
+        return ''
 
     def render(self, context):
-        output = self.nodelist.render(context)
-        context[self.varname] = mark_safe(markdown.markdown(output, extensions=['extra']))
+        ident = self.name.replace('-', '_')
+        if self.variant:
+            context['variant'] = self.variant
+            ident += '_' + self.variant
+        context[ident] = mark_safe(self.render_real(context))
         return ''
 
 @register.tag

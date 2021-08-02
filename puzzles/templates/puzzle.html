@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% load puzzle_tags %}
+{% load static %}
 
 {% block page-title %}
 <title>{{ puzzle.name }}</title>
 {% endblock %}
 
 {% block top-left-actions %}
+{% if round.slug != intro_round_slug %}
+<a href="{% url 'round' round.slug %}" class="btn">{{ round.name }}</a>
+{% endif %}
 {% if team and not hunt_is_closed %}
 <a href="{% url 'solve' puzzle.slug %}" class="btn">Call in an answer</a>
 {% if not puzzle.is_meta and num_free_answers_remaining > 0 and puzzle_answer is None %}
@@ -13,7 +17,7 @@
 {% endif %}
 {% endif %}
 {% if can_view_hints %}
-<a href="{% url 'hints' puzzle.slug %}" class="btn">{% if can_ask_for_hints and puzzle_answer is None %}Ask for a hint{% else %}View hints{% endif %}</a>
+<a href="{% url 'hints' puzzle.slug %}" class="btn">{% if can_ask_for_hints %}Ask for a hint{% else %}View hints{% endif %}</a>
 {% endif %}
 {% if hunt_is_closed or not team and hunt_is_over %}
 <a href="{% url 'post-hunt-solve' puzzle.slug %}" class="btn">Check your answer spoiler-free</a>
@@ -38,14 +42,31 @@
     {% endblock %}
 </h1>
 
-<main>
-    {% captureas puzzle_body_content %}{% spaceless %}
-        {% block puzzle-body %}
-        This puzzle doesn&rsquo;t seem to exist yet.
-        Searched for a puzzle template named `{{ template_name }}`
-        {% endblock %}
-    {% endspaceless %}{% endcaptureas %}
-    {{ puzzle_body_content }}
+<main class="clipboard-container">
+    {% for erratum in visible_errata %}
+    {% if erratum.puzzle == puzzle and erratum.puzzle_text %}
+    <div class="puzzle-erratum">
+        {% if not erratum.published %}
+        <strong>[<a href="{% url 'admin:puzzles_erratum_change' erratum.id %}">UNPUBLISHED</a>]</strong>
+        {% endif %}
+        On {% format_time erratum.timestamp '%A, %B %-d at %-I:%M %p %Z' %},
+        {{ erratum.puzzle_text|safe }}
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    {% block puzzle-body-override %}
+    {% puzzleblock puzzle-body %}
+    {% if puzzle_body %}{{ puzzle_body }}{% elif template_name %}
+    This puzzle doesn&rsquo;t seem to exist yet.
+    Searched for a puzzle template named <code>{{ template_name }}</code>
+    {% else %}
+    This puzzle template exists, but it doesn&rsquo;t seem to define
+    a puzzle content block. Check the post production guide?
+    {% endif %}
+    {% endblock %}
 </main>
+
+<script src="{% static "js/copyjack.js" %}"></script>
 
 {% endblock %}

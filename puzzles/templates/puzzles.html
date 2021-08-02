@@ -1,79 +1,43 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load static %}
 {% block content %}
 
-<h1>Puzzles</h1>
+<style>
+h2 {
+    position: relative;
+}
+
+h2 a {
+    text-decoration: none;
+}
+
+.meta-answer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 2.4rem;
+    line-height: 4.5rem;
+}
+</style>
 
 {% if hunt_is_prereleased %}
-<h4 style="text-align: center">
+<h3 style="text-align: center">
     You are a pre-release testsolver, so you may be seeing puzzles that are
     locked for the general public. Please be careful!
-</h4>
+</h3>
 {% endif %}
 
-<table class="gph-list-table">
-<tr>
-    <th>Puzzle</th>
-    <th>Solved?</th>
-    <th>Stats</th>
-    <th>
-        {% if unlocks.puzzles and unlocks.puzzles.0.full_stats %}
-        Solution
-        {% elif unlocks.puzzles and 'hints' in unlocks.puzzles.0 %}
-        Hints
-        {% endif %}
-    </th>
-    <th>
-    </th>
-</tr>
-{% for data in unlocks.puzzles %}
-<tr>
-    <td><a href="{% url 'puzzle' data.puzzle.slug %}">{{ data.puzzle.name }}</a></td>
-    <td>
-        {% if 'answer' in data %}
-            Answer: <b class="solved-title-answer">{{ data.answer }}</b>
-        {% endif %}
-    </td>
-    <td>
-        {% with data.solve_stats as stats %}
-        {% if data.full_stats %}
-        <a href="{% url 'stats' data.puzzle.slug %}">
-        {% endif %}
-        <b>{{ stats.correct }}</b> solve{{ stats.correct|pluralize }}
-        | <b>{{ stats.guesses }}</b> guess{{ stats.guesses|pluralize:"es" }}
-        {% if data.full_stats %}
-        | <b>{{ stats.teams }}</b> team{{ stats.teams|pluralize }}
-        </a>
-        {% endif %}
-        {% endwith %}
-    </td>
-    <td>
-        {% if data.full_stats %}
-        <a href="{% url 'solution' data.puzzle.slug %}">
-            <b>Solution</b>
-        </a>
-        {% elif 'hints' in data %}
-        <a href="{% url 'hints' data.puzzle.slug %}">
-            Hints: <b>{{ data.hints }}</b>
-        </a>
-        {% endif %}
-    </td>
-    <td>
-        {% if is_superuser %}
-        <a href="{% url 'survey' data.puzzle.slug %}">
-        {% endif %}
-        {% if 'survey_stats' in data %}
-        {% for stat in data.survey_stats %}
-        <b>{{ stat.average|floatformat:2 }} <small>/ {{ stat.max_rating }}</small></b> {{ stat.adjective }}
-        {% if not forloop.last %}|{% endif %}
-        {% endfor %}
-        {% endif %}
-        {% if is_superuser %}
-        </a>
-        {% endif %}
-    </td>
-</tr>
+{% for round in rounds.values %}
+{% if round.round.slug == intro_round_slug %}
+{% include 'puzzles_list.html' with round=round %}
+{% else %}
+<h2>
+    <a href="{% url 'round' round.round.slug %}">{{ round.round.name }}</a>
+    {% if 'meta_answer' in round %}
+    <div class="meta-answer solved-title-answer">{{ round.meta_answer }}</div>
+    {% endif %}
+</h2>
+{% endif %}
 {% endfor %}
-</table>
 
 {% endblock %}

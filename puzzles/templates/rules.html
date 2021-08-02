@@ -9,7 +9,7 @@
     <div class="no-break">
         <h4 id="Format">Format</h4>
         <ul>
-            <li>The puzzlehunt starts on <strong>{% format_time start_time '%A, %B %d, %Y at %I:%M %p %Z' %}</strong> and ends on <strong>{% format_time end_time '%A, %B %d, %Y at %I:%M %p %Z' %}</strong>, at which point puzzle solutions will be available. {# However, we will leave the website running until <strong>{% format_time close_time '%A, %B %d, %Y at %I:%M %p %Z' %}</strong> so teams can still submit answers and go through the hunt at their own pace (see the FAQ for a more detailed explanation). #}</li>
+            <li>The puzzlehunt starts on <strong>{% format_time start_time '%A, %B %-d at %-I:%M %p %Z' %}</strong> and ends on <strong>{% format_time end_time '%A, %B %-d at %-I:%M %p %Z' %}</strong>, at which point puzzle solutions will be available. {# However, we will leave the website running until <strong>{% format_time close_time '%A, %B %-d at %-I:%M %p %Z' %}</strong> so teams can still submit answers and go through the hunt at their own pace (see the <a href="{% url 'faq' %}">FAQ</a> for a more detailed explanation). #}</li>
             <li>Teams have a maximum size of {{ max_members_per_team }}. You may not create multiple accounts or be on multiple teams.</li>
             <li>A few puzzles will be available at the start, and the primary way to unlock new puzzles is by solving puzzles and progressing through the hunt, although puzzles may also be unlocked over time.</li>
             <li>Teams that complete the hunt will be ranked by the time at which they finish. Teams that do not complete the hunt will be ranked by number of puzzles solved and tie-broken by earliest last solve time.</li>
@@ -24,12 +24,18 @@
         </ul>
     </div>
 
-    {% if hint_time %}
+    {% if hints_enabled %}
     <div class="no-break">
         <h4 id="Hints">Hints</h4>
         <ul>
-            <li>Starting on {% format_time hint_time '%A, %B %d' %}, teams will receive <strong>{{ hints_per_day }} hint{{ hints_per_day|pluralize }}</strong> per day, at <strong>{% format_time hint_time '%I:%M %p %Z' %}</strong> each day, until the end of the hunt.</li>
-            <li>You can use a hint to get help on a puzzle. This can be something like a nudge in the right direction (i.e. you give us your progress on the puzzle and we&rsquo;ll try to get you unstuck) or an answer to a question (e.g. &ldquo;Which answers to these crossword clues are wrong?&rdquo;).
+            <li>Starting on <strong>{% format_time hint_time '%A, %B %-d' %}</strong>, teams will receive hints at <strong>{% format_time hint_time '%-I:%M %p %Z' %}</strong> each day until the end of the hunt. The number of hints given each day will be at our discretion based on how the hunt is going.</li>
+            {% if intro_hints %}
+            <li>The first <strong>{{ intro_hints }} hint{{ intro_hints|pluralize }}</strong> your team receives may only be used on the first set of puzzles in the hunt.</li>
+            {% endif %}
+            <li>You can use a hint to get help on a puzzle. This can be something like a nudge in the right direction (i.e. you give us your progress on the puzzle and we&rsquo;ll try to get you unstuck) or an answer to a question (e.g. &ldquo;Which answers to these crossword clues are wrong?&rdquo;).</li>
+            {% if one_hint_at_a_time %}
+            <li>You can only have <strong>one open hint request</strong> at a time.</li>
+            {% endif %}
 </li>
         </ul>
     </div>

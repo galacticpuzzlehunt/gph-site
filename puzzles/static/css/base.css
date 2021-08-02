@@ -54,6 +54,7 @@ h1, h2, h3, h4, h5, h6 {
 h1 {
     margin-top: 1.5rem;
     text-align: center;
+    font-weight: 600;
 }
 
 h2 {
@@ -73,6 +74,21 @@ hr {
 table {
     border-collapse: collapse;
     border-spacing: 0;
+}
+
+table.very-small {
+    font-size: 80%;
+}
+
+table.very-small td, table.very-small th {
+    padding: 0.4em;
+    line-height: 1.4;
+}
+
+code {
+    font-size: 80%;
+    max-width: 1000px;
+    overflow: scroll;
 }
 
 tr:last-child td {
@@ -108,6 +124,10 @@ form .btn {
 input[type=text], input[type=password], input[type=email] {
     width: 100%;
     border-radius: 0;
+}
+
+figcaption {
+    text-align: center;
 }
 
 @media (min-width: 961px) {
@@ -174,17 +194,21 @@ input[type=text], input[type=password], input[type=email] {
     }
 
     .top-tabs {
-        text-align: center;
+        display: flex;
+        white-space: nowrap;
+        justify-content: space-evenly;
         font-size: 2rem;
         margin: 5px 0 1.5rem;
-        line-height: 1.5;
+        line-height: 1;
     }
 
     .top-tabs a {
+        display: inline-flex;
+        position: relative;
+        padding: 6px 0 10px;
         text-decoration: none;
         color: #f9f8f5;
-        padding: 0 8px;
-        padding: 0 1vw;
+        align-items: center;
     }
 
     .top-tabs a:hover,
@@ -193,7 +217,7 @@ input[type=text], input[type=password], input[type=email] {
     }
 
     .top-tabs .selected-tab {
-        font-weight: bold;
+        font-weight: 700;
     }
 
     .top-left-actions {
@@ -219,20 +243,12 @@ input[type=text], input[type=password], input[type=email] {
         white-space: nowrap;
         display: inline-block;
         text-decoration: none;
+        vertical-align: bottom;
     }
 
     .current-stat-label {
-        font-size: 24px;
+        font-size: 2.4rem;
         vertical-align: middle;
-    }
-
-    .current-stat-box {
-        display: inline-block;
-        border: 1px solid black;
-        height: 1.5em;
-        width: 1.5em;
-        line-height: 1.5em;
-        text-align: center;
     }
 
     .shortcuts {
@@ -294,7 +310,7 @@ input[type=text], input[type=password], input[type=email] {
         transform: translateY(calc(5px - 100%));
         transition: transform .1s;
         z-index: 900;
-        padding: 1rem calc(150vw - 1160px);
+        padding: 2rem calc(150vw - 1160px) 1rem;
     }
 
     .tray:before {
@@ -342,6 +358,7 @@ input[type=text], input[type=password], input[type=email] {
 
     .top-tabs {
         align-items: flex-start;
+        justify-content: flex-start;
         margin: 0;
         font-size: calc((960px - 100vw) / 16 + 20px);
     }
@@ -354,7 +371,7 @@ input[type=text], input[type=password], input[type=email] {
         line-height: 2;
         height: auto;
         font-size: calc((960px - 100vw) * 3 / 80 + 18px);
-        margin: calc((960px - 100vw) * 3 / 80 + 6px) 0;
+        margin-bottom: calc((960px - 100vw) * 3 / 40 + 12px);
     }
 
     .top-right-actions {
@@ -385,7 +402,7 @@ input[type=text], input[type=password], input[type=email] {
     }
 
     .tray {
-        padding: 1rem calc((100% - 90vw) / 2);
+        padding: 2rem calc((100% - 90vw) / 2) 1rem;
     }
 
     .top-tabs {
@@ -394,7 +411,7 @@ input[type=text], input[type=password], input[type=email] {
 
     .top-left-actions a {
         font-size: 24px;
-        margin: 12px;
+        margin-bottom: 24px;
     }
 
     .flavor {
@@ -424,7 +441,7 @@ input[type=text], input[type=password], input[type=email] {
         border: none;
         position: sticky;
         top: 0;
-        background-color: #f9f8f5;
+        background-color: white;
         box-shadow: inset 0 -1px 0 0 #111;
     }
 }
@@ -459,9 +476,11 @@ input[type=text], input[type=password], input[type=email] {
 @media screen {
     .story-chunk {
         max-width: 600px;
-        border: 1px solid #111;
-        padding: 20px 30px;
         margin: 0 auto 30px;
+    }
+
+    .story-chunk a {
+        text-decoration: none;
     }
 }
 
@@ -522,7 +541,7 @@ input[type=text], input[type=password], input[type=email] {
 
 .solved-title-marker {
     font-size: 50%;
-    color: #0c0906;
+    color: initial;
 }
 
 .solved-title-answer {
@@ -542,23 +561,39 @@ input[type=text], input[type=password], input[type=email] {
 }
 
 .puzzle-erratum {
-    color: red;
+    color: #c32;
     margin-bottom: 10px;
 }
 
 .hint-table {
     width: 100%;
-    margin-bottom: 0;
 }
 
 .hint-table th, .hint-table td {
     border: none;
-    padding-bottom: 0;
-    padding-top: 0;
+    padding: 0 15px;
 }
 
-.hint-table .submitted-text {
-    padding: 0 2rem 2rem;
+.hint-table tr:first-child th, .hint-table tr:first-child td, .hint-table td[colspan] {
+    padding-top: 12px;
+}
+
+.hint-table tr:last-child th, .hint-table tr:last-child td {
+    padding-bottom: 12px;
+}
+
+.hint-table button {
+    margin: 0;
+}
+
+.hint-table hr {
+    border-color: currentColor;
+    opacity: 0.25;
+}
+
+.hint-table .submitted-text, .hint-table textarea {
+    font-size: 1.5rem;
+    line-height: 2rem;
 }
 
 .hint-controls {
@@ -571,6 +606,105 @@ input[type=text], input[type=password], input[type=email] {
 
 .hint-controls form, .hint-controls input {
     margin: 0;
+}
+
+.puzzles-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.puzzles-list a {
+    text-decoration: none;
+}
+
+.puzzles-entry, .puzzles-spacer {
+    flex-grow: 1;
+    margin: 0 20px;
+    width: 280px;
+    box-sizing: border-box;
+}
+
+.puzzles-entry {
+    margin: 20px;
+    border: 2px solid #111;
+    position: relative;
+    padding: 20px;
+    text-align: center;
+}
+
+.puzzles-link, .puzzles-new, .puzzles-answer, .puzzles-solution {
+    position: absolute;
+    line-height: 24px;
+    background-color: white;
+    padding: 4px 8px;
+}
+
+.puzzles-link { top: -16px; left: -12px; font-size: 2rem; }
+.puzzles-new { top: -16px; right: -12px; color: #ae4160; }
+.puzzles-answer { bottom: -16px; right: -12px; }
+.puzzles-solution { bottom: -16px; left: -12px; }
+
+.puzzles-meta {
+    border-style: dotted;
+}
+
+.puzzles-inner {
+    font-size: 1.4rem;
+}
+
+.puzzles-inner b {
+    font-size: 1.6rem;
+}
+
+.note {
+    border: 1px solid #ae4160;
+    padding: 0.5em;
+    margin-bottom: 2em;
+}
+
+.note strong {
+    color: #ae4160;
+}
+
+.copy-only {
+    display: none;
+}
+
+.clipboard-button {
+    border-radius: 1em;
+    bottom: 1.5em;
+    cursor: pointer;
+    font-size: 1em;
+    height: 2em;
+    padding: 0 0.8em;
+    position: fixed !important;
+    right: 1.5em;
+}
+
+time[title] {
+    text-decoration: underline dotted;
+    text-underline-position: under;
+    cursor: help;
+}
+
+.chart {
+    width: 100%;
+    height: 82px;
+    transform: scaleY(-1);
+    margin-bottom: 24px;
+    position: relative;
+    z-index: -1;
+}
+
+.chart-area {
+    fill: #44454d;
+    opacity: 0.5;
+}
+
+.chart-line {
+    stroke: #ae4160;
+    stroke-width: 0.25%;
+    fill: none;
 }
 
 footer {

@@ -21,7 +21,12 @@
 
     {% if survey %}
     <h4>Optional survey</h4>
-    <p>(You can come back to this page to submit this survey at any time.)</p>
+    <div class="note">
+        This survey will submit on behalf of your whole team, so make sure you
+        don&rsquo;t have two responders overwriting each other&rsquo;s comments.
+        You can come back to this page at any time to edit your response.
+    </div>
+
     <form method="post" class="call-in-answer-panel">
         {% csrf_token %}
 
@@ -38,7 +43,6 @@
                 {% for option in field %}
                     {{ option.tag }}
                     <label for="{{ option.id_for_label }}">★</label>
-                    {% cycle '' '' '' '' '<wbr>' %}
                 {% endfor %}
                 {% endspaceless %}
                 </p>
@@ -50,7 +54,7 @@
 
         {% for field in survey %}
         {% if 'adjective' not in field.field.widget.attrs %}
-        <div>
+        <div class="row">
             <div class="three columns">
                 {{ field.label_tag }}
             </div>
@@ -64,12 +68,6 @@
         </div>
         {% endif %}
         {% endfor %}
-
-        <p style="clear: both">
-            (Note: This survey will submit on behalf of your whole team. You
-            can come back to edit it as much as you want, but make sure you
-            don't have two responders overwriting each other's comments.)
-        </p>
 
         <style>
         .rating {

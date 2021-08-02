@@ -5,35 +5,37 @@
 
 <main>
 
-{% if meta1_open %}
+{% for key in story_points %}
+
+{% if key == 'meta2_done' %}
 <div class="no-break story-chunk">
     <h4>Meta Meta</h4>
-    {% if meta1_done %}
-        You succeeded!
-    {% endif %}
+    You succeeded!
 </div>
 {% endif %}
 
-{% if meta0_open %}
+{% if key == 'round2_open' %}
 <div class="no-break story-chunk">
     <h4>Intro Meta</h4>
-    {% if meta0_done %}
-        But wait...
-    {% endif %}
+    But wait...
 </div>
 {% endif %}
 
-{% if show_started %}
+{% if key == 'round1_open' %}
 <div class="no-break story-chunk">
+    <h4>Hunt Open</h4>
     Time to solve puzzles...
 </div>
 {% endif %}
 
-{% if show_prehunt %}
+{% if key == 'pre_hunt' %}
 <div class="no-break story-chunk">
+    <h4>???</h4>
     Get hyped!
 </div>
 {% endif %}
+
+{% endfor %}
 
 </main>
 

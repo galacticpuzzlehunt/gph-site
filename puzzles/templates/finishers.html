@@ -12,23 +12,6 @@ td {
     border: none;
 }
 
-.chart {
-    width: 100%;
-    height: 82px;
-    background-color: rgba(180, 160, 140, 0.3);
-    transform: scaleY(-1);
-}
-
-.area {
-    fill: rgb(180, 220, 150);
-}
-
-.bar {
-    stroke: rgba(248, 188, 78, 0.5);
-    stroke-width: 0.5%;
-    fill: none;
-}
-
 .sorting [colspan] {
     display: none;
 }
@@ -39,53 +22,57 @@ td {
 <main>
 <table class="sortable gph-list-table">
     <col style="width: 40%">
-    <col style="width: 15%">
-    <col style="width: 15%">
-    <col style="width: 15%">
-    <col style="width: 15%">
+    <col style="width: 12%">
+    <col style="width: 12%">
+    <col style="width: 12%">
+    <col style="width: 12%">
+    <col style="width: 12%">
     <tr onclick="document.querySelector('tbody').className = 'sorting'">
         <th>Team</th>
-        <th>Metameta unlock (EDT)</th>
-        <th>Time to solve<br>after unlock</th>
-        <th>Time to solve<br>after last wrong answer</th>
-        <th>Metameta solve (EDT)</th>
+        <th>Unlock (EDT)</th>
+        <th>Time to wrong</th>
+        <th>Time to solve</th>
+        <th>Total time</th>
+        <th>Solve (EDT)</th>
     </tr>
     {% for team in data %}
     <tr>
         <td><a href="{% url 'team' team.team.team_name %}">
             {{ team.team.team_name }}
         </a></td>
-        <td sorttable_customkey="{{ team.mm1_time|unix_time }}">
-            {% format_time team.mm1_time %}
+        <td sorttable_customkey="{{ team.unlock_time|unix_time }}">
+            {% format_time team.unlock_time %}
         </td>
-        <td sorttable_customkey="{{ team.duration }}">
-            {% format_duration team.duration %}
+        {% for milestone in team.milestones %}
+        <td sorttable_customkey="{% if milestone.1 %}{{ milestone.1 }}{% else %}999999{% endif %}">
+            {% format_duration milestone.1 %}<br>{% format_time milestone.0 %}
         </td>
-        <td sorttable_customkey="{% if team.wrong_duration %}{{ team.wrong_duration }}{% else %}999999{% endif %}">
-            {% format_duration team.wrong_duration %}
+        {% endfor %}
+        <td sorttable_customkey="{{ team.total_time }}">
+            {% format_duration team.total_time %}
         </td>
-        <td sorttable_customkey="{{ team.mm2_time|unix_time }}">
-            {% format_time team.mm2_time %}
+        <td sorttable_customkey="{{ team.solve_time|unix_time }}">
+            {% format_time team.solve_time %}
         </td>
     </tr>
     {% if is_superuser %}
     <tr>
-        <td colspan="5">
+        <td colspan="6">
             <tt>{{ team.team.get_emails|join:', ' }}</tt>
         </td>
     </tr>
     {% endif %}
     <tr>
-        <td colspan="5">
-            <svg class="chart" viewbox="0 0 {{ team.hunt_length }} 41" preserveAspectRatio="none">
+        <td colspan="6">
+            <svg class="chart" viewbox="0 0 {{ team.hunt_length }} {{ all_puzzles|length }}" preserveAspectRatio="none">
                 <path d="M {{ team.hunt_length }} 0 L 0 0
                 {% for solve in team.solves %}
                 L {{ solve.before }} {{ forloop.counter }}
                 L {{ solve.after }} {{ forloop.counter }}
                 {% endfor %}
-                " class="area"></path>
+                " class="chart-area"></path>
                 {% for meta in team.metas %}
-                <path d="M {{ meta }} 0 L {{ meta }} 41" class="bar"></path>
+                <path d="M {{ meta }} 0 L {{ meta }} {{ all_puzzles|length }}" class="chart-line"></path>
                 {% endfor %}
             </svg>
         </td>

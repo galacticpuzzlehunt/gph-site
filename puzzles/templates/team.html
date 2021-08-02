@@ -6,30 +6,21 @@
 <title>{{ view_team.team_name }}</title>
 {% endblock %}
 
+{% block top-left-actions %}
+{% if modify_info_available %}
+<a href="{% url 'edit-team' %}" class="btn">Edit team members</a>
+<a href="{% url 'password_change' %}" class="btn">Change password</a>
+{% elif request.context.is_superuser %}
+<a href="/admin/puzzles/team/{{ view_team.id }}/change/" class="btn">Django admin</a>
+<a href="/admin/puzzles/answersubmission/?team__id__exact={{ view_team.id }}" class="btn">All guesses</a>
+<a href="{% url 'hint-list' %}?team={{ view_team.id }}" class="btn">All hints</a>
+<a href="{% url 'impersonate-start' view_team.user_id %}" class="btn" style="filter: hue-rotate(120deg)">Impersonate</a>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 
 <style>
-.chart {
-    width: 100%;
-    height: 82px;
-    transform: scaleY(-1);
-    margin-bottom: 24px;
-}
-
-.baz {
-    fill: rgba(180, 160, 140, 0.3);
-}
-
-.area {
-    fill: rgb(180, 220, 150);
-}
-
-.bar {
-    stroke: rgba(248, 188, 78, 0.5);
-    stroke-width: 0.5%;
-    fill: none;
-}
-
 .meta {
     font-style: italic;
 }
@@ -42,11 +33,6 @@
     .team-members {
         margin-top: 0;
     }
-}
-
-.team-member-controls {
-    margin-top: 8px;
-    line-height: 36px;
 }
 
 .team-info-panel h4 {
@@ -82,9 +68,6 @@
                 {% if view_team.num_free_answers_remaining > 0 %}
                 <div class="stat-entry">Free answers available: <span class="stat-value">{{ view_team.num_free_answers_remaining }}</span></div>
                 {% endif %}
-                {% if hunt_has_started %}
-                <div class="stat-entry">Depth: <span class="stat-value">{{ view_team.display_deep|intcomma }}</span></div>
-                {% endif %}
                 {% endif %}
             </div>
             <div class="six columns">
@@ -95,28 +78,21 @@
                         {{ team_member.name }}{% if forloop.revcounter != 1 %}, {% endif %}
                         {% endfor %}
                     </div>
-                    {% if modify_info_available %}
-                    <div class="team-member-controls">
-                        <a href="{% url 'edit-team' %}" class="btn">Edit team members</a>
-                        <a href="{% url 'password_change' %}" class="btn">Change password</a>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
     {% if submissions|length %}
     {% if view_info_available or hunt_is_over %}
-    <svg class="chart" viewbox="0 0 {{ chart.hunt_length }} 41" preserveAspectRatio="none">
-        <path d="M 0 0 L {{ chart.end }} 0 L {{ chart.end }} 41 L 0 41" class="baz"></path>
+    <svg class="chart" viewbox="0 0 {{ chart.hunt_length }} {{ all_puzzles|length }}" preserveAspectRatio="none">
         <path d="M {{ chart.hunt_length }} 0 L 0 0
         {% for solve in chart.solves %}
         L {{ solve.before }} {{ forloop.counter }}
         L {{ solve.after }} {{ forloop.counter }}
         {% endfor %}
-        " class="area"></path>
+        " class="chart-area"></path>
         {% for meta in chart.metas %}
-        <path d="M {{ meta }} 0 L {{ meta }} 41" class="bar"></path>
+        <path d="M {{ meta }} 0 L {{ meta }} {{ all_puzzles|length }}" class="chart-line"></path>
         {% endfor %}
     </svg>
     <table class="sortable gph-list-table">
@@ -132,13 +108,13 @@
             <th>Time to solve</th>
             <th>Solve time (EDT)</th>
         </tr>
-        {% for submission in submissions %}
-        <tr{% if submission.used_free_answer %} class="free"{% endif %}>
-            <td sorttable_customkey="{{ submission.name }}"{% if submission.is_meta %} class="meta"{% endif %}><a href="{% url 'puzzle' submission.slug %}">{{ submission.name }}</a></td>
-            <td>{{ submission.guesses }}</td>
-            <td sorttable_customkey="{{ submission.unlock_time|unix_time }}">{% format_time submission.unlock_time %}</td>
-            <td sorttable_customkey="{{ submission.open_duration }}">{% format_duration submission.open_duration %}</td>
-            <td sorttable_customkey="{{ submission.solve_time|unix_time }}">{% format_time submission.solve_time %}</td>
+        {% for s in submissions %}
+        <tr{% if s.submission.used_free_answer %} class="free"{% endif %}>
+            <td sorttable_customkey="{{ s.submission.puzzle.name }}"{% if s.submission.puzzle.is_meta %} class="meta"{% endif %}><a href="{% url 'puzzle' s.submission.puzzle.slug %}">{{ s.submission.puzzle.name }}</a></td>
+            <td>{{ s.guesses }}</td>
+            <td sorttable_customkey="{{ s.unlock_time|unix_time }}">{% format_time s.unlock_time %}</td>
+            <td sorttable_customkey="{{ s.open_duration }}">{% format_duration s.open_duration %}</td>
+            <td sorttable_customkey="{{ s.solve_time|unix_time }}">{% format_time s.solve_time %}</td>
         </tr>
         {% endfor %}
     </table>

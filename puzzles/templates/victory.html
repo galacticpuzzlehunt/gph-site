@@ -2,18 +2,10 @@
 {% load puzzle_tags %}
 
 {% block content %}
-
-{% if hunt_finished %}
-<h1>Congratulations!</h1>
-
 <main style="text-align: center">
-    <h4>
-        Congratulations on completing the {% format_time start_time '%Y' %} {{ hunt_title }}!
+    <h3>
+        Congratulations on completing the {{ hunt_title }}!<br>
         You will receive more information shortly via email.
-    </h4>
+    </h3>
 </main>
-{% else %}
-<h1>You have not completed the hunt.</h1>
-{% endif %}
-
 {% endblock %}

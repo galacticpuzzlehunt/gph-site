@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load puzzle_tags %}
+{% load humanize %}
+
+{% block page-title %}
+<title>Biggraph</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'wrapup' %}" class="btn">Back to wrap-up</a>
+{% endblock %}
+
+{% block content %}
+<style>
+.tooltip-colored-circle {
+	/* echarts:util/format.ts */
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 4px;
+	height: 10px;
+	width: 10px;
+	border-radius: 10px;
+}
+</style>
+<div id="biggraph" style="min-height: 400px;"></div>
+
+<!-- heavily inspired by CTFd (via paradox puzzlehunt) -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.1.1/dist/echarts.min.js" integrity="sha256-Yhe8c0oOs2dPYVQKLAi1aBB9uhr7yMmh67ukoWBqDuU=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+echarts.init(document.getElementById('biggraph')).setOption({
+	title: {
+		left: "center",
+		text: "Top {{ teams|length|escapejs }} Teams",
+	},
+	tooltip: {
+		trigger: "axis",
+		axisPointer: {
+			type: "cross"
+		}
+	},
+	legend: {
+		type: "scroll",
+		orient: "horizontal",
+		align: "left",
+		bottom: 35,
+		data: [
+			{% for team in teams %}
+				"{{ team.team_name|escapejs }}",
+			{% endfor %}
+		],
+	},
+	toolbox: {
+		feature: {
+			dataZoom: {
+				yAxisIndex: "none"
+			},
+			saveAsImage: {}
+		}
+	},
+	grid: {
+		containLabel: true
+	},
+	xAxis: [
+		{
+			type: "time",
+			boundaryGap: false,
+			data: []
+		}
+	],
+	yAxis: [
+		{
+			type: "value"
+		}
+	],
+	dataZoom: [
+		{
+			id: "dataZoomX",
+			type: "slider",
+			xAxisIndex: [0],
+			filterMode: "filter",
+			height: 20,
+			top: 35,
+			fillerColor: "rgba(233, 236, 241, 0.4)"
+		}
+	],
+	tooltip: {
+		formatter: function(params) {
+			var teamName = params.seriesName;
+
+			var date = params.data[0];
+			var score = params.data[1];
+			var info = params.data[2];
+
+			// team name and color;
+			var div1 = document.createElement('div');
+			var span = document.createElement('span');
+			span.className = 'tooltip-colored-circle';
+			span.style.backgroundColor = params.color;
+			div1.appendChild(span);
+			div1.appendChild(document.createTextNode(teamName));
+
+			var div2 = document.createElement('div');
+			var sl = document.createElement('small');
+			sl.textContent = 'Solved: '
+			div2.appendChild(sl);
+			div2.appendChild(document.createTextNode(info));
+			var ns = document.createElement('strong');
+			ns.textContent = ' → ' + score;
+			div2.appendChild(ns);
+
+			var div3 = document.createElement('div');
+			div3.textContent = date.toLocaleString();
+
+			var div = document.createElement('div');
+			div.appendChild(div1);
+			div.appendChild(div2);
+			div.appendChild(div3);
+			return div.outerHTML;
+		},
+	},
+	series: [
+		{% spacelesser %}
+		{% for team in teams %}
+		{
+			name: "{{ team.team_name|escapejs }}",
+			type: "line",
+			itemStyle: {
+				normal: {
+					color: "{{ team.color|escapejs }}",
+				}
+			},
+			symbolSize: function(data) { return data[3] ? 10 : 4; },
+			data: [
+				{% for point in team.graph_data %}
+				[new Date({{ point.0|escapejs }}), {{ point.1|escapejs }}, '{{ point.2|escapejs }}', {% if point.3 %}1{% else %}0{% endif %}],
+				{% endfor %}
+			],
+		},
+		{% endfor %}
+		{% endspacelesser %}
+	],
+});
+</script>
+{% endblock %}

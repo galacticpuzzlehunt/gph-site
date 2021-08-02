@@ -50,10 +50,7 @@ td.S { {# solved #}
     background-color: #060;
     color: white;
 }
-td.b { {# backsolved from some metas #}
-    background-color: #282;
-}
-td.B { {# backsolved from all metas #}
+td.B { {# backsolved #}
     background-color: #4a4;
 }
 td.F { {# free answer #}
@@ -73,7 +70,7 @@ td.P { {# post-hunt solve #}
 td:first-child {
     position: sticky;
     left: 0;
-    background-color: #ddd;
+    background-color: white;
     z-index: 1;
     max-width: 160px;
     overflow: hidden;
@@ -84,7 +81,7 @@ td:first-child {
 th {
     position: sticky;
     top: 0;
-    background-color: #ddd;
+    background-color: white;
     z-index: 2;
     text-align: center;
 }
@@ -101,7 +98,7 @@ small {
     width: 2rem;
     height: 5rem;
     margin: 0 1rem 0 0;
-    vertical-align: bottom;
+    vertical-align: top;
 }
 
 [for=hide] {
@@ -113,6 +110,33 @@ small {
 :checked ~ table .finished {
     display: none;
 }
+
+.puzzle-title-header-link {
+    display: inline-block;
+    padding: 10px 2px;
+    width: 100%;
+}
+
+.puzzle-title-header-link::before {
+    content: attr(data-puzzle-name);
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    font-size: 12pt;
+    font-weight: normal;
+    color: initial;
+    padding: 8px;
+    transform: translate(-50%, 100%);
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+    border-radius: 0 0 8px 8px;
+    background-color: white;
+}
+
+.puzzle-title-header-link:hover::before {
+    opacity: 1;
+}
 </style>
 
 <input type="checkbox" id="hide"><label for="hide">Hide finished teams</label>
@@ -122,10 +146,7 @@ small {
 {% spacelesser %}
 <col> {# team #}
 <col class="end"> {# place #}
-<col> {# deep #}
 <col> {# solves #}
-<col> {# intro #}
-<col> {# jungle #}
 <col> {# metas #}
 <col> {# hints #}
 <col class="end"> {# last solve #}
@@ -135,21 +156,18 @@ small {
 <tr>
     <th>Team
     <th>#
-    <th>Prog.
-    <th>{% include 'icon-solved.svg' %}
-    <th>Intro
-    <th>Jungle
+    <th>Solves
     <th>Metas
     <th>{% include 'icon-hint.svg' %}
     <th>Last solve
     {% for puzzle in puzzles %}
-    <th><a href="{% url 'stats' puzzle.puzzle.slug %}">{{ puzzle.puzzle.short_name }}</a>
+    <th><a class="puzzle-title-header-link" data-puzzle-name="{{ puzzle.puzzle.name }}" href="{% url 'stats' puzzle.puzzle.slug %}">{{ puzzle.puzzle.short_name }}</a>
     {% endfor %}
 </tr>
 <tr>
     <td>Solves
     <td>
-    <td colspan="7">
+    <td colspan="4">
     {% for puzzle in puzzles %}
     <td class="S">{{ puzzle.solves }}
     {% endfor %}
@@ -157,7 +175,7 @@ small {
 <tr>
     <td>Guesses
     <td>
-    <td colspan="7">
+    <td colspan="4">
     {% for puzzle in puzzles %}
     <td class="W">{{ puzzle.total_guesses }}
     {% endfor %}
@@ -165,7 +183,7 @@ small {
 <tr>
     <td>Unlocks
     <td>
-    <td colspan="7">
+    <td colspan="4">
     {% for puzzle in puzzles %}
     <td class="U">{{ puzzle.total_unlocks }}
     {% endfor %}
@@ -173,23 +191,23 @@ small {
 <tr>
     <td>Hints
     <td>
-    <td colspan="7">
+    <td colspan="4">
     {% for puzzle in puzzles %}
     <td class="H">{{ puzzle.hints }}
     {% endfor %}
 </tr>
-<tr>
-    <td>Free Answers
+{% if free_answers_enabled %}<tr>
+    <td>{% include 'icon-answer.svg' %}
     <td>
-    <td colspan="7">
+    <td colspan="4">
     {% for puzzle in puzzles %}
     <td class="F">{{ puzzle.free_solves }}
     {% endfor %}
-</tr>
+</tr>{% endif %}
 <tr>
     <td>%Solve/Guess
     <td>
-    <td colspan="7">
+    <td colspan="4">
     {% for puzzle in puzzles %}
     <td>{% percentage puzzle.solves puzzle.total_guesses %}
     {% endfor %}
@@ -197,7 +215,7 @@ small {
 <tr>
     <td>%Solve/Unlock
     <td>
-    <td colspan="7">
+    <td colspan="4">
     {% for puzzle in puzzles %}
     <td>{% percentage puzzle.solves puzzle.total_unlocks %}
     {% endfor %}
@@ -214,10 +232,6 @@ small {
         <small>{{ board_entry.finished }}</small>
         {% endif %}
     <td>
-        {% if board_entry.deep %}
-        {{ board_entry.deep|intcomma }}
-        {% endif %}
-    <td>
         {% if board_entry.total_solves %}
         {{ board_entry.total_solves }}
         {% endif %}
@@ -228,19 +242,11 @@ small {
         <small>+{{ board_entry.free_solves }}</small>
         {% endif %}
     <td>
-        {% if board_entry.intro_solves %}
-        {{ board_entry.intro_solves }}
-        {% endif %}
-    <td>
-        {% if board_entry.jungle_solves %}
-        {{ board_entry.jungle_solves }}
-        {% endif %}
-    <td>
         {% if board_entry.meta_solves %}
         {{ board_entry.meta_solves }}
         {% endif %}
     <td>
-        {{ board_entry.used_hints }} / {{ board_entry.total_hints }}
+        {{ board_entry.used_hints }} / {{ board_entry.team.num_hints_total }}
     <td>
         {% format_time board_entry.last_solve_time %}
     {% for entry in board_entry.entries %}

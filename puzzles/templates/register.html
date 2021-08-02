@@ -63,7 +63,31 @@
     </div>
 
     <div class="form-section">
+    {% if recaptcha_sitekey %}
+        <script src="https://www.google.com/recaptcha/api.js"></script>
+        <script>
+        function recaptchaSubmit() {
+            var form = document.getElementById('register');
+            if (form.requestSubmit) {
+                form.requestSubmit();
+            } else if (form.reportValidity) {
+                if (form.reportValidity())
+                    form.submit();
+            } else if (form.checkValidity) {
+                if (form.checkValidity())
+                    form.submit();
+            } else {
+                form.submit();
+            }
+        }
+        </script>
+        <button class="btn g-recaptcha"
+                data-sitekey="{{ recaptcha_sitekey }}"
+                data-callback="recaptchaSubmit"
+                data-action="register">Submit</button>
+    {% else %}
         <button class="btn" type="submit">Submit</button>
+    {% endif %}
     </div>
 </form>
 

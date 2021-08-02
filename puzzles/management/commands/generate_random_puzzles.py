@@ -4,7 +4,7 @@
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 from datetime import datetime
-from puzzles.models import Puzzle
+from puzzles.models import Puzzle, Round
 import random
 
 # random "green paint" answers // many words from https://github.com/glitchdotcom/friendly-words
@@ -42,17 +42,36 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         n = options['num_puzzles'][0]
+        limit = 0
+        round_order = 0
+
         for i in range(n):
+            if i == limit:
+                title = 'Intro' if i == 0 else random.choice(nouns).title()
+                slug = slugify(title)
+                round_order += 1
+                puzzle_order = 0
+                limit += random.randint(4, 10)
+
+                round = Round(
+                    name=title,
+                    slug=slug,
+                    order=round_order,
+                )
+                round.save()
+
             answer = random_answer()
             title = random.choice(answerphrases).format(answer)
             slug = slugify(title)
+            puzzle_order += 1
 
             Puzzle(
                 name=title,
                 slug=slug,
                 body_template=slug + '.html',
                 answer=answer,
-                deep=0,
+                round=round,
+                order=puzzle_order,
             ).save()
 
         self.stdout.write(self.style.SUCCESS('Randomly generated {} puzzles'.format(n)))

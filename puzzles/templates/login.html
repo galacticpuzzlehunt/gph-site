@@ -1,46 +1,52 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+@media (min-width: 961px) {
+    #login {
+        position: relative;
+    }
+
+    .six {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+}
+</style>
+
 <h2>Login</h2>
 
-<div class="row">
-    <div class="six columns">
-        <form id="login" method="post">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
+<form id="login" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
 
-            <div class="form-section">
-                {% for field in form %}
-                <div class="row">
-                    <div class="four columns">
-                        {{ field.label_tag }}
-                    </div>
-                    <div class="eight columns">
-                        {{ field }}
-                        {{ field.errors }}
-                    </div>
-                </div>
-                {% endfor %}
+    <div class="form-section">
+        {% for field in form %}
+        <div class="row">
+            <div class="two columns">
+                {{ field.label_tag }}
             </div>
-
-            <div class="form-section">
-                <button class="btn" type="submit">Submit</button>
+            <div class="four columns">
+                {{ field }}
+                {{ field.errors }}
             </div>
-        </form>
+        </div>
+        {% endfor %}
     </div>
 
-    <div class="six columns">
-        {% if not hunt_is_closed %}
-        <p>
-            If you haven&rsquo;t created a team yet,
-            <a href="{% url 'register' %}">register a new team here</a>.
-        </p>
-        {% endif %}
-        <p>
-            Forgot your password?
-            <a href="{% url 'password_reset' %}">Click here to reset password</a>.
-        </p>
+    <div class="form-section">
+        <button class="btn" type="submit">Submit</button>
     </div>
-</div>
+
+    {% if not hunt_is_closed %}
+    <div class="six columns">
+        <p>If you haven&rsquo;t created a team yet,
+        <a href="{% url 'register' %}">register a new team here</a>.
+        <p>Forgot your password?
+        <a href="{% url 'password_reset' %}">Click here to reset password</a>.
+    </div>
+    {% endif %}
+</form>
 
 {% endblock %}

@@ -12,62 +12,65 @@
 {% block content %}
 
 <style>
+h2 {
+    font-size: 2.5rem;
+    font-weight: normal;
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
 h4 {
     font-size: 2rem;
     font-weight: normal;
-    font-style: italic;
-    margin-bottom: 24px;
+    margin: 2rem 0;
 }
 
-.answers-used {
-    column-width: 350px;
-    white-space: pre;
-    font-family: monospace, monospace;
+.solved-title-answer.blur {
+    transition: 0.6s;
+    filter: blur(0.8rem);
 }
+
+.solved-title-answer.blur:hover {
+    filter: blur(0);
+}
+
 </style>
 
 <h1>
     {% block puzzle-title %}
     Solution: {{ puzzle.name }}
-    <div class="solved-title-marker">Answer: <span class="solved-title-answer">{{ puzzle.answer }}</span></div>
+    <div class="solved-title-marker">Answer: <span class="solved-title-answer blur">{{ puzzle.answer }}</span></div>
     {% endblock %}
 </h1>
 
 <main>
-    <h4>
+    <h2>
         Written by
         {% block puzzle-author %}
         aliens
         {% endblock %}
-    </h4>
+    </h2>
 
-    {% captureas solution_body_content %}{% spaceless %}
-        {% block solution-body %}
-        This solution doesn&rsquo;t seem to exist yet.
-        Searched for a solution template named `{{ template_name }}`
-        {% endblock %}
-    {% endspaceless %}{% endcaptureas %}
-    {{ solution_body_content }}
-
-    {% captureas author_notes_content %}{% spaceless %}
-        {% block author-notes %}{% endblock %}
-    {% endspaceless %}{% endcaptureas %}
-
-    {% if author_notes_content %}
-    <hr>
-    <h4>Author&rsquo;s Notes</h4>
-    {{ author_notes_content }}
+    {% puzzleblock solution-body %}
+    {% if solution_body %}{{ solution_body }}{% elif template_name %}
+    This solution doesn&rsquo;t seem to exist yet.
+    Searched for a solution template named <code>{{ template_name }}</code>
+    {% else %}
+    This solution template exists, but it doesn&rsquo;t seem to define
+    a solution content block. Check the post production guide?
     {% endif %}
 
-    {% captureas appendix_content %}{% spaceless %}
-        {% block appendix %}{% endblock %}
-    {% endspaceless %}{% endcaptureas %}
-
-    {% if appendix_content %}
-    <hr>
-    {{ appendix_content }}
+    {% puzzleblock author-notes %}
+    {% if author_notes %}
+    <h2 id="authors-notes">Author&rsquo;s Notes</h2>
+    {{ author_notes }}
     {% endif %}
-      
+
+    {% puzzleblock appendix %}
+    {% if appendix %}
+    <h2 id="appendix">{% block appendix-title %}Appendix{% endblock %}</h2>
+    {{ appendix }}
+    {% endif %}
 </main>
 
 {% endblock %}

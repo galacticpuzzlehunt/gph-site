@@ -116,9 +116,9 @@ class Shortcuts:
         'Show answer'
         raise Exception(puzzle.answer)
 
-    def show_deep(puzzle):
-        'Show deep'
-        raise Exception(puzzle.deep)
+    def show_order(puzzle):
+        'Show order'
+        raise Exception(puzzle.order)
 
     SOLVE = 'Solve this puzzle'
 

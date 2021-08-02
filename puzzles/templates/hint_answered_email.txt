@@ -1,4 +1,6 @@
 {% autoescape off %}
+{{ hint.team }},
+
 Your hint question for the puzzle {{ hint.puzzle }} has been answered.
 
 Question:
@@ -6,4 +8,6 @@ Question:
 
 Response:
 {{ hint.response }}
+
+If you still need help, you can make another request at {{ link }}
 {% endautoescape %}

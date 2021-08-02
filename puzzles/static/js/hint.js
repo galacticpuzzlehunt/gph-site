@@ -11,7 +11,6 @@ function copyHint(id) {
 // they're not (after this JavaScript runs). So we use cookies on both server
 // and client side so they have a consistent view of whether the user has ID'ed
 // themselves.
-
 function askName(force) {
     var name;
     var claimerCookie = document.cookie.split('; ').find(row => row.startsWith('claimer='));
@@ -20,7 +19,7 @@ function askName(force) {
     }
 
     if (!name || force) {
-        name = prompt('Who are you? (personal Discord name/username; this is for internal use)');
+        name = prompt('Who are you? (personal Discord name/username, excluding the #0000 tag; this is for internal use)');
     }
 
     if (name) {
@@ -28,5 +27,35 @@ function askName(force) {
         document.getElementById('claimer').textContent = name;
     }
 }
-
 askName(false);
+
+function getUpdates() {
+    openSocket('/ws/hints', data => {
+        const {id, content} = JSON.parse(data);
+        const elt = document.getElementById('h' + id);
+        if (content && elt)
+            elt.outerHTML = content;
+        else if (content)
+            document.getElementsByClassName('hint-table')[0].innerHTML += content;
+        else if (elt)
+            elt.remove();
+        updateTimestamps();
+    });
+    setInterval(updateDurations, 1000);
+}
+
+function updateDurations() {
+    for (const time of document.querySelectorAll('time')) {
+        let secs = Math.max(0, (Date.now() - new Date(time.dateTime)) / 1000 | 0);
+        const hours = secs / (60 * 60) | 0;
+        secs -= hours * 60 * 60;
+        const mins = secs / 60 | 0;
+        secs -= mins * 60;
+        if (hours > 0)
+            time.textContent = `${hours}h${mins}m`;
+        else if (mins > 0)
+            time.textContent = `${mins}m${secs}s`;
+        else
+            time.textContent = `${secs}s`;
+    }
+}

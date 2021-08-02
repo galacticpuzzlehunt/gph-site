@@ -24,6 +24,9 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'FIXME_SECRET_KEY_HERE')
 
+RECAPTCHA_SITEKEY = None
+RECAPTCHA_SECRETKEY = None
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -40,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'impersonate',
-    # 'mathfilters',
+    'mathfilters',
+    'channels',
     'puzzles',
 ]
 
@@ -55,13 +59,28 @@ MIDDLEWARE = [
     'impersonate.middleware.ImpersonateMiddleware',
     'puzzles.messaging.log_request_middleware',
     'puzzles.context.context_middleware',
+    'puzzles.puzzlehandlers.reverse_proxy_middleware',
 ]
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
     }
 }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [{'address':('127.0.0.1', 6379), 'db': 2}],
+        },
+    }
+}
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_CACHE_ALIAS = 'default'
 
@@ -84,6 +103,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'gph.wsgi.application'
+ASGI_APPLICATION = 'gph.asgi.application'
 
 
 # Database
@@ -95,6 +115,8 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 
 # Password validation
@@ -124,7 +146,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'static'))
 SOLUTION_STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'puzzles/templates/solution_bodies'))
-
+STATICFILES_STORAGE = 'gph.storage.CustomStorage'
 
 # Email SMTP information
 
@@ -162,7 +184,7 @@ LOGGING = {
             'format': '%(asctime)s [%(levelname)s] %(module)s\n%(message)s'
         },
         'puzzles': {
-            'format': '%(asctime)s [%(levelname)s] %(message)s'
+            'format': '%(asctime)s [%(levelname)s] %(name)s %(message)s'
         },
     },
     # FIXME you may want to change the filenames to something like
@@ -173,6 +195,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(LOGS_DIR, 'django.log'),
             'formatter': 'django',
+        },
+        'general': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'general.log'),
+            'formatter': 'puzzles',
         },
         'puzzle': {
             'level': 'INFO',
@@ -190,6 +218,11 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['django'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'puzzles': {
+            'handlers': ['general'],
             'level': 'INFO',
             'propagate': True,
         },

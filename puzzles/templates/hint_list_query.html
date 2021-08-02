@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+{% load puzzle_tags %}
+
+{% block page-title %}
+<title>Hints</title>
+{% endblock %}
+
+{% block top-left-actions %}
+<a href="{% url 'hint-list' %}" class="btn">Back to hint queue</a>
+{% endblock %}
+
+{% block content %}
+<h1>{{ query_description }}</h1>
+
+<table class="hint-table">
+    {% for hint in hints %}
+    <tbody style="background-color: #{{ hint.hint_question|hash|slice:':6' }}20">
+        <tr>
+            <th>
+                <a href="{% url 'hint' hint.id %}">
+                    {% if hint.is_followup %}<em>(followup){% endif %}
+                    {% format_time hint.submitted_datetime '%A, %B %-d at %-I:%M %p %Z' %}
+                    {% if hint.is_followup %}</em>{% endif %}
+                </a>
+            </th>
+            <td>
+                <a href="{% url 'team' hint.team.team_name %}">
+                    {{ hint.team }}
+                </a>
+            </td>
+            <td>
+                <a href="{% url 'solution' hint.puzzle.slug %}">
+                    {{ hint.puzzle }}
+                </a>
+            </td>
+            <td>
+                <a href="/admin/puzzles/hint/{{ hint.id }}/change/">
+                    (view in admin)
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {% if hint.answered_datetime %}
+                    {{ hint.get_status_display }}
+                    {% format_time_since hint.answered_datetime now %} ago
+                    by {{ hint.claimer }}
+                {% elif hint.claimed_datetime %}
+                    Claimed {% format_time_since hint.claimed_datetime now %} ago
+                    by {{ hint.claimer }}
+                {% else %}
+                    Unclaimed
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'hint-list' %}?team={{ hint.team_id }}">
+                    (all from same team)
+                </a>
+            </td>
+            <td>
+                <a href="{% url 'hint-list' %}?puzzle={{ hint.puzzle_id }}">
+                    (all from same puzzle)
+                </a>
+            </td>
+            <td>
+                <a href="{% url 'hint-list' %}?team={{ hint.team_id }}&puzzle={{ hint.puzzle_id }}">
+                    (both)
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <pre class="submitted-text">{{ hint.hint_question }}</pre>
+                <hr>
+                <pre class="submitted-text" id="h{{ hint.id }}">{{ hint.response }}</pre>
+            </td>
+        </tr>
+    </tbody>
+    {% endfor %}
+</table>
+{% endblock %}

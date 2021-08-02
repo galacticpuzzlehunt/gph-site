@@ -7,29 +7,14 @@ import datetime
 import inspect
 import types
 
+from django.conf import settings
+from django.urls import reverse
 from django.utils import timezone
 
-from puzzles.hunt_config import (
-    HUNT_TITLE,
-    HUNT_ORGANIZERS,
-    STORY_PAGE_VISIBLE,
-    ERRATA_PAGE_VISIBLE,
-    WRAPUP_PAGE_VISIBLE,
-    HUNT_START_TIME,
-    HUNT_END_TIME,
-    HUNT_CLOSE_TIME,
-    HINTS_ENABLED,
-    HINTS_PER_DAY,
-    DAYS_BEFORE_HINTS,
-    DEEP_MAX,
-    CONTACT_EMAIL,
-    MAX_MEMBERS_PER_TEAM,
-    MAX_GUESSES_PER_PUZZLE,
-)
-
-from puzzles.shortcuts import get_shortcuts
-
+from puzzles import hunt_config
+from puzzles.hunt_config import HUNT_START_TIME, HUNT_END_TIME, HUNT_CLOSE_TIME
 from puzzles import models
+from puzzles.shortcuts import get_shortcuts
 
 
 def context_middleware(get_response):
@@ -85,21 +70,14 @@ def context_cache(cls):
 # bar and rendering the puzzles page both need the list of puzzles the current
 # team has solved. This object ensures it only needs to be computed once,
 # without explicitly having to pass it around from one place to the other.
-# The properties here are accessible both from views and from templates. If
-# you're adding something with complicated logic, prefer to put most of it in
-# a model method and just leave a stub call here.
 
-# In theory, `BaseContext` properties are things that make sense if all the info
-# you have is an optional team (e.g. you don't know about a specific puzzle, or
-# a user who might not be specified by the team). (But TODO(gph): this setup
-# may currently be overengineered.)
+# There are currently two types of contexts: request Contexts (below) and Team
+# models (in models.py). Simple properties that are generally useful to either
+# can go in BaseContext. The fact that Teams are contexts enables the above
+# caching benefits when calculating things like a team's solves, unlocked
+# puzzles, or remaining hints -- whether you're looking at your own logged-in
+# team or another team's details page.
 class BaseContext:
-    def hunt_title(self):
-        return HUNT_TITLE
-
-    def hunt_organizers(self):
-        return HUNT_ORGANIZERS
-
     def now(self):
         return timezone.localtime()
 
@@ -111,27 +89,6 @@ class BaseContext:
 
     def close_time(self):
         return HUNT_CLOSE_TIME
-
-    def is_story_page_visible(self):
-        return STORY_PAGE_VISIBLE
-
-    def is_errata_page_visible(self):
-        return ERRATA_PAGE_VISIBLE
-
-    def is_wrapup_page_visible(self):
-        return WRAPUP_PAGE_VISIBLE
-
-    def hints_per_day(self):
-        if HINTS_ENABLED:
-            return HINTS_PER_DAY
-        else:
-            return 0
-
-    def hint_time(self):
-        if HINTS_ENABLED:
-            return self.start_time + datetime.timedelta(days=DAYS_BEFORE_HINTS)
-        else:
-            return None
 
     # XXX do NOT name this the same as a field on the actual Team model or
     # you'll silently be unable to update that field because you'll be writing
@@ -151,34 +108,32 @@ class BaseContext:
     def hunt_is_closed(self):
         return self.now >= self.close_time
 
-    def deep(self):
-        return models.Team.compute_deep(self)
+# Also include the constants from hunt_config.
+for (key, value) in hunt_config.__dict__.items():
+    if key.isupper() and key not in ('HUNT_START_TIME', 'HUNT_END_TIME', 'HUNT_CLOSE_TIME'):
+        (lambda v: setattr(BaseContext, key.lower(), lambda self: v))(value)
 
-    def display_deep(self):
-        return '\u221e' if self.deep == DEEP_MAX else int(self.deep)
+# Also include select constants from settings.
+for key in ('RECAPTCHA_SITEKEY', 'GA_CODE', 'DOMAIN'):
+    (lambda v: setattr(BaseContext, key.lower(), lambda self: v))(getattr(settings, key))
 
-    def contact_email(self):
-        return CONTACT_EMAIL
 
-    def max_members_per_team(self):
-        return MAX_MEMBERS_PER_TEAM
-
-    def max_guesses_per_puzzle(self):
-        return MAX_GUESSES_PER_PUZZLE
-
-# In theory, `Context` properties are things that don't make sense if all the
-# info you have is a team. They might make sense for a specific Django request
-# that specifies a puzzle.
+# The properties of a request Context are accessible both from views and from
+# templates. If you're adding something with complicated logic, prefer to put
+# most of it in a model method and just leave a stub call here.
 @context_cache
 class Context:
     def __init__(self, request):
         self.request = request
 
+    def request_user(self):
+        return self.request.user
+
     def is_superuser(self):
-        return self.request.user.is_superuser
+        return self.request_user.is_superuser
 
     def team(self):
-        return getattr(self.request.user, 'team', None)
+        return getattr(self.request_user, 'team', None)
 
     def shortcuts(self):
         return tuple(get_shortcuts(self))
@@ -189,17 +144,20 @@ class Context:
     def num_free_answers_remaining(self):
         return self.team.num_free_answers_remaining if self.team else 0
 
-    def submissions(self):
-        return self.team.submissions if self.team else []
-
     def unlocks(self):
         return models.Team.compute_unlocks(self)
 
     def all_puzzles(self):
-        return tuple(models.Puzzle.objects.prefetch_related('metas').order_by('deep'))
+        return tuple(models.Puzzle.objects.select_related('round').order_by('round__order', 'order'))
 
     def unclaimed_hints(self):
         return models.Hint.objects.filter(status=models.Hint.NO_RESPONSE, claimer='').count()
+
+    def visible_errata(self):
+        return models.Erratum.get_visible_errata(self)
+
+    def errata_page_visible(self):
+        return self.is_superuser or any(erratum.updates_text for erratum in self.visible_errata)
 
     def puzzle(self):
         return None  # set by validate_puzzle
@@ -212,3 +170,16 @@ class Context:
 
     def puzzle_submissions(self):
         return self.team and self.puzzle and self.team.puzzle_submissions(self.puzzle)
+
+    def round(self):
+        return self.puzzle.round if self.puzzle else None
+
+    # The purpose of this logic is to keep archive links current. For example,
+    # https://2019.galacticpuzzlehunt.com/archive is a page that exists but only
+    # links to the 2017, 2018, and 2019 GPHs. We're not going to keep updating
+    # that page for all future GPHs. Instead, we'd like to link to
+    # https://galacticpuzzlehunt.com/archive, which we've set up to redirect to
+    # the most recent GPH, so it'll show all GPHs run so far. If you don't have
+    # an archive, you don't have to bother with this.
+    def archive_link(self):
+        return reverse('archive') if settings.DEBUG else 'https://FIXME/archive'

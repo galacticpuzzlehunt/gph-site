@@ -8,6 +8,36 @@
 
 {% block content %}
 
+<style>
+  p img {
+    width: 600px;
+    max-width: 100%;
+  }
+
+  aside {
+    display: none;
+  }
+
+  @media screen and (min-width: 961px) {
+    {# we can make this look pretty later #}
+    aside {
+      display: block;
+      position: fixed;
+      top: 120px;
+      left: 0;
+    }
+
+    aside div {
+      color: #ae4160;
+      cursor: pointer;
+    }
+
+    aside .highlight, aside :hover {
+      font-weight: bold;
+    }
+  }
+</style>
+
 <h1>Wrap-Up</h1>
 
 <main>
@@ -15,5 +45,30 @@
 <p>Congratulations!</p>
 
 </main>
+
+<aside></aside>
+
+<script>
+(() => {
+const heads = [];
+for (const head of $('main').find('h1,h2,h3,h4,h5,h6')) {
+  const link = $('<div>')
+      .text($(head).text())
+      .css('padding-left', head.tagName.substr(1) + 'em')
+      .click(() => head.scrollIntoView())
+      .appendTo('aside');
+  heads.push([head, link]);
+}
+function highlight() {
+  const rects = heads.map(([head]) => head.getBoundingClientRect());
+  heads.forEach(([head, link], i) => {
+    link.toggleClass('highlight',
+        (!rects[i + 1] || rects[i + 1].top > 0) && rects[i].top < innerHeight);
+  });
+}
+document.addEventListener('scroll', highlight, {passive: true});
+highlight();
+})();
+</script>
 
 {% endblock %}

@@ -1,6 +1,6 @@
+import collections
 import datetime
 import re
-from collections import defaultdict
 from urllib.parse import quote_plus
 
 from django import forms
@@ -12,6 +12,7 @@ from django.db.models import F, FilteredRelation, Q, Case, When, Count, Min
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils import timezone
 
 from puzzles.context import context_cache
@@ -22,34 +23,44 @@ from puzzles.messaging import (
     dispatch_submission_alert,
     send_mail_wrapper,
     discord_interface,
+    show_unlock_notification,
+    show_solve_notification,
+    show_hint_notification,
 )
 
 from puzzles.hunt_config import (
-    HUNT_START_TIME,
     HUNT_END_TIME,
     MAX_GUESSES_PER_PUZZLE,
-
     HINTS_ENABLED,
     HINTS_PER_DAY,
-    DAYS_BEFORE_HINTS,
+    HINT_TIME,
     TEAM_AGE_BEFORE_HINTS,
-    CAP_HINTS_BY_TEAM_AGE,
-
+    INTRO_HINTS,
     FREE_ANSWERS_ENABLED,
-    DAYS_BEFORE_FREE_ANSWERS,
-    CAP_FREE_ANSWERS_BY_TEAM_AGE,
     FREE_ANSWERS_PER_DAY,
-
-    DEEP_MAX,
-    INTRO_META_SLUG,
+    FREE_ANSWER_TIME,
+    TEAM_AGE_BEFORE_FREE_ANSWERS,
+    INTRO_ROUND_SLUG,
     META_META_SLUG,
 )
+
+
+class Round(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True)
+    meta = models.ForeignKey(
+        'Puzzle', limit_choices_to={'is_meta': True}, related_name='+',
+        null=True, blank=True, on_delete=models.SET_NULL)
+    order = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
 
 
 class Puzzle(models.Model):
     '''A single puzzle in the puzzlehunt.'''
 
-    name = models.CharField(max_length=500)
+    name = models.CharField(max_length=255)
 
     # I considered making this default to django.utils.text.slugify(name) via
     # cleaning, but that's a bit more invasive because you need blank=True for
@@ -58,7 +69,7 @@ class Puzzle(models.Model):
     # can't be URL-reversed). Note that not all routes a model could enter the
     # database will call clean().
     slug = models.SlugField(
-        max_length=500, unique=True,
+        max_length=255, unique=True,
         help_text='Slug used in URLs to identify this puzzle (must be unique)',
     )
 
@@ -66,7 +77,7 @@ class Puzzle(models.Model):
     # default in clean(), a blank body template could sneak in anyway, but it
     # seems less likely to be harmful here.
     body_template = models.CharField(
-        max_length=500, blank=True,
+        max_length=255, blank=True,
         help_text='''File name of a Django template (including .html) under
         puzzle_bodies and solution_bodies containing the puzzle and
         solution content, respectively. Defaults to slug + ".html" if not
@@ -74,25 +85,25 @@ class Puzzle(models.Model):
     )
 
     answer = models.CharField(
-        max_length=500,
+        max_length=255,
         help_text='Answer (fine if unnormalized)',
     )
 
-    deep = models.IntegerField(
-        verbose_name='DEEP threshold',
-        help_text='DEEP/Progress threshold teams must meet to unlock this puzzle'
-    )
-
-    # indicates if this puzzle is a metapuzzle
+    round = models.ForeignKey(Round, on_delete=models.CASCADE)
+    order = models.IntegerField(default=0)
     is_meta = models.BooleanField(default=False)
 
-    metas = models.ManyToManyField(
-        'self', limit_choices_to={'is_meta': True}, symmetrical=False, blank=True,
-        help_text='All metas that this puzzle is part of',
-    )
+    # For unlocking purposes, a "main round solve" is a solve that is not a
+    # meta or in the intro round.
+    unlock_hours = models.IntegerField(default=-1,
+        help_text='If nonnegative, puzzle unlocks N hours after the hunt starts.')
+    unlock_global = models.IntegerField(default=-1,
+        help_text='If nonnegative, puzzle unlocks after N main round solves in any round.')
+    unlock_local = models.IntegerField(default=-1,
+        help_text='If nonnegative, puzzle unlocks after N main round solves in this round.')
 
     emoji = models.CharField(
-        max_length=500, default=':question:',
+        max_length=32, default=':question:',
         help_text='Emoji to use in Discord integrations involving this puzzle'
     )
 
@@ -127,10 +138,6 @@ class Puzzle(models.Model):
     def normalize_answer(s):
         return s and re.sub(r'[^A-Z]', '', s.upper())
 
-    def is_intro(self):
-        '''Is this puzzle in the intro round?'''
-        # FIXME: Not all hunts have an intro round.
-        return any(meta.slug == INTRO_META_SLUG for meta in self.metas.all())
 
 @context_cache
 class Team(models.Model):
@@ -148,7 +155,7 @@ class Team(models.Model):
     # Public team name for scoreboards and comms -- not necessarily the same as
     # the user's name from the User object
     team_name = models.CharField(
-        max_length=100, unique=True,
+        max_length=255, unique=True,
         help_text='Public team name for scoreboards and communications',
     )
 
@@ -182,8 +189,7 @@ class Team(models.Model):
 
     is_hidden = models.BooleanField(
         default=False,
-        help_text='''If a team is hidden, it will not be visible to the
-        public''',
+        help_text='If a team is hidden, it will not be visible to the public',
     )
 
     def __str__(self):
@@ -202,10 +208,7 @@ class Team(models.Model):
         ]
 
     def puzzle_answer(self, puzzle):
-        return puzzle.answer if any(
-            submission.is_correct
-            for submission in self.puzzle_submissions(puzzle)
-        ) else None
+        return puzzle.answer if puzzle.id in self.solves else None
 
     def guesses_remaining(self, puzzle):
         wrong_guesses = sum(
@@ -315,7 +318,7 @@ class Team(models.Model):
         # complicated scoring/ranking algorithm or one that uses information
         # not available in the database, like GPH 2018...)
 
-        # total_solves = defaultdict(int)
+        # total_solves = collections.defaultdict(int)
         # meta_times = {}
         # for team_id, slug, time in AnswerSubmission.objects.filter(
         #     used_free_answer=False, is_correct=True, submitted_datetime__lt=HUNT_END_TIME
@@ -343,52 +346,44 @@ class Team(models.Model):
     def team(self):
         return self
 
-    def team_created_after_hunt_start(self):
-        return max(0, (self.creation_time - self.start_time).days)
+    def asked_hints(self):
+        return tuple(self.hint_set.select_related('puzzle', 'puzzle__round'))
 
     def num_hints_total(self):
         '''
         Compute the total number of hints (used + remaining) available to this team.
         '''
-        if not HINTS_ENABLED: return 0
 
-        now = min(self.now, HUNT_END_TIME)
-        days_since_hunt_start = (now - self.start_time).days
-        time_since_team_created = now - self.creation_time
-        if TEAM_AGE_BEFORE_HINTS is not None and time_since_team_created < TEAM_AGE_BEFORE_HINTS:
-            # No hints available for first X days of any team (to discourage
-            # creating additional teams after the hunt has started to farm
-            # hints)
+        if not HINTS_ENABLED or self.hunt_is_over:
             return 0
-
-        # First hint accumulation is on day 3...
-        days = days_since_hunt_start - DAYS_BEFORE_HINTS + 1
-        # ...unless the team was created later than that.
-        if CAP_HINTS_BY_TEAM_AGE:
-            days = min(days, days_since_hunt_start - self.team_created_after_hunt_start)
-
-        return max(0, days) * HINTS_PER_DAY + self.total_hints_awarded
+        if self.now < self.creation_time + TEAM_AGE_BEFORE_HINTS:
+            return self.total_hints_awarded
+        days = max(0, (self.now - (HINT_TIME - self.start_offset)).days + 1)
+        return self.total_hints_awarded + sum(HINTS_PER_DAY[:days])
 
     def num_hints_used(self):
-        return self.hint_set.filter(status__in=(Hint.ANSWERED, Hint.NO_RESPONSE)).count()
+        return sum(hint.consumes_hint for hint in self.asked_hints)
 
     def num_hints_remaining(self):
         return self.num_hints_total - self.num_hints_used
 
-    def num_awarded_hints_remaining(self):
-        return self.total_hints_awarded - self.num_hints_used
+    def num_intro_hints_used(self):
+        return min(INTRO_HINTS, sum(hint.consumes_hint for hint in
+            self.asked_hints if hint.puzzle.round.slug == INTRO_ROUND_SLUG))
+
+    def num_intro_hints_remaining(self):
+        return min(self.num_hints_remaining, INTRO_HINTS - self.num_intro_hints_used)
+
+    def num_nonintro_hints_remaining(self):
+        return self.num_hints_remaining - self.num_intro_hints_remaining
 
     def num_free_answers_total(self):
-        if not FREE_ANSWERS_ENABLED: return 0
-
-        days_since_hunt_start = (self.now - self.start_time).days
-        if CAP_FREE_ANSWERS_BY_TEAM_AGE and self.team_created_after_hunt_start >= DAYS_BEFORE_FREE_ANSWERS - 1:
-            # No free answers at all for late-created teams.
+        if not FREE_ANSWERS_ENABLED or self.hunt_is_over:
             return 0
-        return sum(
-            h for (i, h) in enumerate(FREE_ANSWERS_PER_DAY)
-            if days_since_hunt_start >= DAYS_BEFORE_FREE_ANSWERS + i
-        ) + self.total_free_answers_awarded
+        if self.now < self.creation_time + TEAM_AGE_BEFORE_FREE_ANSWERS:
+            return self.total_free_answers_awarded
+        days = max(0, (self.now - (FREE_ANSWER_TIME - self.start_offset)).days + 1)
+        return self.total_free_answers_awarded + sum(FREE_ANSWERS_PER_DAY[:days])
 
     def num_free_answers_used(self):
         return sum(
@@ -402,8 +397,7 @@ class Team(models.Model):
     def submissions(self):
         return tuple(
             self.answersubmission_set
-            .select_related('puzzle')
-            .prefetch_related('puzzle__metas')
+            .select_related('puzzle', 'puzzle__round')
             .order_by('-submitted_datetime')
         )
 
@@ -415,60 +409,68 @@ class Team(models.Model):
         }
 
     def db_unlocks(self):
-        return tuple(
-            self.puzzleunlock_set
-            .select_related('puzzle')
-            .order_by('-unlock_datetime')
-        )
+        return {
+            unlock.puzzle_id: unlock
+            for unlock in self.puzzleunlock_set
+            .select_related('puzzle', 'puzzle__round')
+        }
 
-    # DEEP (name taken from the 2015 Mystery Hunt) is a global measure of
-    # progress through the hunt used to determine when teams unlock each
-    # puzzle. Each puzzle is unlocked at a certain global DEEP value. Solving
-    # puzzles grants each team DEEP, as does the passage of time.
+    def main_round_solves(self):
+        global_solves = 0
+        local_solves = collections.defaultdict(int)
+        for puzzle in self.solves.values():
+            if puzzle.is_meta:
+                continue
+            local_solves[puzzle.round.slug] += 1
+            if puzzle.round.slug == INTRO_ROUND_SLUG:
+                continue
+            global_solves += 1
+        return (global_solves, local_solves)
 
-    # Because each Galactic Puzzle Hunt has had very different and often
-    # complicated unlocking mechanisms, we have just included a stripped-down
-    # implementation that computes how many puzzles each team has solved (so
-    # each puzzle is worth 1 DEEP). You may want to replace it with your own
-    # implementation, maybe depending on time or additional fields of puzzles,
-    # or just a completely different unlocking implementation. You may also
-    # want to cache its computation. This will depend on your hunt design and
-    # structure.
-
-    # If you do replace it, make sure to replace the descriptions where it's
-    # displayed.
-    @staticmethod
-    def compute_deep(context):
-        if context.hunt_is_prereleased or context.hunt_is_closed:
-            return DEEP_MAX
-        if context.team is None:
-            if context.hunt_is_over:
-                return DEEP_MAX
-            return 0
-        return len(context.team.solves)
-
-    # NOTE: This method creates unlocks with the current time; in other words,
-    # time-based unlocks are not correctly backdated. This is because the DEEP
-    # over time algorithm is nonlinear and unlocks are not important enough to
-    # warrant calculating the inverse function. This method will be called the
-    # next time a puzzle or the puzzles list is loaded, so solvers should not
-    # be affected, but it may be worth keeping in mind if you're doing analysis.
     @staticmethod
     def compute_unlocks(context):
-        team = context.team
-        deep = context.deep
-        unlocks = None
-        if team and not team.is_prerelease_testsolver:
-            unlocks = {unlock.puzzle_id for unlock in team.db_unlocks}
-        out = {'puzzles': [], 'ids': set()}
+        metas_solved = []
+        puzzles_unlocked = collections.OrderedDict()
         for puzzle in context.all_puzzles:
-            if puzzle.deep > deep:
-                break
-            if deep != DEEP_MAX and unlocks is not None and puzzle.id not in unlocks:
-                PuzzleUnlock(team=team, puzzle=puzzle).save()
-            out['puzzles'].append({'puzzle': puzzle})
-            out['ids'].add(puzzle.id)
-        return out
+            unlocked_at = None
+            if 0 <= puzzle.unlock_hours:
+                unlock_time = context.start_time + datetime.timedelta(hours=puzzle.unlock_hours)
+                if unlock_time <= context.now:
+                    unlocked_at = unlock_time
+            if context.hunt_is_prereleased or context.hunt_is_over:
+                unlocked_at = context.start_time
+            elif context.team:
+                (global_solves, local_solves) = context.team.main_round_solves
+                if 0 <= puzzle.unlock_global <= global_solves and (global_solves or any(metas_solved)):
+                    unlocked_at = context.now
+                if 0 <= puzzle.unlock_local <= local_solves[puzzle.round.slug]:
+                    unlocked_at = context.now
+                if puzzle.slug == META_META_SLUG and all(metas_solved):
+                    unlocked_at = context.now
+                if puzzle.is_meta:
+                    metas_solved.append(puzzle.id in context.team.solves)
+                if puzzle.id in context.team.db_unlocks:
+                    unlocked_at = context.team.db_unlocks[puzzle.id].unlock_datetime
+                elif unlocked_at:
+                    Team.unlock_puzzle(context, puzzle, unlocked_at)
+            if unlocked_at:
+                puzzles_unlocked[puzzle] = unlocked_at
+        return puzzles_unlocked
+
+    @staticmethod
+    def unlock_puzzle(context, puzzle, unlocked_at):
+        if context.hunt_is_prereleased or context.hunt_is_over:
+            return
+        if puzzle.id in context.team.db_unlocks:
+            return
+        unlock = PuzzleUnlock(
+            team=context.team,
+            puzzle=puzzle,
+            unlock_datetime=unlocked_at)
+        unlock.save()
+        context.team.db_unlocks[puzzle.id] = unlock
+        if unlocked_at == context.now:
+            show_unlock_notification(context, unlock)
 
 
 @receiver(post_save, sender=Team)
@@ -482,7 +484,7 @@ class TeamMember(models.Model):
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
 
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=255)
     email = models.EmailField(blank=True, verbose_name='Email (optional)')
 
     def __str__(self):
@@ -502,7 +504,8 @@ class PuzzleUnlock(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE)
 
-    unlock_datetime = models.DateTimeField(auto_now_add=True)
+    unlock_datetime = models.DateTimeField()
+    view_datetime = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return '%s -> %s @ %s' % (
@@ -513,22 +516,13 @@ class PuzzleUnlock(models.Model):
         unique_together = ('team', 'puzzle')
 
 
-@receiver(post_save, sender=PuzzleUnlock)
-def notify_on_meta_unlock(sender, instance, created, **kwargs):
-    if created:
-        if instance.puzzle.slug == INTRO_META_SLUG:
-            send_mail_wrapper('Intro Meta', 'FIXME', {}, instance.team.get_emails())
-        elif instance.puzzle.slug == META_META_SLUG:
-            send_mail_wrapper('Meta Meta', 'FIXME', {}, instance.team.get_emails())
-
-
 class AnswerSubmission(models.Model):
     '''Represents a team making a solve attempt on a puzzle (right or wrong).'''
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE)
 
-    submitted_answer = models.CharField(max_length=500)
+    submitted_answer = models.CharField(max_length=255)
     is_correct = models.BooleanField()
     submitted_datetime = models.DateTimeField(auto_now_add=True)
     used_free_answer = models.BooleanField()
@@ -584,20 +578,19 @@ def notify_on_answer_submission(sender, instance, created, **kwargs):
                     puzzle=instance.puzzle,
                     is_correct=True,
                     used_free_answer=False,
+                    team__is_hidden=False,
                 ).count(), ':white_check_mark:')
             dispatch_submission_alert(
                 '{} {} Team {} submitted `{}` for {}: {}{}'.format(
                     sigil, instance.puzzle.emoji, instance.team,
                     instance.submitted_answer, instance.puzzle,
-                    'Correct!' if instance.is_correct else 'Incorrect!!',
+                    'Correct!' if instance.is_correct else 'Incorrect.',
                     hint_line,
                 ),
                 correct=instance.is_correct)
         if not instance.is_correct:
             return
-        if instance.puzzle.slug == INTRO_META_SLUG:
-            send_mail_wrapper('Intro Meta', 'FIXME', {}, instance.team.get_emails())
-
+        show_solve_notification(instance)
         obsoleted_hints = Hint.objects.filter(
             team=instance.team,
             puzzle=instance.puzzle,
@@ -609,6 +602,7 @@ def notify_on_answer_submission(sender, instance, created, **kwargs):
             hint.status = Hint.OBSOLETE
             hint.answered_datetime = now
             hint.save()
+
 
 class ExtraGuessGrant(models.Model):
     '''Extra guesses granted to a particular team.'''
@@ -632,7 +626,7 @@ class PuzzleMessage(models.Model):
 
     puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE)
 
-    guess = models.CharField(max_length=500)
+    guess = models.CharField(max_length=255)
     response = models.TextField()
 
     def __str__(self):
@@ -645,6 +639,49 @@ class PuzzleMessage(models.Model):
     @staticmethod
     def semiclean_guess(s):
         return s and re.sub(r'[^A-Z0-9]', '', s.upper())
+
+
+class Erratum(models.Model):
+    '''An update made to the hunt while it's running that should be announced.'''
+
+    puzzle = models.ForeignKey(Puzzle, null=True, blank=True, on_delete=models.CASCADE)
+    updates_text = models.TextField(blank=True, help_text='''
+        Text to show on the Updates (errata) page. If blank, it will not appear there.
+        Use $PUZZLE to refer to the puzzle. HTML is ok.
+    ''')
+    puzzle_text = models.TextField(blank=True, help_text='''
+        Text to show on the puzzle page. If blank, it will not appear there. HTML is ok.
+    ''')
+    timestamp = models.DateTimeField(default=timezone.now)
+    published = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '%s erratum @ %s' % (self.puzzle, self.timestamp)
+
+    @property
+    def formatted_updates_text(self):
+        if not self.puzzle: return self.updates_text
+        return self.updates_text.replace('$PUZZLE', '<a href="%s">%s</a>' % (
+            reverse('puzzle', args=(self.puzzle.slug,)), self.puzzle))
+
+    @staticmethod
+    def get_visible_errata(context):
+        errata = []
+        for erratum in Erratum.objects.select_related('puzzle'):
+            if not context.is_superuser:
+                if not erratum.published:
+                    continue
+                if erratum.puzzle and erratum.puzzle not in context.unlocks:
+                    continue
+            errata.append(erratum)
+        return errata
+
+    def get_emails(self):
+        teams = PuzzleUnlock.objects.filter(puzzle=self.puzzle).values_list('team_id', flat=True)
+        return TeamMember.objects.filter(team_id__in=teams).exclude(email='').values_list('email', flat=True)
+
+    class Meta:
+        verbose_name_plural = 'Errata'
 
 
 class RatingField(models.PositiveSmallIntegerField):
@@ -721,13 +758,13 @@ class Hint(models.Model):
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE)
+    is_followup = models.BooleanField(default=False)
 
     submitted_datetime = models.DateTimeField(auto_now_add=True)
     hint_question = models.TextField()
     notify_emails = models.CharField(default='none', max_length=255)
 
-    claimed_datetime = models.DateTimeField(null=True)
-
+    claimed_datetime = models.DateTimeField(null=True, blank=True)
     # Making these null=True, blank=False is painful and apparently not
     # idiomatic Django. For example, if set that way, the Django admin won't
     # let you save a model with blank values. Just check for the empty string
@@ -735,14 +772,14 @@ class Hint(models.Model):
     claimer = models.CharField(blank=True, max_length=255)
     discord_id = models.CharField(blank=True, max_length=255)
 
-    answered_datetime = models.DateTimeField(null=True)
+    answered_datetime = models.DateTimeField(null=True, blank=True)
     status = models.CharField(choices=STATUSES, default=NO_RESPONSE, max_length=3)
     response = models.TextField(blank=True)
 
     def __str__(self):
         def abbr(s):
             if len(s) > 50:
-                return s[:50] + '...'
+                return s[:47] + '...'
             return s
         o = '{}, {}: "{}"'.format(
             self.team.team_name,
@@ -752,6 +789,16 @@ class Hint(models.Model):
         if self.status != self.NO_RESPONSE:
             o = o + ' {}'.format(self.status)
         return o
+
+    @property
+    def consumes_hint(self):
+        if self.status == Hint.REFUNDED:
+            return False
+        if self.status == Hint.OBSOLETE:
+            return False
+        if self.is_followup:
+            return False
+        return True
 
     def recipients(self):
         if self.notify_emails == 'all':
@@ -767,9 +814,10 @@ class Hint(models.Model):
 
     def short_discord_message(self, threshold=500):
         return (
-            'Hint requested on {} {} by {}\n'
+            '{} requested on {} {} by {}\n'
             '```{}```\n'
         ).format(
+            '*Followup hint*' if self.is_followup else 'Hint',
             self.puzzle.emoji, self.puzzle, self.team,
             self.hint_question[:threshold],
         )
@@ -780,9 +828,9 @@ class Hint(models.Model):
             '**Puzzle:** {} ({})\n'
         ).format(
             settings.DOMAIN + 'team/%s' % quote_plus(self.team.team_name, safe=''),
-            settings.DOMAIN + 'admin/puzzles/hint/?team__id__exact=%s' % self.team_id,
+            settings.DOMAIN + 'hints?team=%s' % self.team_id,
             settings.DOMAIN + 'solution/' + self.puzzle.slug,
-            settings.DOMAIN + 'admin/puzzles/hint/?puzzle__id__exact=%s' % self.puzzle_id,
+            settings.DOMAIN + 'hints?puzzle=%s' % self.puzzle_id,
         )
 
 
@@ -801,6 +849,11 @@ def notify_on_hint_update(sender, instance, created, update_fields, **kwargs):
         if 'discord_id' not in update_fields:
             discord_interface.clear_hint(instance)
         if 'response' in update_fields:
+            link = settings.DOMAIN.rstrip('/') + reverse(
+                'hints', args=(instance.puzzle.slug,))
             send_mail_wrapper(
                 'Hint answered for {}'.format(instance.puzzle),
-                'hint_answered_email', {'hint': instance}, instance.recipients())
+                'hint_answered_email',
+                {'hint': instance, 'link': link},
+                instance.recipients())
+            show_hint_notification(instance)

@@ -12,6 +12,18 @@ EMAIL_SUBJECT_PREFIX = ''
 
 STATIC_ROOT = 'static'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -20,7 +32,7 @@ LOGGING = {
             'format': '%(asctime)s [%(levelname)s] %(module)s\n%(message)s'
         },
         'puzzles-file': {
-            'format': '%(asctime)s [%(levelname)s] %(message)s'
+            'format': '%(asctime)s [%(levelname)s] %(name)s %(message)s'
         },
         'django-console': {
             'format': '\033[34;1m%(asctime)s \033[35;1m[%(levelname)s] \033[34;1m%(module)s\033[0m\n%(message)s'
@@ -36,6 +48,12 @@ LOGGING = {
             'filename': './logs/django.log',
             'formatter': 'django-file',
         },
+        'general': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': './logs/general.log',
+            'formatter': 'puzzles-file',
+        },
         'puzzle': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
@@ -49,7 +67,7 @@ LOGGING = {
             'formatter': 'puzzles-file',
         },
         'django-console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'django-console',
         },
@@ -67,7 +85,7 @@ LOGGING = {
         },
         'django.db.backends': {
             'level': 'INFO',
-            'handlers': ['django'],
+            'handlers': ['django', 'django-console'],
             'propagate': False,
         },
         'django.server': {
@@ -80,7 +98,7 @@ LOGGING = {
             'propagate': True,
         },
         'puzzles': {
-            'handlers': ['puzzles-console'],
+            'handlers': ['general', 'puzzles-console'],
             'level': 'INFO',
             'propagate': True,
         },
@@ -90,7 +108,7 @@ LOGGING = {
             'propagate': False,
         },
         'puzzles.request': {
-            'handlers': ['request', 'puzzles-console'],
+            'handlers': ['request'],
             'level': 'INFO',
             'propagate': False,
         },

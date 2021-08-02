@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.contrib.auth.models import User
 from django.core.validators import validate_email
@@ -9,6 +11,9 @@ from puzzles.models import (
     Hint,
 )
 
+
+def looks_spammy(s):
+    return re.search('https?://', s, re.IGNORECASE) is not None
 
 class RegisterForm(forms.Form):
     team_id = forms.CharField(
@@ -42,6 +47,11 @@ class RegisterForm(forms.Form):
         password = cleaned_data.get('password')
         password2 = cleaned_data.get('password2')
         team_name = cleaned_data.get('team_name')
+
+        if looks_spammy(team_name):
+            raise forms.ValidationError(
+                'That public team name isn\u2019t allowed.'
+            )
 
         if password != password2:
             raise forms.ValidationError(
@@ -83,8 +93,11 @@ class TeamMemberForm(forms.Form):
 def validate_team_emails(formset):
     emails = []
     for form in formset.forms:
-        if not form.cleaned_data.get('name'):
+        name = form.cleaned_data.get('name')
+        if not name:
             raise forms.ValidationError('All team members must have names.')
+        if looks_spammy(name):
+            raise forms.ValidationError('That team member name isn\u2019t allowed.')
         email = form.cleaned_data.get('email')
         if email:
             emails.append(email)
@@ -144,16 +157,39 @@ class RequestHintForm(forms.Form):
         )
 
 
+class HintStatusWidget(forms.Select):
+    def get_context(self, name, value, attrs):
+        self.choices = []
+        for (option, desc) in Hint.STATUSES:
+            if option == Hint.NO_RESPONSE:
+                if value != Hint.NO_RESPONSE: continue
+            elif option == Hint.ANSWERED:
+                if value == Hint.OBSOLETE: continue
+                if self.is_followup:
+                    desc += ' (as followup)'
+            elif option == Hint.REFUNDED:
+                if value == Hint.OBSOLETE: continue
+                if self.is_followup:
+                    desc += ' (thread closed)'
+            elif option == Hint.OBSOLETE:
+                if value != Hint.OBSOLETE: continue
+            self.choices.append((option, desc))
+        if value == Hint.NO_RESPONSE:
+            value = Hint.ANSWERED
+            attrs['style'] = 'background-color: #ff3'
+        return super(HintStatusWidget, self).get_context(name, value, attrs)
+
 class AnswerHintForm(forms.ModelForm):
     class Meta:
         model = Hint
-        fields = ['response', 'status']
+        fields = ('response', 'status')
+        widgets = {'status': HintStatusWidget}
 
 
 class SurveyForm(forms.ModelForm):
     class Meta:
         model = Survey
-        exclude = ['team', 'puzzle']
+        exclude = ('team', 'puzzle')
 
 
 # This form is a customization of forms.PasswordResetForm

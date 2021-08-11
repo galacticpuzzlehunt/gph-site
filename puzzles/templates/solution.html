@@ -24,22 +24,12 @@ h4 {
     font-weight: normal;
     margin: 2rem 0;
 }
-
-.solved-title-answer.blur {
-    transition: 0.6s;
-    filter: blur(0.8rem);
-}
-
-.solved-title-answer.blur:hover {
-    filter: blur(0);
-}
-
 </style>
 
 <h1>
     {% block puzzle-title %}
     Solution: {{ puzzle.name }}
-    <div class="solved-title-marker">Answer: <span class="solved-title-answer blur">{{ puzzle.answer }}</span></div>
+    <div class="solved-title-marker">Answer: <span class="solved-title-answer spoiler">{{ puzzle.answer }}</span></div>
     {% endblock %}
 </h1>
 

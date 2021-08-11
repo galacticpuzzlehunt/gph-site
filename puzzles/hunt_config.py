@@ -23,7 +23,7 @@ WRAPUP_PAGE_VISIBLE = False
 INITIAL_STATS_AVAILABLE = False
 # Change this to True to start showing post-solve surveys to teams.
 # Survey results are only available to superusers.
-SURVEYS_AVAILABLE = True
+SURVEYS_AVAILABLE = False
 
 HUNT_START_TIME = timezone.make_aware(datetime.datetime(
     year=9001,

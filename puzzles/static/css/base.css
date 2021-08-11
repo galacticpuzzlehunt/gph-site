@@ -666,6 +666,18 @@ figcaption {
     color: #ae4160;
 }
 
+@media screen {
+    .spoiler.solved-title-answer {
+        display: inline-block;
+        min-width: 200px;
+        text-align: left;
+    }
+
+    .spoiler:not(:hover) {
+        background-color: currentColor;
+    }
+}
+
 .copy-only {
     display: none;
 }
@@ -681,10 +693,18 @@ figcaption {
     right: 1.5em;
 }
 
-time[title] {
-    text-decoration: underline dotted;
-    text-underline-position: under;
-    cursor: help;
+@media print {
+    .clipboard-button {
+        display: none;
+    }
+}
+
+@media screen {
+    time[title] {
+        text-decoration: underline dotted;
+        text-underline-position: under;
+        cursor: help;
+    }
 }
 
 .chart {
@@ -707,8 +727,20 @@ time[title] {
     fill: none;
 }
 
+@media print {
+    .chart {
+        display: none;
+    }
+}
+
 footer {
     text-align: center;
     opacity: 0.5;
     font-size: 80%;
+}
+
+@media print {
+    footer {
+        display: none;
+    }
 }

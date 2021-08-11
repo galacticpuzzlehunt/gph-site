@@ -9,20 +9,15 @@
 {% block content %}
 
 <style>
-  p img {
-    width: 600px;
-    max-width: 100%;
-  }
-
   aside {
     display: none;
   }
 
   @media screen and (min-width: 961px) {
-    {# we can make this look pretty later #}
     aside {
       display: block;
       position: fixed;
+      width: 240px;
       top: 120px;
       left: 0;
     }
@@ -30,10 +25,21 @@
     aside div {
       color: #ae4160;
       cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    aside .highlight, aside :hover {
+    aside :hover {
+      text-decoration: underline;
+    }
+
+    aside .highlight {
       font-weight: bold;
+    }
+
+    .content {
+      margin-left: calc(240px - 10vw);
     }
   }
 </style>
@@ -46,29 +52,21 @@
 
 </main>
 
-<aside></aside>
-
-<script>
-(() => {
-const heads = [];
-for (const head of $('main').find('h1,h2,h3,h4,h5,h6')) {
-  const link = $('<div>')
-      .text($(head).text())
+<aside>
+  <script>
+    const heads = [...$('h1,h2,h3,h4,h5,h6')].map(head => [head, $('<div>')
+      .text(head.textContent)
       .css('padding-left', head.tagName.substr(1) + 'em')
       .click(() => head.scrollIntoView())
-      .appendTo('aside');
-  heads.push([head, link]);
-}
-function highlight() {
-  const rects = heads.map(([head]) => head.getBoundingClientRect());
-  heads.forEach(([head, link], i) => {
-    link.toggleClass('highlight',
-        (!rects[i + 1] || rects[i + 1].top > 0) && rects[i].top < innerHeight);
-  });
-}
-document.addEventListener('scroll', highlight, {passive: true});
-highlight();
-})();
-</script>
+      .appendTo('aside')]);
+    function highlight() {
+      const rects = heads.map(([head]) => head.getBoundingClientRect());
+      heads.forEach(([head, link], i) => link.toggleClass('highlight',
+        (!rects[i + 1] || rects[i + 1].top > 0) && rects[i].top < innerHeight));
+    }
+    document.addEventListener('scroll', highlight, { passive: true });
+    highlight();
+  </script>
+</aside>
 
 {% endblock %}

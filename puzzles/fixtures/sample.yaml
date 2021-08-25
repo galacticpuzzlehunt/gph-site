@@ -4,6 +4,11 @@
     name: Sample Round
     slug: sample
     meta: 7
+- model: puzzles.Round
+  pk: 2
+  fields:
+    name: Sample Round II
+    slug: sample-ii
 - model: puzzles.Puzzle
   pk: 1
   fields:
@@ -66,6 +71,15 @@
     body_template: sample.html
     answer: SAMPLE
     round: 1
+    unlock_global: 0
+- model: puzzles.Puzzle
+  pk: 8
+  fields:
+    name: "Interactive Demo"
+    slug: interactive-demo
+    body_template: interactive-demo.html
+    answer: DEMO
+    round: 2
     unlock_global: 0
 - model: auth.User
   pk: 1

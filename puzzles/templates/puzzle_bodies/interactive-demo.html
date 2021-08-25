@@ -1,0 +1,75 @@
+{% extends "puzzle.html" %}
+{% block puzzle-body-html %}
+Here is an example interactive puzzle!
+
+<form id="interactive-demo-form" autocomplete="off" action="javascript:void(0);">
+    {# Adding the csrf_token tag is sort of a hack, because we don't care about having an <input> tag with the token; we just care about having the cookie. #}
+    {% csrf_token %}
+    <input type="text" name="index" id="index" placeholder="Index (1&ndash;11)">
+    <input type="text" name="guess" id="guess" placeholder="Guess (A&ndash;Z)">
+    <input type="submit" value="Guess!">
+    <div id="output">...</div>
+</form>
+
+<script type="text/javascript">
+// This demo code uses jQuery and modern JavaScript features flagrantly.
+// You should evaluate your own needs.
+document.addEventListener('DOMContentLoaded', () => {
+    async function submit() {
+        $('#index').prop("disabled", true);
+        $('#guess').prop("disabled", true);
+        $('#sumbit').prop("disabled", true);
+
+        let csrftoken = getCookie('csrftoken');
+        try {
+            let result = await fetch("/puzzle/interactive-demo/submit", {
+                method: 'POST',
+                body: JSON.stringify({
+                    index: $('#index').val(),
+                    guess: $('#guess').val(),
+                }),
+                headers: { "X-CSRFToken": csrftoken },
+            });
+            if (!result.ok) {
+                // HTTP response code was not 2xx. Maybe introspect more...
+                $('#output').text(`Error: ${result.status} ${result.statusText}`);
+            } else {
+                let res = await result.json();
+                if (res.error) {
+                    $('#output').text(`Error: ${res.error}`);
+                } else {
+                    $('#output').text(res.correct ? "Right!" : "Wrong!");
+                }
+            }
+        } catch (e) {
+            // This error handling will be very poor.
+            $('#output').text(`Error: ${e}`);
+        }
+        // calls you might make: .val(""), .select(), .focus()
+        $('#index').prop("disabled", false);
+        $('#guess').prop("disabled", false);
+        $('#submit').prop("disabled", false);
+    }
+
+    // https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $('#interactive-demo-form').on('submit', submit);
+});
+</script>
+
+{% endblock %}

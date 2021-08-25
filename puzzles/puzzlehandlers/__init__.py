@@ -29,7 +29,8 @@ def simple_ratelimit(handler, rate):
     return rate_limiter
 
 # Usage: mypuzzle_submit = simple_ratelimit(mypuzzle.submit, '10/s')
-
+# See https://django-ratelimit.readthedocs.io/en/stable/rates.html for the rate
+# limit string.
 
 def check_ratelimit(request, rate):
     data = get_usage_count(request, group=request.path, rate=rate, key='user_or_ip')
@@ -73,4 +74,6 @@ def error_ratelimit(handler, rate, error, check_response=None, encode_response=N
         return HttpResponse(response)
     return rate_limiter
 
-# Usage: mypuzzle_submit = error_ratelimit(mypuzzle.submit, '2/m', {'error': 'Please limit your attempts to twice a minute.'}, lambda response: response['was_correct'], json.dumps)
+# Example usage:
+from . import interactive_demo
+interactive_demo_submit = error_ratelimit(interactive_demo.submit, '2/m', {'error': 'Please limit your attempts to two per minute.'}, lambda response: response['correct'], json.dumps)

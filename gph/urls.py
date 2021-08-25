@@ -85,6 +85,10 @@ urlpatterns = [
     path('solution/<slug:slug>', views.solution, name='solution'),
     path('solution/<path:path>', views.solution_static, name='solution-static'),
 
+    path('puzzle/interactive-demo/submit',
+        puzzlehandlers.interactive_demo_submit,
+        name='interactive_demo_submit'),
+
     path('story', views.story, name='story'),
     path('victory', views.victory, name='victory'),
     path('errata', views.errata, name='errata'),

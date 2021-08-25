@@ -5,7 +5,7 @@ import django.urls as urls
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 
-from .models import Puzzle, Team, AnswerSubmission
+from .models import Puzzle, Round, Team, AnswerSubmission
 
 # wow, we log a lot of things as INFO
 logging.disable(logging.INFO)
@@ -38,12 +38,18 @@ class Misc(TestCase):
         )
         self.team_b.save()
 
+        self.sample_round = Round(
+            name="Sample Round",
+            slug="sample",
+        )
+        self.sample_round.save()
         self.sample_puzzle = Puzzle(
             name="Sample",
             slug="sample",
             body_template="sample.html",
             answer="SAMPLE ANSWER",
-            deep=0,
+            round=self.sample_round,
+            unlock_global=0,
         )
         self.sample_puzzle.save()
         self.sample_puzzle_2 = Puzzle(
@@ -51,7 +57,8 @@ class Misc(TestCase):
             slug="sample-ii",
             body_template="sample.html",
             answer="SAMPLE",
-            deep=1000,
+            round=self.sample_round,
+            unlock_global=1000,
         )
         self.sample_puzzle_2.save()
 
@@ -73,11 +80,10 @@ class Misc(TestCase):
         c = Client()
         c.login(username="b", password="password")
 
-        response = c.get(urls.reverse("puzzles"))
+        response = c.get(urls.reverse("round", args=(self.sample_round.slug,)))
         self.assertEqual(response.status_code, 200)
 
-        # we do so much magic that this is kinda gross :(
-        puzzles = response.context[0]['unlocks']()['puzzles']
+        puzzles = response.context[0]['round']['puzzles']
         # self.assertEqual(len(puzzles), 1)
         puzzle = puzzles[0]
         self.assertEqual(puzzle['puzzle'].name, "Sample")
@@ -97,14 +103,14 @@ class Misc(TestCase):
         c = Client()
         c.login(username="b", password="password")
 
-        response = c.get(urls.reverse("puzzles"))
+        response = c.get(urls.reverse("round", args=(self.sample_round.slug,)))
         self.assertEqual(response.status_code, 200)
 
-        puzzles = response.context[0]['unlocks']()['puzzles']
+        puzzles = response.context[0]['round']['puzzles']
         # self.assertEqual(len(puzzles), 1)
         puzzle = puzzles[0]
         self.assertEqual(puzzle['puzzle'].name, "Sample")
-        self.assertEqual(puzzle['answer'], "SAMPLEANSWER")
+        self.assertEqual(puzzle['answer'], "SAMPLE ANSWER")
 
     def test_team_page(self):
         c = Client()

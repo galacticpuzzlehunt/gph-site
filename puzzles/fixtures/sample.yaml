@@ -1,3 +1,9 @@
+- model: puzzles.Round
+  pk: 1
+  fields:
+    name: Sample Round
+    slug: sample
+    meta: 7
 - model: puzzles.Puzzle
   pk: 1
   fields:
@@ -5,7 +11,8 @@
     slug: ambiguity
     body_template: ambiguity.html
     answer: ISAAC
-    deep: 0
+    round: 1
+    unlock_global: 0
 - model: puzzles.Puzzle
   pk: 2
   fields:
@@ -13,7 +20,8 @@
     slug: bad-cryptogram-puzzle
     body_template: bad-cryptogram-puzzle.html
     answer: ENGINEERS
-    deep: 0
+    round: 1
+    unlock_global: 0
 - model: puzzles.Puzzle
   pk: 3
   fields:
@@ -21,7 +29,8 @@
     slug: break-it-down
     body_template: break-it-down.html
     answer: HAMMER
-    deep: 0
+    round: 1
+    unlock_global: 0
 - model: puzzles.Puzzle
   pk: 4
   fields:
@@ -29,7 +38,8 @@
     slug: championship
     body_template: championship.html
     answer: SCRIPPS
-    deep: 0
+    round: 1
+    unlock_global: 0
 - model: puzzles.Puzzle
   pk: 5
   fields:
@@ -37,7 +47,8 @@
     slug: diagramless
     body_template: diagramless.html
     answer: BASS
-    deep: 0
+    round: 1
+    unlock_global: 0
 - model: puzzles.Puzzle
   pk: 6
   fields:
@@ -45,7 +56,8 @@
     slug: geometry
     body_template: geometry.html
     answer: PARALLEL
-    deep: 0
+    round: 1
+    unlock_global: 0
 - model: puzzles.Puzzle
   pk: 7
   fields:
@@ -53,7 +65,8 @@
     slug: sample
     body_template: sample.html
     answer: SAMPLE
-    deep: 0
+    round: 1
+    unlock_global: 0
 - model: auth.User
   pk: 1
   fields:

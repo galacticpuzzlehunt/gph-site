@@ -1,6 +1,6 @@
 {% extends "puzzle.html" %}
 {% load static %}
-{% block puzzle-body %}
+{% block puzzle-body-md %}
 <style>
 .break-it-down {
 	text-align: center;
@@ -15,6 +15,6 @@
 {# markdown="1" is parsed by python-markdown and removed from the final output #}
 <div class="break-it-down" markdown="1">
 ![]({% static 'puzzle_resources/break-it-down/break-it-down.svg' %})
-<div class="boxed">\_ \_ \_ \_ \_ \_</div>
+<div class="boxed">_ _ _ _ _ _</div>
 </div>
 {% endblock %}

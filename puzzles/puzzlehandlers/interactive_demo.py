@@ -17,8 +17,9 @@ def submit(request):
     # additionally encrypt/decrypt the state on the server if you don't want
     # users to be able to introspect or tamper with it. Of course, this option
     # requires that the state be fairly compact and cheaply
-    # serializable/deserializable. (Remember, kids: depickling untrusted
-    # sources can lead to arbitrary code execution!)
+    # serializable/deserializable, and it cannot prevent solvers from manually
+    # saving/restoring states. (Remember, kids: depickling untrusted sources
+    # can lead to arbitrary code execution!)
     #
     # 2. Persist it on the server. You can just add a puzzle-specific model
     # with a foreign key to Team. If you have strong performance needs and are

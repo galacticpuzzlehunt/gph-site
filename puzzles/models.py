@@ -667,7 +667,7 @@ class Erratum(models.Model):
     @staticmethod
     def get_visible_errata(context):
         errata = []
-        for erratum in Erratum.objects.select_related('puzzle'):
+        for erratum in Erratum.objects.select_related('puzzle').order_by('timestamp'):
             if not context.is_superuser:
                 if not erratum.published:
                     continue

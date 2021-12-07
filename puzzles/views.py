@@ -1140,7 +1140,7 @@ def finishers(request):
         used_free_answer=False,
         is_correct=True,
         submitted_datetime__lt=HUNT_END_TIME,
-    ):
+    ).order_by('submitted_datetime'):
         solves_by_team[solve.team_id].append(solve.submitted_datetime)
         if solve.puzzle.is_meta:
             metas_by_team[solve.team_id].append(solve.submitted_datetime)

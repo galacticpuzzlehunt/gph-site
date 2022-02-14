@@ -1,0 +1,942 @@
+# French version
+# Copyright (C) 2022 enigmatix
+# This file is distributed under the same license as the gph-site package.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-14 17:14-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: puzzles/templates/archive.html:5
+msgid "Hunt Archive"
+msgstr "Archive des chasses"
+
+#: puzzles/templates/archive.html:9
+msgid "Current Hunt!"
+msgstr "Chasse actuelle !"
+
+#: puzzles/templates/archive.html:11
+msgid "Link to Archive"
+msgstr "Lien vers les archives"
+
+#: puzzles/templates/base.html:15
+#, python-format
+msgid "Registration for this year's %(hunt)s is now open!"
+msgstr "L'inscription pour %(hunt)s est maintenant ouverte !"
+
+#: puzzles/templates/base.html:41
+msgid "Home"
+msgstr "Accueil"
+
+#: puzzles/templates/base.html:44 puzzles/templates/rules.html:7
+msgid "Rules"
+msgstr "Règlement"
+
+#: puzzles/templates/base.html:48
+msgid "Story"
+msgstr "Intrigue"
+
+#: puzzles/templates/base.html:53
+msgid "Puzzles"
+msgstr "Énigmes"
+
+#: puzzles/templates/base.html:57
+msgid "Teams"
+msgstr "Équipes"
+
+#: puzzles/templates/base.html:60
+msgid "FAQ"
+msgstr "FAQ"
+
+#: puzzles/templates/base.html:64
+msgid "Updates"
+msgstr "News"
+
+#: puzzles/templates/base.html:69
+msgid "Wrap-Up"
+msgstr "Debrief"
+
+#: puzzles/templates/base.html:73
+msgid "Archive"
+msgstr "Archives"
+
+#: puzzles/templates/base.html:88
+msgid "Currently impersonating"
+msgstr "Personnifiant"
+
+#: puzzles/templates/base.html:94
+#, python-format
+msgid "Available hints: %(hints)s"
+msgstr "Indices disponibles : %(hints)s"
+
+#: puzzles/templates/base.html:100
+#, python-format
+msgid "Free answers: %(answers)s"
+msgstr "Réponses gratuites : %(answers)s"
+
+#: puzzles/templates/base.html:106
+msgid "Admin toolbox"
+msgstr "Boite à outils"
+
+#: puzzles/templates/base.html:106
+msgid "Shortcuts"
+msgstr "Outils"
+
+#: puzzles/templates/base.html:108
+#, python-format
+msgid "Hints that need answering: %(need_answers)s"
+msgstr "Indices en attente d'une réponse : %(need_answers)s"
+
+#: puzzles/templates/base.html:114
+msgid "Logout"
+msgstr "Se déconnecter"
+
+#: puzzles/templates/base.html:116
+msgid "Login"
+msgstr "Se connecter"
+
+#: puzzles/templates/base.html:117
+msgid "Register"
+msgstr "S'enregistrer"
+
+#: puzzles/templates/base.html:132
+msgid "Download logs"
+msgstr "Télécharger les logs"
+
+#: puzzles/templates/base.html:133
+msgid "Guess"
+msgstr "Réponse"
+
+#: puzzles/templates/base.html:134
+msgid "Hint"
+msgstr "Indice"
+
+#: puzzles/templates/base.html:135
+msgid "Puzzle"
+msgstr "Énigme"
+
+#: puzzles/templates/base.html:165
+msgid "Powered by"
+msgstr "Réalisé avec"
+
+#: puzzles/templates/errata.html:7
+msgid "New erratum"
+msgstr "Nouvel erratum"
+
+#: puzzles/templates/errata.html:12
+msgid "Errata / Updates"
+msgstr "Errata / News"
+
+#: puzzles/templates/errata.html:18
+msgid "UNPUBLISHED"
+msgstr "NON PUBLIÉ"
+
+#: puzzles/templates/errata.html:21
+#, python-format
+msgid "On %(erratum_time)s, "
+msgstr "Le  %(erratum_time)s, "
+
+#: puzzles/templates/errata.html:25
+msgid "Emails:"
+msgstr "E-mails :"
+
+#: puzzles/templates/faq.html:7
+msgid "FAQs"
+msgstr "FAQ"
+
+#: puzzles/templates/faq.html:11
+msgid "What is a puzzlehunt? How do I solve these puzzles?"
+msgstr "Qu'est-ce qu'une chasse au trésor ? Comment résoudre ces énigmes ?"
+
+#: puzzles/templates/faq.html:12
+msgid ""
+"If you&rsquo;ve never heard of puzzlehunts before, here&rsquo;s a very brief "
+"summary: in a typical puzzle, you receive some information and have to "
+"extract an answer out of it, which is almost always an English word or "
+"phrase. Puzzles can come in many different forms; the only real commonality "
+"is that you usually receive no direct instructions, so it&rsquo;s up to you "
+"to figure out how to make sense of the information you&rsquo;re given. You "
+"can read a longer introduction to puzzlehunts <a href=\\\"https://blog.vero."
+"site/post/puzzlehunts\\\" target=\\\"_blank\\\">here</a>."
+msgstr ""
+"Si vous n'avez jamais entendu parler de chasse au trésor, voilà un petit "
+"résumé : dans une énigme typique, vous recevez des informations et devez en "
+"extraire une réponse, qui est presque toujours un mot ou une phrase en "
+"français. Les énigmes peuvent avoir différents formats ; le seul point "
+"commun est que vous ne recevrez aucune instruction directement et c'est à "
+"vous de comprendre que faire de l'information qui vous est donnée. Vous "
+"pouvez lire une plus longue introduction aux chasses aux trésors <a href="
+"\"https://blog.vero.site/post/puzzlehunts\" target=\"_blank\">ici</a>."
+
+#: puzzles/templates/faq.html:13
+msgid ""
+"If you are new to puzzles and are interested in seeing some examples, or if "
+"you&rsquo;re looking for some practice, we recommend looking at puzzles from "
+"other online hunts such as <a target=\\\"_blank\\\" href=\\\"https://"
+"galacticpuzzlehunt.com/\\\">Galactic Puzzle Hunt</a>, <a target=\\\"_blank\\"
+"\" href =\\\"https://teammatehunt.com/\\\">Teammate Hunt</a>, <a target=\\"
+"\"_blank\\\" href=\\\"https://puzzlepotluck.com/\\\">Puzzle Potluck</a>, or "
+"<a target=\\\"_blank\\\" href=\\\"https://reddothunt.sg/2018\\\">REDDOThunt</"
+"a>.\""
+msgstr ""
+"Si vous découvrez les énigmes et êtes intéressé de voir des exemples, ou si "
+"vous cherchez à vous exercer, nous recommandons de jeter un coup d'œil aux "
+"énigmes d'autres chasses en ligne telles que <a target=\\\"_blank\\\" href=\\"
+"\"https://galacticpuzzlehunt.com/\\\">Galactic Puzzle Hunt</a>, <a target=\\"
+"\"_blank\\\" href =\\\"https://teammatehunt.com/\\\">Teammate Hunt</a>, <a "
+"target=\\\"_blank\\\" href=\\\"https://puzzlepotluck.com/\\\">Puzzle "
+"Potluck</a>, ou <a target=\\\"_blank\\\" href=\\\"https://reddothunt."
+"sg/2018\\\">REDDOThunt</a>."
+
+#: puzzles/templates/faq.html:17
+msgid "I think there&rsquo;s a mistake in this puzzle!"
+msgstr "Je pense qu'il y a une erreur dans cette énigme !"
+
+#: puzzles/templates/faq.html:18
+#, python-format
+msgid ""
+"Please describe the error in an email to <a href=\"mailto:%(contact)s\">"
+"%(contact)s</a> and we&rsquo;ll try to correct it."
+msgstr ""
+"Veuillez décrire l'erreur par e-mail à <a href=\"mailto:%(contact)s\">"
+"%(contact)s</a> et nous essaierons de la corriger."
+
+#: puzzles/templates/faq.html:22
+msgid "I&rsquo;m stuck on a puzzle. What should I do?"
+msgstr "Je suis bloqué sur une énigme. Que faire ?"
+
+#: puzzles/templates/faq.html:23
+msgid "Here are some general puzzle tips that might be useful:"
+msgstr "Voici quelques tuyaux qui peuvent aider en général :"
+
+#: puzzles/templates/faq.html:25
+msgid ""
+"Thoroughly check the work that you&rsquo;ve already done. Fixing a small "
+"mistake or incorrect assumption can greatly help with getting unstuck."
+msgstr ""
+"Vérifiez bien ce que vous avez déj́à fait. Corriger une petite erreur ou une "
+"hypothèse incorrecte peut aider grandement à se débloquer."
+
+#: puzzles/templates/faq.html:26
+msgid ""
+"Get fresh eyes on the puzzle, or conversely, take a break and look at "
+"something else."
+msgstr ""
+"Jetez un œil nouveau à l'énigme, ou inversement, faites une pause et "
+"regardez autre chose."
+
+#: puzzles/templates/faq.html:27
+msgid "Consider what information you haven&rsquo;t used yet."
+msgstr "Considérez quelles informations vous n'avez pas utilisées."
+
+#: puzzles/templates/faq.html:28
+msgid ""
+"It can be useful to put everything you have into your favorite search engine."
+msgstr ""
+"Il peut être utile de mettre tout ce que vous avez dans un engin de "
+"recherche."
+
+#: puzzles/templates/faq.html:29
+msgid "Have you tried&hellip;"
+msgstr "Avez-vous essayé&hellip;"
+
+#: puzzles/templates/faq.html:32
+msgid ""
+"Remember that after hints are released, you can also use them to get a nudge "
+"in the right direction."
+msgstr ""
+"Rappelez vous que lorsque les indices sont disponibles, vous pouvez les "
+"utiliser pour obtenir un coup de pouce."
+
+#: puzzles/templates/faq.html:37
+msgid "I have a question that&rsquo;s not on this list!"
+msgstr "J'ai une question qui n'est pas dans la liste !"
+
+#: puzzles/templates/faq.html:38
+#, python-format
+msgid ""
+"Contact us at <a href=\"mailto:%(contact)s\">%(contact)s</a> and we&rsquo;ll "
+"do our best to answer it."
+msgstr ""
+"Contactez-nous à <a href=\"mailto:%(contact)s\">%(contact)s</a> et nous "
+"ferons de notre mieux pour vous répondre."
+
+#: puzzles/templates/free_answer.html:5
+#, python-format
+msgid "Free answer: %(name)s"
+msgstr "Réponse gratuite : %(name)s"
+
+#: puzzles/templates/free_answer.html:9 puzzles/templates/hints.html:10
+#: puzzles/templates/solve.html:9
+msgid "Back to the puzzle"
+msgstr "Retour à l'énigme"
+
+#: puzzles/templates/free_answer.html:14
+#, python-format
+msgid "Use a free answer on %(name)s"
+msgstr "Utiliser une réponse gratuite : %(name)s"
+
+#: puzzles/templates/free_answer.html:19 puzzles/templates/solve.html:19
+msgid "Solved!"
+msgstr "Résolu !"
+
+#: puzzles/templates/free_answer.html:20 puzzles/templates/solve.html:20
+#, python-format
+msgid "The answer was <b>%(answer)s</b>."
+msgstr "La réponse était <b>%(answer)s</b>."
+
+#: puzzles/templates/free_answer.html:23
+msgid "You can't use a free answer on a metapuzzle."
+msgstr "Vous ne pouvez utiliser de réponse gratuite sur une méta-énigme."
+
+#: puzzles/templates/free_answer.html:25
+msgid "You have no free answers to use."
+msgstr "Vous n'avez pas de réponse gratuite disponible."
+
+#: puzzles/templates/free_answer.html:27
+#, python-format
+msgid "You have <b>%(answers)s free answer</b>"
+msgid_plural "You have <b>%(answers)s free answers</b>"
+msgstr[0] "Vous avez <b>%(answers)s réponse gratuite</b>"
+msgstr[1] "Vous avez <b>%(answers)s réponses gratuites</b>"
+
+#: puzzles/templates/free_answer.html:29
+msgid ". Are you sure you want to use one on this puzzle?"
+msgstr ". Êtes-vous sûr d'en utiliser une sur cette énigme ?"
+
+#: puzzles/templates/free_answer.html:32
+msgid "Yes"
+msgstr "Oui"
+
+#: puzzles/templates/free_answer.html:33
+msgid "No"
+msgstr "Non"
+
+#: puzzles/templates/hints.html:6
+msgid "Hints:"
+msgstr "Indices :"
+
+#: puzzles/templates/hints.html:40
+#, python-format
+msgid "Hints for %(puzzle)s"
+msgstr "Indices pour %(puzzle)s"
+
+#: puzzles/templates/hints.html:46 puzzles/templates/hints.html:56
+#, python-format
+msgid "You have <b>%(hints)s hint</b>"
+msgid_plural "You have <b>%(hints)s hints</b>"
+msgstr[0] "Vous avez <b>%(hints)s indice</b>"
+msgstr[1] "Vous avez <b>%(hints)s indices</b>"
+
+#: puzzles/templates/hints.html:48
+#, python-format
+msgid ""
+"that you may use to ask for a hint on <b>any of the first %(intro_count)s "
+"puzzles.</b>"
+msgstr ""
+"que vous pouvez utiliser pour un indice sur <b>n'importe quelle des "
+"%(intro_count)s premières énigmes.</b>"
+
+#: puzzles/templates/hints.html:52
+#, python-format
+msgid "Your remaining <b>%(hints)s hint</b>"
+msgid_plural "Your remaining <b>%(hints)s hints</b>"
+msgstr[0] "Vous avez <b>%(hints)s indice restant</b>"
+msgstr[1] "Vous avez <b>%(hints)s indices restants</b>"
+
+#: puzzles/templates/hints.html:54
+msgid "can be used on <b>any puzzle in the hunt.</b>"
+msgstr ""
+"que vous pouvez utiliser sur <b>n'importe quelle énigme de la chasse.</b>"
+
+#: puzzles/templates/hints.html:58
+msgid "that you may use to ask for a hint on any puzzle."
+msgstr ""
+"que vous pouvez utiliser pour demander un indice sour n'importe quelle "
+"énigme."
+
+#: puzzles/templates/hints.html:63
+#, python-format
+msgid "You can also use your <b>%(answers)s free answer</b>"
+msgid_plural "You can also use your <b>%(answers)s free answers</b>"
+msgstr[0] ""
+"Vous pouvez aussi utiliser votre <b>%(answers)s réponse gratuite</b>"
+msgstr[1] ""
+"Vous pouvez aussi utiliser vos <b>%(answers)s réponses gratuites</b>"
+
+#: puzzles/templates/hints.html:65
+msgid "as a hint if you run out of hints."
+msgstr "comme indice si vous n'avez plus d'indices."
+
+#: puzzles/templates/hints.html:67
+#, python-format
+msgid ""
+"You have no usable hints, but you do have <b>%(answers)s free answer</b>"
+msgid_plural ""
+"You have no usable hints, but you do have <b>%(answers)s free answers</b>"
+msgstr[0] ""
+"Vous n'avez plus d'indice utilisable, mais vous avez <b>%(answers)s réponse "
+"gratuite</b>"
+msgstr[1] ""
+"Vous n'avez plus d'indice utilisable, mais vous avez <b>%(answers)s réponses "
+"gratuites</b>"
+
+#: puzzles/templates/hints.html:69
+msgid "that you may use as a hint."
+msgstr "que vous pouvez utiliser comme indice."
+
+#: puzzles/templates/hints.html:73
+msgid ""
+"You may have <b>one hint</b> open at a time. You must wait until that hint "
+"is answered to ask another."
+msgstr ""
+"Vous ne pouvez avoir qu'<b>un indice</b> en cours à la fois. Vous devez "
+"attendre que cet indice ait une réponse avant d'en demander un autre."
+
+#: puzzles/templates/hints.html:76
+#, python-format
+msgid ""
+"See the <a href=\"%(rules)s#Hints\">rules page</a> for details on when hints "
+"will be released."
+msgstr ""
+"Voir le <a href=\"%(rules)s#Hints\">règlement</a> pour les détails sur la "
+"fourniture des indices."
+
+#: puzzles/templates/hints.html:80
+msgid "Request a hint"
+msgstr "Demander un indice"
+
+#: puzzles/templates/hints.html:88
+msgid ""
+"You&rsquo;ve already solved this puzzle, but you can ask for a hint anyway "
+"if you&rsquo;d like (for example, if you&rsquo;re not sure about a step or "
+"you backsolved it). The restrictions above still apply."
+msgstr ""
+"Vous avez déjà résolu cette énigme, mais vous pouvez toujours demander un "
+"indice si vous le désirez (par exemple si vous n'êtes pas sûr d'une étape ou "
+"si vous l'avez \"rétrosolue\"). Les restrictions ci-dessus s'appliquent "
+"toujours."
+
+#: puzzles/templates/hints.html:102
+msgid ""
+"You&rsquo;re asking us for a follow-up to your last hint. This won&rsquo;t "
+"consume one of your hints; we&rsquo;ll see if we can be more helpful based "
+"on your submission, but we may ask you to use a new regular hint instead."
+msgstr ""
+"Vous nous demandez un suivi sur votre dernier indice. Cela ne vous coùtera "
+"pas un de vos indices ; nous verrons si nous pouvons vous être plus utile "
+"d'après votre requête, mais nous pourrions aussi vous demander d'utiliser un "
+"indice supplémentaire."
+
+#: puzzles/templates/hints.html:125 puzzles/templates/solve.html:63
+#: puzzles/templates/solve.html:129
+msgid "Submit"
+msgstr "Envoyer"
+
+#: puzzles/templates/hints.html:134
+msgid "This wasn&rsquo;t helpful"
+msgstr "Ça n'a pas aidé"
+
+#: puzzles/templates/hints.html:140
+msgid "Q:"
+msgstr "Q :"
+
+#: puzzles/templates/hints.html:142 puzzles/templates/hints.html:144
+msgid "A:"
+msgstr "R :"
+
+#: puzzles/templates/hints.html:142
+msgid "No response yet."
+msgstr "Pas encore de réponse."
+
+#: puzzles/templates/hints.html:150
+#, python-format
+msgid "Asked %(submitted)s"
+msgstr "Demandé le %(submitted)s"
+
+#: puzzles/templates/hints.html:153
+#, python-format
+msgid "Answered %(answered)s"
+msgstr "Répondu le %(answered)s"
+
+#: puzzles/templates/hints.html:161
+msgid "This was a follow-up hint."
+msgstr "C'était un suivi d'indice."
+
+#: puzzles/templates/hints.html:163
+msgid "Your use of the hint was refunded."
+msgstr "Votre indice vous a été remboursé."
+
+#: puzzles/templates/home.html:55
+#, python-format
+msgid ""
+"The %(hunt_title)s has now come to a close. Thanks for puzzling with us!"
+msgstr ""
+"La chasse \"%(hunt_title)s\" est maintenant terminée. Merci de nous avoir "
+"rejoints !"
+
+#: puzzles/templates/home.html:58
+#, python-format
+msgid ""
+"The %(hunt_title)s is now over, but you can still register and progress "
+"through the hunt until %(hunt_close)s."
+msgstr ""
+"La chasse \"%(hunt_title)s\" est maintenant terminée, mais vous pouvez "
+"encore vous inscrire et progresser dans la chasse jusqu'au %(hunt_close)s."
+
+#: puzzles/templates/home.html:64
+#, python-format
+msgid ""
+"Please fill out our <a href=\"%(feedback_url)s\">feedback form</a> and check "
+"out our <a href=\"%(wrapup_url)s\">wrap-up</a>!"
+msgstr ""
+"Veuillez remplir notre <a href=\"%(feedback_url)s\">formulaire de "
+"commentaires</a> et lire notre <a href=\"%(wrapup_url)s\">debriefing</a>"
+
+#: puzzles/templates/home.html:66
+#, python-format
+msgid ""
+"Please fill out our <a href=\"%(feedback_url)s\">feedback form</a> to let us "
+"know what you thought about the hunt."
+msgstr ""
+"Veuillez remplir notre <a href=\"%(feedback_url)s\">formulaire de "
+"commentaires</a>pour nous dire ce que vous avez pensé de la chasse"
+
+#: puzzles/templates/home.html:74
+msgid "What"
+msgstr "Quoi"
+
+#: puzzles/templates/home.html:75
+msgid ""
+"A mysterious list of puzzles has appeared on the internet!  If you can solve "
+"them, you could win prizes and bragging rights!<sup>*"
+msgstr ""
+"Une mystérieuse liste d'énigmes est apparue sur internet ! Si vous pouvez "
+"les résoudre, vous pourriez gagner un prix et notre considération !<sup>*"
+
+#: puzzles/templates/home.html:77
+msgid "there are no prizes"
+msgstr "il n'y a pas de prix"
+
+#: puzzles/templates/home.html:80
+msgid "When"
+msgstr "Quand"
+
+#: puzzles/templates/home.html:85
+#, python-format
+msgid "The hunt began on %(hunt_start)s, and ended on %(hunt_end)s."
+msgstr ""
+"La chasse a démarré le %(hunt_start)s, et s'est terminée le %(hunt_end)s."
+
+#: puzzles/templates/home.html:88
+#, python-format
+msgid ""
+"The hunt will begin on %(hunt_start)s, and it will end %(num_days)s days "
+"later on %(hunt_end)s."
+msgstr ""
+"La chasse commencera le %(hunt_start)s, et se terminera %(num_days)s jours "
+"plus tard le %(hunt_end)s."
+
+#: puzzles/templates/home.html:93
+msgid "Who"
+msgstr "Qui"
+
+#: puzzles/templates/home.html:97
+#, python-format
+msgid "This was a puzzlehunt run by %(organizer)s."
+msgstr "C'était une chasse organisée par %(organizer)s."
+
+#: puzzles/templates/home.html:101
+#, python-format
+msgid "This is a puzzlehunt run by %(organizer)s."
+msgstr "C'est une chasse organisée par %(organizer)s."
+
+#: puzzles/templates/home.html:102
+#, python-format
+msgid ""
+"Registration is open! Be sure to check out the <a href=\"%(rules_url)s"
+"\">rules</a> and <a href=\"%(faq_url)s\">FAQ</a> for more information."
+msgstr ""
+"L'inscription est ouverte ! Assurez-vous de lire le <a href=\"%(rules_url)s"
+"\">règlement</a> et <a href=\"%(faq_url)s\">FAQ</a> pour plus d'informations."
+
+#: puzzles/templates/home.html:115
+msgid "Register your team!"
+msgstr "Inscrivez votre équipe !"
+
+#: puzzles/templates/home.html:118
+#, python-format
+msgid "Register at %(register_url)s"
+msgstr "Inscrivez vous à %(register_url)s"
+
+#: puzzles/templates/puzzles.html:26 puzzles/templates/round.html:21
+msgid ""
+"You are a pre-release testsolver, so you may be seeing puzzles that are "
+"locked for the general public. Please be careful!"
+msgstr ""
+"Vous êtes un beta testeur, vous pourriez voir des énigmes qui sont "
+"verrouillées pour le public. Soyez prudent !"
+
+#: puzzles/templates/round.html:10
+msgid "All puzzles"
+msgstr "Toutes les énigmes"
+
+#: puzzles/templates/round.html:26
+msgid "Imagine some cool art goes here."
+msgstr "Imaginez un joli dessin ici."
+
+#: puzzles/templates/rules.html:11
+msgid "Format"
+msgstr "Format"
+
+#: puzzles/templates/rules.html:15
+#, python-format
+msgid ""
+"The puzzlehunt starts on <strong>%(hunt_start)s</strong> and ends on <strong>"
+"%(hunt_end)s</strong>, at which point puzzle solutions will be available. "
+msgstr ""
+"La chasse commence le <strong>%(hunt_start)s</strong> et se termine le "
+"<strong>%(hunt_end)s</strong>, date à laquelle les solutions des énigmes "
+"seront disponibles. "
+
+#: puzzles/templates/rules.html:23
+#, python-format
+msgid ""
+"Teams have a maximum size of %(max_members)s. You may not create multiple "
+"accounts or be on multiple teams."
+msgstr ""
+"Les équipes ont une taille maximale de %(max_members)s membres. Vous ne "
+"pouvez pas avoir plusieurs comptes ou faire partie de plusieurs équipes."
+
+#: puzzles/templates/rules.html:24
+msgid ""
+"A few puzzles will be available at the start, and the primary way to unlock "
+"new puzzles is by solving puzzles and progressing through the hunt, although "
+"puzzles may also be unlocked over time."
+msgstr ""
+"Certaines énigmes seront disponibles au début de la chasse, la façon "
+"habituelle de déverrouiller de nouvelles énigmes est de résoudre des énigmes "
+"et d'avancer dans la chasse, bien que des énigmes peuvent aussi être "
+"débloquées au fil du temps."
+
+#: puzzles/templates/rules.html:25
+msgid ""
+"Teams that complete the hunt will be ranked by the time at which they "
+"finish. Teams that do not complete the hunt will be ranked by number of "
+"puzzles solved and tie-broken by earliest last solve time."
+msgstr ""
+"Les équipes qui finissent la chasse seront classées au temps. Les équipes "
+"qui ne finissent pas la chasse seront classées au nombre d'énigmes résolues "
+"et départagées au temps."
+
+#: puzzles/templates/rules.html:30
+msgid "Solving"
+msgstr "Résolution"
+
+#: puzzles/templates/rules.html:32
+msgid ""
+"Each answer is a string of letters A&ndash;Z. Lowercase letters will be "
+"changed into uppercase, and any other characters will be stripped before "
+"checking for correctness."
+msgstr ""
+"Chaque réponse est une chaîne de caractères A&ndash;Z. Les minuscules seront "
+"converties en majuscules, et tout autre caractère sera supprimé avant "
+"vérification de la réponse."
+
+#: puzzles/templates/rules.html:33
+#, python-format
+msgid ""
+"You have <strong>%(max_guesses)s total guesses</strong> for each puzzle. If "
+"you legitimately run out of guesses and need more, feel free to contact us, "
+"though we won&rsquo;t grant your request if we see that you were, for "
+"example, guessing random thematic answers, or brute-forcing all 10-letter "
+"words."
+msgstr ""
+"Vous avez <strong>un nombre total de %(max_guesses)s essais</strong> pour "
+"chaque énigme. Si vous n'en avez plus et avez une raison légitime d'en "
+"demander plus, veuillez nous contacter. Cependant, nous n'accèderons pas à "
+"votre requête si nous voyons que vous essayiez par exemple de deviner des "
+"réponses thématiques au hasard, ou d'utiliser de force brute sur tous les "
+"mots de 10 lettres."
+
+#: puzzles/templates/rules.html:39
+msgid "Hints"
+msgstr "Indices"
+
+#: puzzles/templates/rules.html:43
+#, python-format
+msgid ""
+"Starting on <strong>%(hint_date)s</strong>, teams will receive hints at "
+"<strong>%(hint_time)s</strong> each day until the end of the hunt. The "
+"number of hints given each day will be at our discretion based on how the "
+"hunt is going."
+msgstr ""
+"À partir du <strong>%(hint_date)s</strong>, les équipes recevront des "
+"indices à <strong>%(hint_time)s</strong> chaque jour jusqu'à la fin de la "
+"chasse. Le nombre d'indices donnés chaque jour sera à notre discrétion en "
+"fonction de la façon dont la chasse se déroule."
+
+#: puzzles/templates/rules.html:45
+#, python-format
+msgid ""
+"The first <strong>%(hints)s hint%(plural)s</strong> your team receives may "
+"only be used on the first set of puzzles in the hunt."
+msgstr ""
+"Les <strong>%(hints)s premiers indice%(plural)s</strong> que votre équipe "
+"reçoit ne peuvent être utilisés que sur le premier groupe d'énigmes dans la "
+"chasse."
+
+#: puzzles/templates/rules.html:47
+msgid ""
+"You can use a hint to get help on a puzzle. This can be something like a "
+"nudge in the right direction (i.e. you give us your progress on the puzzle "
+"and we&rsquo;ll try to get you unstuck) or an answer to a question (e.g. "
+"&ldquo;Which answers to these crossword clues are wrong?&rdquo;)."
+msgstr ""
+"Vous pouvez utiliser un indice pour obtenir de l'aide sur une énigme. Cela "
+"peut être un coup de pouce (c-à-d vous nous faites état de votre situation "
+"et nous essaierons de vous débloquer), ou une réponse à une question (ex : "
+"\"Quelles réponses sont fausses dans ce mots-croisés ?\")."
+
+#: puzzles/templates/rules.html:49
+msgid "You can only have <strong>one open hint request</strong> at a time."
+msgstr ""
+"Vous ne pouvez avoir qu'<strong>une demande d'indice en cours</strong> à la "
+"fois."
+
+#: puzzles/templates/rules.html:57
+msgid "Other"
+msgstr "Autres"
+
+#: puzzles/templates/rules.html:59
+msgid ""
+"You may use any external sources for help, including other people, as long "
+"as they aren&rsquo;t helping other teams and aren&rsquo;t actively "
+"participating in the hunt."
+msgstr ""
+"Vous pouvez utiliser toute source d'information externe, y compris d'autres "
+"personnes, à condition qu'elles n'aident pas activement d'autres équipes "
+"participantes."
+
+#: puzzles/templates/rules.html:60
+msgid "You may not publicly stream a solve of our hunt when the hunt is live."
+msgstr ""
+"Vous ne devez pas diffuser la résolution d'une énigme lorsque la chasse est "
+"en cours."
+
+#: puzzles/templates/rules.html:61
+msgid ""
+"It won&rsquo;t be necessary to look at the HTML source/JavaScript/CSS on any "
+"webpages for any puzzle, but you&rsquo;re welcome to look anyway."
+msgstr ""
+"Il ne sera pas nécessaire de regarder le code HTML/JavaScript/CSS de quelque "
+"page web d'énigme que ce soit, mais libre à vous de le faire."
+
+#: puzzles/templates/rules.html:62
+msgid ""
+"We reserve the right to disqualify any team for unsportsmanlike conduct."
+msgstr ""
+"Nous nous réservons le droit de disqualifier toute équipe pour conduite anti-"
+"sportive."
+
+#: puzzles/templates/rules.html:63
+msgid ""
+"We reserve the right to change any of these rules. If there&rsquo;s a big "
+"change, we&rsquo;ll announce it to all teams."
+msgstr ""
+"Nous nous réservons le droit de changer toute partie de ce règlement. S'il y "
+"avait un gros changement, nous l'annoncerions à toutes les équipes."
+
+#: puzzles/templates/rules.html:64
+#, python-format
+msgid ""
+"If you have any questions about these rules, or if you want to contact us "
+"for any reason, email <a href=\"mailto:%(contact)s\">%(contact)s</a>. We "
+"will get back to you as soon as we can."
+msgstr ""
+"Si vous avez des questions sur ce règlement, ou si vous voulez nous "
+"contacter pour quelque raison que ce soit, écrivez nous à <a href=\"mailto:"
+"%(contact)s\">%(contact)s</a>. Nous vous répondrons aussi vite que possible."
+
+#: puzzles/templates/solve.html:5
+msgid "Call in: %(name)s"
+msgstr "Envoyer : %(name)s"
+
+#: puzzles/templates/solve.html:14
+#, python-format
+msgid "Call in an answer for %(name)s"
+msgstr "Envoyer une réponse pour %(name)s"
+
+#: puzzles/templates/solve.html:24
+msgid "Optional survey"
+msgstr "Sondage optionnel"
+
+#: puzzles/templates/solve.html:25
+msgid ""
+"This survey will submit on behalf of your whole team, so make sure you "
+"don&rsquo;t have two responders overwriting each other&rsquo;s comments.  "
+"You can come back to this page at any time to edit your response."
+msgstr "Ce sondage sera envoyé au nom de toute votre équipe, assurez-vous que deux équipiers n'écrasent pas les commentaires de l'autre. Vous pouvez revenir sur cette page à tout moment pour éditer votre réponse."
+
+#: puzzles/templates/solve.html:37
+#, python-format
+msgid "On a scale from 1 to %(max_value)s, how %(adjective)s was this puzzle?"
+msgstr "Sur une échelle de 1 à %(max_value)s, quelle était %(adjective)s de cette énigme ?"
+
+#: puzzles/templates/solve.html:112
+msgid "You have no more guesses remaining for this puzzle!"
+msgstr "Vous n'avez pas d'indice restant pour cette énigme."
+
+#: puzzles/templates/solve.html:134
+#, python-format
+msgid "You have %(guesses)s guess remaining for this puzzle."
+msgid_plural "You have %(guesses)s guesses remaining for this puzzle."
+msgstr[0] "Vous avez %(guesses)s essai restant pour cette énigme."
+msgstr[1] "Vous avez %(guesses)s essais restants pour cette énigme."
+
+#: puzzles/templates/solve.html:139
+#, python-format
+msgid "You have <b><a href=\"%(slug)s\">%(answers)s free answer</a></b>"
+msgid_plural "You have <b><a href=\"%(slug)s\">%(answers)s free answer</a></b>"
+msgstr[0] "Vous avez <b><a href=\"%(slug)s\">%(answers)s réponse gratuite</a></b>"
+msgstr[1] "Vous avez <b><a href=\"%(slug)s\">%(answers)s réponses gratuites</a></b>"
+
+#: puzzles/templates/solve.html:141
+msgid " that you may use to instantly solve any non-meta puzzle."
+msgstr " que vous pouvez utiliser pour résoudre instantanément n'importe quelle énigme non-méta."
+
+#: puzzles/templates/solve.html:146
+msgid "Previous guesses"
+msgstr "Essais précédents"
+
+#: puzzles/templates/team.html:12
+msgid "Edit team members"
+msgstr "Editer les équipiers"
+
+#: puzzles/templates/team.html:13
+msgid "Change password"
+msgstr "Changer le mot de passe"
+
+#: puzzles/templates/team.html:15
+msgid "Django admin"
+msgstr "Admin Django"
+
+#: puzzles/templates/team.html:16
+msgid "All guesses"
+msgstr "Tous les essais"
+
+#: puzzles/templates/team.html:17
+msgid "All hints"
+msgstr "Tous les indices"
+
+#: puzzles/templates/team.html:18
+msgid "Impersonate"
+msgstr "Personnifier"
+
+#: puzzles/templates/team.html:62
+msgid "Stats"
+msgstr "Stats"
+
+#: puzzles/templates/team.html:63
+msgid "Rank:"
+msgstr "Rang :"
+
+#: puzzles/templates/team.html:64
+msgid "Puzzles solved:"
+msgstr "Énigmes résolues :"
+
+#: puzzles/templates/team.html:67
+msgid "Hints available:"
+msgstr "Indices disponibles :"
+
+#: puzzles/templates/team.html:70
+msgid "Free answers available: "
+msgstr "Réponses gratuites :"
+
+#: puzzles/templates/team.html:76
+msgid "Team Members:"
+msgstr "Équipiers"
+
+#: puzzles/templates/team.html:107
+msgid "Incorrect guesses"
+msgstr "Essais incorrects"
+
+#: puzzles/templates/team.html:108
+#, python-format
+msgid "Unlock time (%(timezone)s)"
+msgstr "Heure déverrouillée (%(timezone)s)"
+
+#: puzzles/templates/team.html:109
+msgid "Time to solve"
+msgstr "Temps de résolution"
+
+#: puzzles/templates/team.html:110
+#, python-format
+msgid "Solve time (%(timezone)s)"
+msgstr "Heure de résolution (%(timezone)s)"
+
+#: puzzles/templates/teams.html:6
+msgid "Team Scoreboard"
+msgstr "Classement"
+
+#: puzzles/templates/teams.html:20
+msgid "Rank"
+msgstr "Rang"
+
+#: puzzles/templates/teams.html:21
+msgid "Team"
+msgstr "Équipe"
+
+#: puzzles/templates/teams.html:23
+msgid "Solves"
+msgstr "Solutions"
+
+#: puzzles/templates/teams.html:24
+#, python-format
+msgid "Finish Time (%(timezone)s)"
+msgstr "Heure d'arrivée (%(timezone)s)"
+
+#: puzzles/templates/teams.html:36
+msgid "impersonate"
+msgstr "personnifier"
+
+#: puzzles/templatetags/puzzle_tags.py:54
+msgid "Local time: "
+msgstr "Heure locale : "
+
+#: puzzles/views.py:787
+msgid "Sorry, hints are closed."
+msgstr "Désolé, les indices ne sont plus disponibles."
+
+#: puzzles/views.py:790
+msgid "You have no hints available!"
+msgstr "Vous n'avez pas d'indice disponible !"
+
+#: puzzles/views.py:792
+msgid "You have no hints that can be used on this puzzle."
+msgstr "Vous n'avez pas d'indice qui puisse être utilisé sur cette énigme."
+
+#: puzzles/views.py:794
+#, python-format
+msgid ""
+"You already have a hint open (on %s)! You can have one hint open at a time."
+msgstr ""
+"Vous avez déjà un indice en attente (sur %s) ! Vous ne pouvez avoir qu'un "
+"indice en cours à la fois."
+
+#, python-format
+#~ msgid ""
+#~ "It is the follow-up to the previous <a href=\"%(archive_link)s\">"
+#~ "%(previous_hunts)s Puzzle Hunts</a>."
+#~ msgstr ""
+#~ "C'est la suite des <a href=\"%(archive_link)s\">chasses "
+#~ "\"%(previous_hunts)s\"</a>."

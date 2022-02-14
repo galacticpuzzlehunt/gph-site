@@ -1,37 +1,36 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page-title %}
-<title>Free answer: {{ puzzle.name }}</title>
+<title>{% blocktranslate with name=puzzle.name %}Free answer: {{ name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">{% translate "Back to the puzzle" %}</a>
 {% endblock %}
 
 {% block content %}
 
-<h1>Use a free answer on {{ puzzle.name }}</h1>
+<h1>{% blocktranslate with name=puzzle.name %}Use a free answer on {{ name }}{% endblocktranslate %}</h1>
 
 <main>
     {% if puzzle_answer != None %}
     <div class="solved-panel">
-        <h4>Solved!</h4>
-        <p>The answer was <b>{{ puzzle_answer }}</b>.</p>
+        <h4>{% translate "Solved!" %}</h4>
+        <p>{% blocktranslate with answer=puzzle.answer %}The answer was <b>{{ answer }}</b>.{% endblocktranslate %}</p>
     </div>
     {% elif puzzle.is_meta %}
-    <p>You can't use a free answer on a metapuzzle.</p>
+    <p>{% translate "You can't use a free answer on a metapuzzle." %}</p>
     {% elif num_free_answers_remaining <= 0 %}
-    <p>You have no free answers to use.</p>
+    <p>{% translate "You have no free answers to use." %}</p>
     {% else %}
-    <p>You have <b>
-        {{ num_free_answers_remaining }}
-        free answer{{ num_free_answers_remaining|pluralize }}
+    <p>{% blocktranslate count answers=num_free_answers_remaining %}You have <b>{{ answers }} free answer</b>{% plural %}You have <b>{{ answers }} free answers</b>{% endblocktranslate %}
         {% include 'icon-answer.svg' %}
-    </b>. Are you sure you want to use one on this puzzle?</p>
+    {% translate ". Are you sure you want to use one on this puzzle?" %}</p>
     <form method="post" class="call-in-answer-panel">
         {% csrf_token %}
-        <button class="btn" type="submit" name="use" value="Yes">Yes</button>
-        <button class="btn" type="submit" name="use" value="No">No</button>
+        <button class="btn" type="submit" name="use" value="Yes">{% translate "Yes" %}</button>
+        <button class="btn" type="submit" name="use" value="No">{% translate "No" %}</button>
     </form>
     {% endif %}
 </main>

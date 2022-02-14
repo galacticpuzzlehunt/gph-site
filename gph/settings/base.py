@@ -129,7 +129,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'en-us' #FIXME
+LANGUAGE_CODE = 'fr-fr' #FIXME
 
 TIME_ZONE = 'America/New_York'
 
@@ -139,6 +140,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOCALE_PATHS = [os.path.normpath(os.path.join(BASE_DIR, 'locale'))]
+FORMAT_MODULE_PATH = ['gph.formats']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/

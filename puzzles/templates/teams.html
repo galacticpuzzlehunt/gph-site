@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 {% block content %}
 
-<h1>Team Scoreboard</h1>
+<h1>{% translate "Team Scoreboard" %}</h1>
 
 <main>
     <table class="gph-list-table">
@@ -16,22 +17,23 @@
         {% endif %}
         <tbody>
             <tr>
-                <th>Rank</th>
-                <th>Team</th>
+                <th>{% translate "Rank" %}</th>
+                <th>{% translate "Team" %}</th>
                 {% if hunt_has_started %}
-                    <th>Solves</th>
-                    <th>Finish time (EDT)</th>
+                    <th>{% translate "Solves" %}</th>
+                    <th>{% blocktranslate with timezone=end_time|date:"T" %}Finish Time ({{ timezone }}){% endblocktranslate %}</th>
                 {% endif %}
             </tr>
             {% for team in teams %}
             <tr {% if team.id == current_team.id %}class="current-team"{% endif %}>
                 <td>{{ forloop.counter }}</td>
                 <td>
+                    {# FIXME change ✈✈✈ #}
                     {% if team.metameta_solve_time is not None %}✈✈✈{% endif %}
                     <a href="{% url 'team' team.team_name %}">{{ team.team_name }}</a>
                     {% if team.metameta_solve_time is not None %}✈✈✈{% endif %}
                     {% if is_superuser %}
-                        (<a href="{% url 'impersonate-start' team.user_id %}">impersonate</a>)
+                        (<a href="{% url 'impersonate-start' team.user_id %}">{% translate "impersonate" %}</a>)
                     {% endif %}
                 </td>
                 {% if hunt_has_started %}

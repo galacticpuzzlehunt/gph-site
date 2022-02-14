@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.html import escape
 from django.utils.http import urlsafe_base64_encode
+from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET, require_POST
 from django.views.static import serve
@@ -783,15 +784,15 @@ def hints(request):
 
     error = None
     if request.context.hunt_is_over:
-        error = 'Sorry, hints are closed.'
+        error = _('Sorry, hints are closed.')
         can_followup = False
     elif team.num_hints_remaining <= 0 and team.num_free_answers_remaining <= 0:
-        error = 'You have no hints available!'
+        error = _('You have no hints available!')
     elif relevant_hints_remaining <= 0 and team.num_free_answers_remaining <= 0:
-        error = 'You have no hints that can be used on this puzzle.'
+        error = _('You have no hints that can be used on this puzzle.')
     elif open_hints:
-        error = ('You already have a hint open (on %s)! '
-            'You can have one hint open at a time.' % open_hints[0].puzzle)
+        error = (_('You already have a hint open (on %s)! '
+            'You can have one hint open at a time.') % open_hints[0].puzzle)
         can_followup = False
 
     if request.method == 'POST':

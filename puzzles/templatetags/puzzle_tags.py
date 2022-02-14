@@ -7,6 +7,8 @@ from django import template
 from django.template.base import NodeList
 from django.template.loader_tags import BlockNode
 from django.utils import timezone
+from django.utils import formats
+from django.utils.translation import gettext as _
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
 
@@ -43,16 +45,13 @@ def unix_time(timestamp):
     return timestamp.strftime('%s') if timestamp else ''
 
 @register.simple_tag
-def format_time(timestamp, format='%b %-d, %H:%M'):
+def format_time(timestamp, format='DATETIME_FORMAT'):
     if not timestamp:
         return ''
     timestamp2 = timestamp.astimezone(timezone.get_default_timezone())
-    try:
-        text = timestamp2.strftime(format)
-    except ValueError:
-        text = timestamp2.strftime(format.replace('%-', '%'))
-    return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
-        % (timestamp.isoformat(), format, text))
+    text = formats.date_format(timestamp2, format=format)
+    return mark_safe('<time title="%s" datetime="%s" data-format="%s">%s</time>'
+        % (_('Local time: '), timestamp.isoformat(), formats.get_format(format), text))
 
 @register.simple_tag
 def percentage(a, b):

@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load puzzle_tags %}
 {% load humanize %}
 {% load static %}
@@ -11,7 +12,7 @@
     {% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=0.5">
     <meta property="og:title" content="FIXME">
-    <meta property="og:description" content="Registration for this year's {{ hunt_title }} is now open!">
+    <meta property="og:description" content="{% blocktranslate with hunt=hunt_title%}Registration for this year's {{ hunt }} is now open!{% endblocktranslate %}">
     <meta property="og:image" content="{{ domain|slice:'-1' }}FIXME">
     <meta property="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
@@ -37,39 +38,39 @@
         <span class="tray">
             <div class="top-tabs">
                 <a{% if request.path == '/' %} class="selected-tab"{% endif %} href="{% url 'index' %}">
-                    Home
+                    {% translate "Home" %}
                 </a>
                 <a{% if request.path == '/rules' %} class="selected-tab"{% endif %} href="{% url 'rules' %}">
-                    Rules
+                    {% translate "Rules" %}
                 </a>
                 {% if story_page_visible %}
                 <a{% if request.path == '/story' %} class="selected-tab"{% endif %} href="{% url 'story' %}">
-                    Story
+                    {% translate "Story" %}
                 </a>
                 {% endif %}
                 {% if hunt_has_started or hunt_has_almost_started %}
                 <a{% if '/puzzle' in request.path or '/solve' in request.path or '/post-hunt-solve' in request.path or '/hints' in request.path or '/stats' in request.path or '/solution' in request.path %} class="selected-tab"{% endif %} href="{% url 'puzzles' %}">
-                    Puzzles
+                    {% translate "Puzzles" %}
                 </a>
                 {% endif %}
                 <a{% if '/team' in request.path %} class="selected-tab"{% endif %} href="{% url 'teams' %}">
-                    Teams
+                    {% translate "Teams" %}
                 </a>
                 <a{% if request.path == '/faq' %} class="selected-tab"{% endif %} href="{% url 'faq' %}">
-                    FAQ
+                    {% translate "FAQ" %}
                 </a>
                 {% if errata_page_visible %}
                 <a{% if request.path == '/errata' %} class="selected-tab"{% endif %} href="{% url 'errata' %}">
-                    Updates
+                    {% translate "Updates" %}
                 </a>
                 {% endif %}
                 {% if wrapup_page_visible %}
                 <a{% if '/wrapup' in request.path %} class="selected-tab"{% endif %} href="{% url 'wrapup' %}">
-                    Wrap-Up
+                    {% translate "Wrap-Up" %}
                 </a>
                 {% endif %}
                 <a{% if request.path == '/archive' %} class="selected-tab"{% endif %} href="{{ archive_link }}">
-                    Archive
+                    {% translate "Archive" %}
                 </a>
             </div>
             <div class="top-left-actions">
@@ -84,36 +85,36 @@
             {{ request.user }}
             {% endif %}
             {% if request.user.is_impersonate %}
-            <span class="current-stat" title="Currently impersonating">
+            <span class="current-stat" title="{% blocktranslate %}Currently impersonating{% endblocktranslate %}">
                 ({{ request.impersonator }}
                 <a href="{% url 'impersonate-stop' %}">&#x1F6D1;</a>)
             </span>
             {% endif %}
             {% if team and num_hints_remaining > 0 %}
-            <span class="current-stat" title="Available hints: {{ num_hints_remaining }}">
+            <span class="current-stat" title="{% blocktranslate with hints=num_hints_remaining %}Available hints: {{ hints }}{% endblocktranslate %}">
                 {% include 'icon-hint.svg' %}
                 <span class="current-stat-label">{{ num_hints_remaining }}</span>
             </span>
             {% endif %}
             {% if team and num_free_answers_remaining > 0 %}
-            <span class="current-stat" title="Free answers: {{ num_free_answers_remaining }}">
+            <span class="current-stat" title="{% blocktranslate with answers=num_free_answers_remaining %}Free answers: {{ answers }}{% endblocktranslate %}">
                 {% include 'icon-answer.svg' %}
                 <span class="current-stat-label">{{ num_free_answers_remaining }}</span>
             </span>
             {% endif %}
             {% if is_superuser %}
-            <label for="shortcuts" title="Admin toolbox">Shortcuts</label>
+            <label for="shortcuts" title="{% translate "Admin toolbox" %}>{% translate "Shortcuts" %}</label>
             {% if unclaimed_hints %}
-            <a class="current-stat" title="Hints that need answering: {{ unclaimed_hints }}" href="{% url 'hint-list' %}" style="color: red">
+            <a class="current-stat" title="{% blocktranslate with need_answers=num_free_answers_remaining %}Hints that need answering: {{ need_answers }}{% endblocktranslate %}" href="{% url 'hint-list' %}" style="color: red">>
                 {% include 'icon-hint.svg' %}
                 <span class="current-stat-label">{{ unclaimed_hints }}</span>
             </a>
             {% endif %}
             {% endif %}
-            <a href="{% url 'logout' %}" class="btn">Logout</a>
+            <a href="{% url 'logout' %}" class="btn">{% translate "Logout" %}</a>
         {% elif not hunt_is_closed %}
-            <a href="{% url 'login' %}" class="btn">Login</a>
-            <a href="{% url 'register' %}" class="btn">Register</a>
+            <a href="{% url 'login' %}" class="btn">{% translate "Login" %}</a>
+            <a href="{% url 'register' %}" class="btn">{% translate "Register" %}</a>
         {% endif %}
         </div>
     </nav>
@@ -128,10 +129,10 @@
             <div>{{ shortcut.name }}</div>
             {% endif %}
             {% endfor %}
-            <div>Download logs</div>
-            <a class="btn" href="{% url 'guess-csv' %}">Guess</button></a>
-            <a class="btn" href="{% url 'hint-csv' %}">Hint</button></a>
-            <a class="btn" href="{% url 'puzzle-log' %}">Puzzle</button></a>
+            <div>{% translate "Download logs" %}</div>
+            <a class="btn" href="{% url 'guess-csv' %}">{% translate "Guess" %}</button></a>
+            <a class="btn" href="{% url 'hint-csv' %}">{% translate "Hint" %}</button></a>
+            <a class="btn" href="{% url 'puzzle-log' %}">{% translate "Puzzle" %}</button></a>
             {% if puzzle %}
             <input name="puzzle" value="{{ puzzle.slug }}" type="hidden">
             {% endif %}
@@ -161,7 +162,7 @@
         {% block content %}{% endblock %}
     </div>
     <footer>
-        Powered by <a href="https://github.com/galacticpuzzlehunt/gph-site">gph-site</a>
+        {% translate "Powered by" %} <a href="https://github.com/galacticpuzzlehunt/gph-site">gph-site</a>
     </footer
 </body>
 </html>

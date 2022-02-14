@@ -1,40 +1,41 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 
 {% block content %}
 
-<h1>FAQs</h1>
+<h1>{% translate "FAQs" %}</h1>
 
 <main>
     <div class="no-break">
-        <h4>What is a puzzlehunt? How do I solve these puzzles?</h4>
-        <p>If you&rsquo;ve never heard of puzzlehunts before, here&rsquo;s a very brief summary: in a typical puzzle, you receive some information and have to extract an answer out of it, which is almost always an English word or phrase. Puzzles can come in many different forms; the only real commonality is that you usually receive no direct instructions, so it&rsquo;s up to you to figure out how to make sense of the information you&rsquo;re given. You can read a longer introduction to puzzlehunts <a href="https://blog.vero.site/post/puzzlehunts" target="_blank">here</a>.</p>
-        <p>If you are new to puzzles and are interested in seeing some examples, or if you&rsquo;re looking for some practice, we recommend looking at puzzles from other online hunts such as <a target="_blank" href="https://galacticpuzzlehunt.com/">Galactic Puzzle Hunt</a>, <a target="_blank" href ="https://teammatehunt.com/">Teammate Hunt</a>, <a target="_blank" href="https://puzzlepotluck.com/">Puzzle Potluck</a>, or <a target="_blank" href="https://reddothunt.sg/2018">REDDOThunt</a>.</p>
+        <h4>{% translate "What is a puzzlehunt? How do I solve these puzzles?" %}</h4>
+        <p>{% blocktranslate %}If you&rsquo;ve never heard of puzzlehunts before, here&rsquo;s a very brief summary: in a typical puzzle, you receive some information and have to extract an answer out of it, which is almost always an English word or phrase. Puzzles can come in many different forms; the only real commonality is that you usually receive no direct instructions, so it&rsquo;s up to you to figure out how to make sense of the information you&rsquo;re given. You can read a longer introduction to puzzlehunts <a href=\"https://blog.vero.site/post/puzzlehunts\" target=\"_blank\">here</a>.{% endblocktranslate %}</p>
+        <p>{% blocktranslate %}If you are new to puzzles and are interested in seeing some examples, or if you&rsquo;re looking for some practice, we recommend looking at puzzles from other online hunts such as <a target=\"_blank\" href=\"https://galacticpuzzlehunt.com/\">Galactic Puzzle Hunt</a>, <a target=\"_blank\" href =\"https://teammatehunt.com/\">Teammate Hunt</a>, <a target=\"_blank\" href=\"https://puzzlepotluck.com/\">Puzzle Potluck</a>, or <a target=\"_blank\" href=\"https://reddothunt.sg/2018\">REDDOThunt</a>."{% endblocktranslate %}</p>
     </div>
 
     <div class="no-break">
-        <h4>I think there&rsquo;s a mistake in this puzzle!</h4>
-        <p>Please describe the error in an email to <a href="mailto:{{ contact_email }}">{{ contact_email }}</a> and we&rsquo;ll try to correct it.</p>
+        <h4>{% translate "I think there&rsquo;s a mistake in this puzzle!" %}</h4>
+        <p>{% blocktranslate with contact=contact_email %}Please describe the error in an email to <a href="mailto:{{ contact }}">{{ contact }}</a> and we&rsquo;ll try to correct it.{% endblocktranslate %}</p>
     </div>
 
     <div class="no-break">
-        <h4>I&rsquo;m stuck on a puzzle. What should I do?</h4>
-        <p>Here are some general puzzle tips that might be useful:</p>
+        <h4>{% translate "I&rsquo;m stuck on a puzzle. What should I do?" %}</h4>
+        <p>{% translate "Here are some general puzzle tips that might be useful:" %}</p>
         <ul>
-            <li>Thoroughly check the work that you&rsquo;ve already done. Fixing a small mistake or incorrect assumption can greatly help with getting unstuck.</li>
-            <li>Get fresh eyes on the puzzle, or conversely, take a break and look at something else.</li>
-            <li>Consider what information you haven&rsquo;t used yet.</li>
-            <li>It can be useful to put everything you have into your favorite search engine.</li>
-            <li><a target="_blank" href="https://www.mit.edu/~puzzle/resources/haveyoutried.pdf">Have you tried&hellip;</a></li>
+            <li>{% translate "Thoroughly check the work that you&rsquo;ve already done. Fixing a small mistake or incorrect assumption can greatly help with getting unstuck." %}</li>
+            <li>{% translate "Get fresh eyes on the puzzle, or conversely, take a break and look at something else." %}</li>
+            <li>{% translate "Consider what information you haven&rsquo;t used yet." %}</li>
+            <li>{% translate "It can be useful to put everything you have into your favorite search engine." %}</li>
+            <li><a target="_blank" href="https://www.mit.edu/~puzzle/resources/haveyoutried.pdf">{% translate "Have you tried&hellip;" %}</a></li>
         </ul>
         {% if hints_enabled %}
-        <p>Remember that after hints are released, you can also use them to get a nudge in the right direction.</p>
+        <p>{% translate "Remember that after hints are released, you can also use them to get a nudge in the right direction." %}</p>
         {% endif %}
     </div>
 
     <div class="no-break">
-        <h4>I have a question that&rsquo;s not on this list!</h4>
-        <p>Contact us at <a href="mailto:{{ contact_email }}">{{ contact_email }}</a> and we&rsquo;ll do our best to answer it.</p>
+        <h4>{% translate "I have a question that&rsquo;s not on this list!" %}</h4>
+        <p>{% blocktranslate with contact=contact_email %}Contact us at <a href="mailto:{{ contact }}">{{ contact }}</a> and we&rsquo;ll do our best to answer it.{% endblocktranslate %}</p>
     </div>
 </main>
 

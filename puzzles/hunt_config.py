@@ -75,7 +75,7 @@ INTRO_HINTS = 2
 ONE_HINT_AT_A_TIME = True
 
 # These options are exactly analogous to the above.
-FREE_ANSWERS_ENABLED = False
+FREE_ANSWERS_ENABLED = True
 FREE_ANSWERS_PER_DAY = (1, 2, 2)
 FREE_ANSWER_TIME = HUNT_START_TIME + datetime.timedelta(days=6)
 TEAM_AGE_BEFORE_FREE_ANSWERS = datetime.timedelta(days=3)

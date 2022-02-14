@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load static %}
 {% block content %}
 
@@ -22,8 +23,7 @@ h2 a {
 
 {% if hunt_is_prereleased %}
 <h3 style="text-align: center">
-    You are a pre-release testsolver, so you may be seeing puzzles that are
-    locked for the general public. Please be careful!
+    {% translate "You are a pre-release testsolver, so you may be seeing puzzles that are locked for the general public. Please be careful!" %}
 </h3>
 {% endif %}
 

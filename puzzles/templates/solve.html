@@ -1,30 +1,28 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page-title %}
-<title>Call in: {{ puzzle.name }}</title>
+<title>{% blocktranslate with name=puzzle.name %}Call in: {{ name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">{% translate "Back to the puzzle" %}</a>
 {% endblock %}
 
 {% block content %}
 
-<h1>Call in an answer for {{ puzzle.name }}</h1>
+<h1>{% blocktranslate with name=puzzle.name %}Call in an answer for {{ name }}{% endblocktranslate %}</h1>
 
 <main>
 {% if puzzle_answer != None %}
     <div class="solved-panel">
-        <h4>Solved!</h4>
-        <p>The answer was <b>{{ puzzle_answer }}</b>.</p>
+        <h4>{% translate "Solved!" %}</h4>
+        <p>{% blocktranslate with answer=puzzle_answer%}The answer was <b>{{ answer }}</b>.{% endblocktranslate %}</p>
     </div>
 
     {% if survey %}
-    <h4>Optional survey</h4>
-    <div class="note">
-        This survey will submit on behalf of your whole team, so make sure you
-        don&rsquo;t have two responders overwriting each other&rsquo;s comments.
-        You can come back to this page at any time to edit your response.
+    <h4>{% translate "Optional survey" %}</h4>
+    <div class="note">{% translate "This survey will submit on behalf of your whole team, so make sure you don&rsquo;t have two responders overwriting each other&rsquo;s comments.  You can come back to this page at any time to edit your response." %}
     </div>
 
     <form method="post" class="call-in-answer-panel">
@@ -36,8 +34,7 @@
         {% for field in survey %}
             {% if 'adjective' in field.field.widget.attrs %}
             <div class="six columns rating">
-                On a scale from 1 to {{ field.field.max_value }}, how
-                {{ field.field.widget.attrs.adjective }} was this puzzle?
+            	{% blocktranslate with max_value=field.field.max_value adjective=field.field.widget.attrs.adjective %}On a scale from 1 to {{ max_value }}, how {{ adjective }} was this puzzle?{% endblocktranslate %}
                 <p>
                 {% spaceless %}
                 {% for option in field %}
@@ -63,7 +60,7 @@
                 {{ field.errors }}
             </div>
             <div class="three columns">
-                <button class="btn" type="submit">Submit</button>
+                <button class="btn" type="submit">{% translate "Submit" %}</button>
             </div>
         </div>
         {% endif %}
@@ -112,7 +109,7 @@
     {% endif %}
 {% else %}
     {% if guesses_remaining == 0 %}
-    <p>You have no more guesses remaining for this puzzle!</p>
+    <p>{% translate "You have no more guesses remaining for this puzzle!" %}</p>
     {% else %}
     <form method="post" class="call-in-answer-panel">
         {% csrf_token %}
@@ -129,25 +126,24 @@
                 {{ field.errors }}
             </div>
             <div class="four columns">
-                <button class="btn" type="submit">Submit</button>
+                <button class="btn" type="submit">{% translate "Submit" %}</button>
             </div>
         </div>
         {% endfor %}
     </form>
-    <p>You have {{ guesses_remaining }} guess{{ guesses_remaining|pluralize:"es" }} remaining for this puzzle.</p>
+    <p>{% blocktranslate count guesses=guesses_remaining %}You have {{ guesses }} guess remaining for this puzzle.{% plural %}You have {{ guesses }} guesses remaining for this puzzle.{% endblocktranslate %}</p>
     {% endif %}
 
     {% if not puzzle.is_meta and num_free_answers_remaining > 0 %}
-    <p>You have <b><a href="{% url 'free-answer' puzzle.slug %}">
-        {{ num_free_answers_remaining }}
-        free answer{{ num_free_answers_remaining|pluralize }}</a>
+    {% url 'free-answer' puzzle.slug as slug %}
+    <p>{% blocktranslate count answers=num_free_answers_remaining %}You have <b><a href="{{ slug }}">{{ answers }} free answer</a></b>{% plural %}You have <b><a href="{{ slug }}">{{ answers }} free answer</a></b>{% endblocktranslate %}
         {% include 'icon-answer.svg' %}
-    </b> that you may use to instantly solve any non-meta puzzle.</p>
+    {% translate " that you may use to instantly solve any non-meta puzzle." %}</p>
     {% endif %}
 {% endif %}
 
 {% if puzzle_submissions %}
-    <h4>Previous guesses</h4>
+    <h4>{% translate "Previous guesses" %}</h4>
     <ul>
         {% for submission in puzzle_submissions %}
         <li>{{ submission.submitted_answer }}</li>

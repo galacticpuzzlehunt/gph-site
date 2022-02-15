@@ -266,6 +266,13 @@ figcaption {
         margin: 0;
     }
 
+    .shortcuts p {
+        width: 25rem;
+        font-size: 1.5rem;
+        line-height: 1.75rem;
+        margin: 0 0 1rem;
+    }
+
     #shortcuts {
         position: absolute;
         opacity: 0;

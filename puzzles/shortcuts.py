@@ -54,7 +54,7 @@ def dispatch_shortcut(request):
 
 class Shortcuts:
     def create_team(user):
-        'Create team'
+        'Create admin team'
         models.Team(
             user=user,
             team_name=user.username,

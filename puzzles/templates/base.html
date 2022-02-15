@@ -102,7 +102,10 @@
             </span>
             {% endif %}
             {% if is_superuser %}
-            <label for="shortcuts" title="Admin toolbox">Shortcuts</label>
+            <label for="shortcuts" title="Admin toolbox">
+                {% if not hunt_is_prereleased %}&#x26A0;&#xFE0F;{% endif %}
+                Shortcuts
+            </label>
             {% if unclaimed_hints %}
             <a class="current-stat" title="Hints that need answering: {{ unclaimed_hints }}" href="{% url 'hint-list' %}" style="color: red">
                 {% include 'icon-hint.svg' %}
@@ -121,6 +124,13 @@
     <main class="shortcuts">
         <form method="post" action="{% url 'shortcuts' %}" target="dummy">
             {% csrf_token %}
+            {% if not hunt_is_prereleased %}
+            <p>
+                Even though you&rsquo;re an admin, you&rsquo;re not currently
+                marked as a testsolver, so you won&rsquo;t be able to view
+                puzzles.
+            </p>
+            {% endif %}
             {% for shortcut in shortcuts %}
             {% if 'action' in shortcut %}
             <button class="btn" type="submit" name="action" value="{{ shortcut.action }}">{{ shortcut.name }}</button>

@@ -1,5 +1,6 @@
 import inspect
 import types
+from django.utils.translation import gettext as _
 
 from puzzles import models
 
@@ -54,7 +55,7 @@ def dispatch_shortcut(request):
 
 class Shortcuts:
     def create_team(user):
-        'Create team'
+        _('Create team')
         models.Team(
             user=user,
             team_name=user.username,
@@ -62,11 +63,11 @@ class Shortcuts:
         ).save()
 
     def prerelease_testsolver(team):
-        'Toggle testsolver'
+        _('Toggle testsolver')
         team.is_prerelease_testsolver ^= True
         team.save()
 
-    HINTS = 'Hints (my team)'
+    HINTS = _('Hints (my team)')
 
     def hint_1(team):
         '+1'
@@ -84,11 +85,11 @@ class Shortcuts:
         team.save()
 
     def reset_hints(team):
-        'Reset'
+        _('Reset')
         team.total_hints_awarded = 0
         team.save()
 
-    FREE_ANSWERS = 'Free answers (my team)'
+    FREE_ANSWERS = _('Free answers (my team)')
 
     def free_answer_1(team):
         '+1'
@@ -106,24 +107,24 @@ class Shortcuts:
         team.save()
 
     def reset_free_answers(team):
-        'Reset'
+        _('Reset')
         team.total_free_answers_awarded = 0
         team.save()
 
-    PUZZLE = 'This puzzle'
+    PUZZLE = _('This puzzle')
 
     def show_answer(puzzle):
-        'Show answer'
+        _('Show answer')
         raise Exception(puzzle.answer)
 
     def show_order(puzzle):
-        'Show order'
+        _('Show order')
         raise Exception(puzzle.order)
 
-    SOLVE = 'Solve this puzzle'
+    SOLVE = _('Solve this puzzle')
 
     def solve(puzzle, team):
-        'Solve'
+        _('Solve')
         if not team.answersubmission_set.filter(puzzle=puzzle, is_correct=True).exists():
             team.answersubmission_set.create(
                 puzzle=puzzle,
@@ -133,7 +134,7 @@ class Shortcuts:
             )
 
     def free_answer(puzzle, team):
-        'Free'
+        _('Free')
         if not team.answersubmission_set.filter(puzzle=puzzle, is_correct=True).exists():
             team.answersubmission_set.create(
                 puzzle=puzzle,
@@ -143,24 +144,24 @@ class Shortcuts:
             )
 
     def unsolve(puzzle, team):
-        'Unsolve'
+        _('Unsolve')
         team.answersubmission_set.filter(puzzle=puzzle, is_correct=True).delete()
 
-    PUZZLE_HINTS = 'Request hint on this puzzle'
+    PUZZLE_HINTS = _('Request hint on this puzzle')
 
     def unanswered_hint(puzzle, team):
-        'Unanswered'
+        _('Unanswered')
         return team.hint_set.create(
             puzzle=puzzle,
             hint_question='Halp',
         )
 
     def answered_hint(puzzle, team, now):
-        'Answered'
+        _('Answered')
         hint = Shortcuts.unanswered_hint(puzzle, team)
         hint.answered_datetime = now
         hint.status = models.Hint.ANSWERED
-        hint.response = 'Ok'
+        hint.response = _('Ok')
         hint.save(update_fields=('answered_datetime', 'status', 'response'))
 
     PUZZLE_GUESSES = 'Guesses (on this puzzle)'
@@ -168,34 +169,34 @@ class Shortcuts:
     def guess_1(puzzle, team):
         '+1'
         grant, _ = team.extraguessgrant_set.get_or_create(puzzle=puzzle,
-            defaults={'extra_guesses': 0})
+            defaults={_('extra_guesses'): 0})
         grant.extra_guesses += 1
         grant.save()
 
     def guess_5(puzzle, team):
         '+5'
         grant, _ = team.extraguessgrant_set.get_or_create(puzzle=puzzle,
-            defaults={'extra_guesses': 0})
+            defaults={_('extra_guesses'): 0})
         grant.extra_guesses += 5
         grant.save()
 
     def guess_0(puzzle, team):
         '=0'
         grant, _ = team.extraguessgrant_set.get_or_create(puzzle=puzzle,
-            defaults={'extra_guesses': 0})
+            defaults={_('extra_guesses'): 0})
         grant.extra_guesses -= team.guesses_remaining(puzzle)
         grant.save()
 
     def reset_guesses(puzzle, team):
-        'Reset'
+        _('Reset')
         team.extraguessgrant_set.filter(puzzle=puzzle).delete()
 
     DELETE = 'Delete all my (on this puzzle)'
 
     def delete_hints(puzzle, team):
-        'Hints'
+        _('Hints')
         team.hint_set.filter(puzzle=puzzle).delete()
 
     def delete_guesses(puzzle, team):
-        'Guesses'
+        _('Guesses')
         team.answersubmission_set.filter(puzzle=puzzle).delete()

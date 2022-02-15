@@ -439,6 +439,9 @@ figcaption {
 
 .gph-list-table td, .gph-list-table th {
     padding: 4px 8px;
+}
+
+.gph-list-table td {
     word-break: break-word;
     overflow-wrap: anywhere;
 }

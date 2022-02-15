@@ -33,9 +33,9 @@
             <tr>
                 <th>Team</th>
                 <th>Incorrect guesses</th>
-                <th>Unlock time (EDT)</th>
+                <th>Unlock time ({{ start_time|date:"T" }})</th>
                 <th>Time to solve</th>
-                <th>Solve time (EDT)</th>
+                <th>Solve time ({{ start_time|date:"T" }})</th>
             </tr>
             {% for solver in solvers %}
             <tr{% if solver.is_current %} class="current-team"{% endif %}>

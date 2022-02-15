@@ -104,9 +104,9 @@
         <tr>
             <th>Puzzle</th>
             <th>Incorrect guesses</th>
-            <th>Unlock time (EDT)</th>
+            <th>Unlock time ({{ start_time|date:"T" }})</th>
             <th>Time to solve</th>
-            <th>Solve time (EDT)</th>
+            <th>Solve time ({{ start_time|date:"T" }})</th>
         </tr>
         {% for s in submissions %}
         <tr{% if s.submission.used_free_answer %} class="free"{% endif %}>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-15 15:55-0400\n"
+"POT-Creation-Date: 2022-02-16 09:26-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 msgid "No response"
 msgstr "Pas de réponse"
 
-#: puzzles/models.py:751
+#: puzzles/models.py:751 puzzles/shortcuts.py:160
 msgid "Answered"
 msgstr "Répondu"
 
@@ -31,6 +31,102 @@ msgstr "Remboursé"
 #: puzzles/models.py:757
 msgid "Obsolete"
 msgstr "Obsolète"
+
+#: puzzles/shortcuts.py:58
+msgid "Create team"
+msgstr ""
+
+#: puzzles/shortcuts.py:66
+#, fuzzy
+#| msgid "Total solves:"
+msgid "Toggle testsolver"
+msgstr "Nombre de résolutions :"
+
+#: puzzles/shortcuts.py:70
+#, fuzzy
+#| msgid "Hints from "
+msgid "Hints (my team)"
+msgstr "Indices de "
+
+#: puzzles/shortcuts.py:88 puzzles/shortcuts.py:110 puzzles/shortcuts.py:191
+msgid "Reset"
+msgstr ""
+
+#: puzzles/shortcuts.py:92
+#, fuzzy
+#| msgid "Free answers:"
+msgid "Free answers (my team)"
+msgstr "Réponses gratuites :"
+
+#: puzzles/shortcuts.py:114
+#, fuzzy
+#| msgid "All puzzles"
+msgid "This puzzle"
+msgstr "Toutes les énigmes"
+
+#: puzzles/shortcuts.py:117
+#, fuzzy
+#| msgid "The answer was"
+msgid "Show answer"
+msgstr "La réponse était"
+
+#: puzzles/shortcuts.py:121
+msgid "Show order"
+msgstr ""
+
+#: puzzles/shortcuts.py:124
+#, fuzzy
+#| msgid "Solve time"
+msgid "Solve this puzzle"
+msgstr "Heure de résolution"
+
+#: puzzles/shortcuts.py:127
+#, fuzzy
+#| msgid "Solves"
+msgid "Solve"
+msgstr "Résolutions"
+
+#: puzzles/shortcuts.py:137
+msgid "Free"
+msgstr ""
+
+#: puzzles/shortcuts.py:147
+#, fuzzy
+#| msgid "Solves"
+msgid "Unsolve"
+msgstr "Résolutions"
+
+#: puzzles/shortcuts.py:150
+msgid "Request hint on this puzzle"
+msgstr ""
+
+#: puzzles/shortcuts.py:153
+#, fuzzy
+#| msgid "Answered"
+msgid "Unanswered"
+msgstr "Répondu"
+
+#: puzzles/shortcuts.py:164
+msgid "Ok"
+msgstr ""
+
+#: puzzles/shortcuts.py:172 puzzles/shortcuts.py:179 puzzles/shortcuts.py:186
+#, fuzzy
+#| msgid "guesses"
+msgid "extra_guesses"
+msgstr "essais"
+
+#: puzzles/shortcuts.py:197 puzzles/templates/hint_list.html:6
+#: puzzles/templates/hint_list_query.html:7 puzzles/templates/rules.html:39
+#: puzzles/views.py:728
+msgid "Hints"
+msgstr "Indices"
+
+#: puzzles/shortcuts.py:201
+#, fuzzy
+#| msgid "guesses"
+msgid "Guesses"
+msgstr "essais"
 
 #: puzzles/templates/archive.html:5
 msgid "Hunt Archive"
@@ -329,7 +425,7 @@ msgstr "La réponse était <b>%(answer)s</b>."
 msgid "You can't use a free answer on a metapuzzle."
 msgstr "Vous ne pouvez utiliser de réponse gratuite sur une méta-énigme."
 
-#: puzzles/templates/free_answer.html:25
+#: puzzles/templates/free_answer.html:25 puzzles/views.py:662
 msgid "You have no free answers to use."
 msgstr "Vous n'avez pas de réponse gratuite disponible."
 
@@ -454,11 +550,6 @@ msgstr "Retour à la liste"
 #: puzzles/templates/hint.html:157
 msgid "Copy response"
 msgstr "Copier la réponse"
-
-#: puzzles/templates/hint_list.html:6 puzzles/templates/hint_list_query.html:7
-#: puzzles/templates/rules.html:39 puzzles/views.py:728
-msgid "Hints"
-msgstr "Indices"
 
 #: puzzles/templates/hint_list.html:10
 msgid "Open Hints"
@@ -1224,6 +1315,86 @@ msgstr "{}s"
 msgid "Local time: "
 msgstr "Heure locale : "
 
+#: puzzles/views.py:85
+msgid "Invalid puzzle name."
+msgstr ""
+
+#: puzzles/views.py:95
+msgid "You must be signed in and have a registered team to access this page."
+msgstr ""
+
+#: puzzles/views.py:134
+msgid "Sorry, not available until the hunt ends."
+msgstr ""
+
+#: puzzles/views.py:140
+#, fuzzy
+#| msgid "Sorry, hints are closed."
+msgid "Sorry, the hunt is over."
+msgstr "Désolé, les indices ne sont plus disponibles."
+
+#: puzzles/views.py:384
+msgid "You\\u2019re not logged in."
+msgstr ""
+
+#: puzzles/views.py:467
+msgid "Invalid round name."
+msgstr ""
+
+#: puzzles/views.py:579 puzzles/views.py:660
+msgid "You\\u2019ve already solved this puzzle!"
+msgstr ""
+
+#: puzzles/views.py:582
+#, fuzzy
+#| msgid "You have no more guesses remaining for this puzzle!"
+msgid "You have no more guesses for this puzzle!"
+msgstr "Vous n'avez pas d'indice restant pour cette énigme."
+
+#: puzzles/views.py:602
+msgid ""
+"All puzzle answers will have at least one letter A through Z (case does not "
+"matter)."
+msgstr ""
+
+#: puzzles/views.py:605
+#, python-format
+msgid ""
+"You\\u2019ve already tried calling in the answer \\u201c%s\\u201d for this "
+"puzzle."
+msgstr ""
+
+#: puzzles/views.py:620
+#, python-format
+msgid "%s is correct!"
+msgstr ""
+
+#: puzzles/views.py:623
+#, python-format
+msgid "Team %s has finished the hunt!"
+msgstr ""
+
+#: puzzles/views.py:627
+#, python-format
+msgid "%s is incorrect."
+msgstr ""
+
+#: puzzles/views.py:637
+msgid "Thanks!"
+msgstr ""
+
+#: puzzles/views.py:658
+#, fuzzy
+#| msgid "You can't use a free answer on a metapuzzle."
+msgid "You can\\u2019t use a free answer on a metapuzzle."
+msgstr "Vous ne pouvez utiliser de réponse gratuite sur une méta-énigme."
+
+#: puzzles/views.py:671
+#, fuzzy
+#| msgid "Free answers:"
+msgid "Free answer used!"
+msgstr "Réponses gratuites :"
+
 #: puzzles/views.py:732
 msgid " from "
 msgstr " de "
@@ -1252,8 +1423,53 @@ msgstr ""
 "Vous avez déjà un indice en attente (sur %s) ! Vous ne pouvez avoir qu'un "
 "indice en cours à la fois."
 
-#~ msgid "Hints from "
-#~ msgstr "Indices de "
+#: puzzles/views.py:817
+msgid ""
+"Your request for a hint has been submitted and the puzzle hunt staff has "
+"been notified\\u2014we will respond to it soon!"
+msgstr ""
+
+#: puzzles/views.py:854
+msgid ""
+"Oh no! The status of this hint changed. Likely either someone else answered "
+"it, or the team solved the puzzle. You may wish to copy your text and reload."
+msgstr ""
+
+#: puzzles/views.py:862
+#, fuzzy
+#| msgid "Hints"
+msgid "Hint saved."
+msgstr "Indices"
+
+#: puzzles/views.py:870
+#, fuzzy
+#| msgid "Top hint answerers"
+msgid "This hint has been answered!"
+msgstr "Meilleurs fournisseurs d'indices"
+
+#: puzzles/views.py:872
+msgid "This hint has been answered by {}!"
+msgstr ""
+
+#: puzzles/views.py:876
+msgid "This hint is currently claimed!"
+msgstr ""
+
+#: puzzles/views.py:878
+msgid "This hint is currently claimed by {}!"
+msgstr ""
+
+#: puzzles/views.py:884
+#, fuzzy
+#| msgid "Claim this hint"
+msgid "You have claimed this hint!"
+msgstr "Assigner cet indice"
+
+#: puzzles/views.py:886
+msgid ""
+"Please set your name before claiming hints! (If you just set your name, you "
+"can refresh or click Claim.)"
+msgstr ""
 
 #, python-format
 #~ msgid "Unlock time (%(timezone)s)"

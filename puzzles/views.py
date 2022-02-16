@@ -866,12 +866,16 @@ def hint(request, id):
     if claimer:
         claimer = unquote(claimer)
     if hint.status != Hint.NO_RESPONSE:
-        form.add_error(None, _('This hint has been answered{}!').format(
-            _(' by ') + hint.claimer if hint.claimer else ''))
+        if hint.claimer:
+            form.add_error(None, _('This hint has been answered!'))
+        else:
+            form.add_error(None, _('This hint has been answered by {}!').format(hint.claimer))
     elif hint.claimed_datetime:
         if hint.claimer != claimer:
-            form.add_error(None, _('This hint is currently claimed{}!').format(
-                _(' by ') + hint.claimer if hint.claimer else ''))
+            if hint.claimer:
+                form.add_error(None, _('This hint is currently claimed!'))
+            else:
+                form.add_error(None, _('This hint is currently claimed by {}!').format(hint.claimer))
     elif request.GET.get('claim'):
         if claimer:
             hint.claimed_datetime = request.context.now
@@ -1083,7 +1087,7 @@ def story(request):
     story_points = [key for (key, visible) in story_points.items() if visible]
     if not request.context.hunt_is_over:
         story_points.reverse()
-    return render(request, 'story.html', {_('story_points'): story_points})
+    return render(request, 'story.html', {'story_points': story_points})
 
 
 @require_GET

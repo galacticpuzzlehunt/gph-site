@@ -82,7 +82,7 @@ def validate_puzzle(require_team=False):
         def inner(request, slug):
             puzzle = Puzzle.objects.filter(slug=slug).first()
             if not puzzle or puzzle not in request.context.unlocks:
-                messages.error(request, 'Invalid puzzle name.')
+                messages.error(request, _('Invalid puzzle name.'))
                 return redirect('puzzles')
             if request.context.team:
                 unlock = request.context.team.db_unlocks.get(puzzle.id)
@@ -92,8 +92,8 @@ def validate_puzzle(require_team=False):
             elif require_team:
                 messages.error(
                     request,
-                    'You must be signed in and have a registered team to '
-                    'access this page.'
+                    _('You must be signed in and have a registered team to '
+                    'access this page.')
                 )
                 return redirect('puzzle', slug)
             request.context.puzzle = puzzle
@@ -131,13 +131,13 @@ def require_admin(request):
 @access_restrictor
 def require_after_hunt_end_or_admin(request):
     if not request.context.hunt_is_over:
-        messages.error(request, 'Sorry, not available until the hunt ends.')
+        messages.error(request, _('Sorry, not available until the hunt ends.'))
         return redirect('index')
 
 @access_restrictor
 def require_before_hunt_closed_or_admin(request):
     if request.context.hunt_is_closed:
-        messages.error(request, 'Sorry, the hunt is over.')
+        messages.error(request, _('Sorry, the hunt is over.'))
         return redirect('index')
 
 
@@ -381,7 +381,7 @@ def teams_unhidden(request):
 def edit_team(request):
     team = request.context.team
     if team is None:
-        messages.error(request, 'You\u2019re not logged in.')
+        messages.error(request, _('You\u2019re not logged in.'))
         return redirect('login')
     team_members_formset = modelformset_factory(
         TeamMember,
@@ -464,7 +464,7 @@ def round(request, slug):
                 # A plausible cause of it being a directory is that the slug
                 # is blank.
                 return redirect('puzzles')
-    messages.error(request, 'Invalid round name.')
+    messages.error(request, _('Invalid round name.'))
     return redirect('puzzles')
 
 
@@ -576,10 +576,10 @@ def solve(request):
 
     if request.method == 'POST' and 'answer' in request.POST:
         if request.context.puzzle_answer:
-            messages.error(request, 'You\u2019ve already solved this puzzle!')
+            messages.error(request, _('You\u2019ve already solved this puzzle!'))
             return redirect('solve', puzzle.slug)
         if request.context.guesses_remaining <= 0:
-            messages.error(request, 'You have no more guesses for this puzzle!')
+            messages.error(request, _('You have no more guesses for this puzzle!'))
             return redirect('solve', puzzle.slug)
 
         semicleaned_guess = PuzzleMessage.semiclean_guess(request.POST.get('answer'))
@@ -599,11 +599,11 @@ def solve(request):
             for message in puzzle_messages:
                 form.add_error(None, message.response)
         elif not normalized_answer:
-            form.add_error(None, 'All puzzle answers will have '
-                'at least one letter A through Z (case does not matter).')
+            form.add_error(None, _('All puzzle answers will have '
+                'at least one letter A through Z (case does not matter).'))
         elif tried_before:
-            form.add_error(None, 'You\u2019ve already tried calling in the '
-                'answer \u201c%s\u201d for this puzzle.' % normalized_answer)
+            form.add_error(None, _('You\u2019ve already tried calling in the '
+                'answer \u201c%s\u201d for this puzzle.') % normalized_answer)
         elif form.is_valid():
             AnswerSubmission(
                 team=team,
@@ -617,14 +617,14 @@ def solve(request):
                 if not request.context.hunt_is_over:
                     team.last_solve_time = request.context.now
                     team.save()
-                messages.success(request, '%s is correct!' % puzzle.answer)
+                messages.success(request, _('%s is correct!') % puzzle.answer)
                 if puzzle.slug == META_META_SLUG:
                     dispatch_victory_alert(
-                        'Team %s has finished the hunt!' % team +
+                        _('Team %s has finished the hunt!') % team +
                         '\n**Emails:** <%s>' % request.build_absolute_uri(reverse('finishers')))
                     return redirect('victory')
             else:
-                messages.error(request, '%s is incorrect.' % normalized_answer)
+                messages.error(request, _('%s is incorrect.') % normalized_answer)
             return redirect('solve', puzzle.slug)
 
     elif request.method == 'POST':
@@ -634,7 +634,7 @@ def solve(request):
         if survey.is_valid():
             Survey.objects.update_or_create(
                 puzzle=puzzle, team=team, defaults=survey.cleaned_data)
-            messages.success(request, 'Thanks!')
+            messages.success(request, _('Thanks!'))
             return redirect('solve', puzzle.slug)
 
     if survey is None and SURVEYS_AVAILABLE:
@@ -655,11 +655,11 @@ def free_answer(request):
     team = request.context.team
     if request.method == 'POST':
         if puzzle.is_meta:
-            messages.error(request, 'You can\u2019t use a free answer on a metapuzzle.')
+            messages.error(request, _('You can\u2019t use a free answer on a metapuzzle.'))
         elif request.context.puzzle_answer:
-            messages.error(request, 'You\u2019ve already solved this puzzle!')
+            messages.error(request, _('You\u2019ve already solved this puzzle!'))
         elif team.num_free_answers_remaining <= 0:
-            messages.error(request, 'You have no free answers to use.')
+            messages.error(request, _('You have no free answers to use.'))
         elif request.POST.get('use') == 'Yes':
             AnswerSubmission(
                 team=team,
@@ -668,7 +668,7 @@ def free_answer(request):
                 is_correct=True,
                 used_free_answer=True,
             ).save()
-            messages.success(request, 'Free answer used!')
+            messages.success(request, _('Free answer used!'))
         return redirect('solve', puzzle.slug)
     return render(request, 'free_answer.html')
 
@@ -813,7 +813,7 @@ def hints(request):
                 notify_emails=form.cleaned_data['notify_emails'],
                 is_followup=is_followup,
             ).save()
-            messages.success(request, (
+            messages.success(request, _(
                 'Your request for a hint has been submitted and the puzzle '
                 'hunt staff has been notified\u2014we will respond to it soon!'
             ))
@@ -851,36 +851,36 @@ def hint(request, id):
     elif request.method == 'POST':
         form = AnswerHintForm(request.POST)
         if hint.status != request.POST.get('initial_status'):
-            form.add_error(None, 'Oh no! The status of this hint changed. '
+            form.add_error(None, _('Oh no! The status of this hint changed. '
                 'Likely either someone else answered it, or the team solved '
-                'the puzzle. You may wish to copy your text and reload.')
+                'the puzzle. You may wish to copy your text and reload.'))
         elif form.is_valid():
             hint.answered_datetime = request.context.now
             hint.status = form.cleaned_data['status']
             hint.response = form.cleaned_data['response']
             hint.save(update_fields=('answered_datetime', 'status', 'response'))
-            messages.success(request, 'Hint saved.')
+            messages.success(request, _('Hint saved.'))
             return redirect('hint-list')
 
     claimer = request.COOKIES.get('claimer')
     if claimer:
         claimer = unquote(claimer)
     if hint.status != Hint.NO_RESPONSE:
-        form.add_error(None, 'This hint has been answered{}!'.format(
-            ' by ' + hint.claimer if hint.claimer else ''))
+        form.add_error(None, _('This hint has been answered{}!').format(
+            _(' by ') + hint.claimer if hint.claimer else ''))
     elif hint.claimed_datetime:
         if hint.claimer != claimer:
-            form.add_error(None, 'This hint is currently claimed{}!'.format(
-                ' by ' + hint.claimer if hint.claimer else ''))
+            form.add_error(None, _('This hint is currently claimed{}!').format(
+                _(' by ') + hint.claimer if hint.claimer else ''))
     elif request.GET.get('claim'):
         if claimer:
             hint.claimed_datetime = request.context.now
             hint.claimer = claimer
             hint.save()
-            messages.success(request, 'You have claimed this hint!')
+            messages.success(request, _('You have claimed this hint!'))
         else:
-            messages.error(request, 'Please set your name before claiming hints! '
-                '(If you just set your name, you can refresh or click Claim.)')
+            messages.error(request, _('Please set your name before claiming hints! '
+                '(If you just set your name, you can refresh or click Claim.)'))
 
     limit = request.META.get('QUERY_STRING', '')
     limit = int(limit) if limit.isdigit() else 20
@@ -1083,7 +1083,7 @@ def story(request):
     story_points = [key for (key, visible) in story_points.items() if visible]
     if not request.context.hunt_is_over:
         story_points.reverse()
-    return render(request, 'story.html', {'story_points': story_points})
+    return render(request, 'story.html', {_('story_points'): story_points})
 
 
 @require_GET

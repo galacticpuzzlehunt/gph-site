@@ -29,11 +29,11 @@ td {
     <col style="width: 12%">
     <tr onclick="document.querySelector('tbody').className = 'sorting'">
         <th>Team</th>
-        <th>Unlock (EDT)</th>
+        <th>Unlock ({{ start_time|date:"T" }})</th>
         <th>Time to wrong</th>
         <th>Time to solve</th>
         <th>Total time</th>
-        <th>Solve (EDT)</th>
+        <th>Solve ({{ start_time|date:"T" }})</th>
     </tr>
     {% for team in data %}
     <tr>

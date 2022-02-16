@@ -1,48 +1,48 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 {% load static %}
 
 {% block page-title %}
-<title>Hint: {{ hint.puzzle }} from {{ hint.team }}</title>
+<title>{% translate "Hint:" %} {{ hint.puzzle }} {% translate "from" %} {{ hint.team }}</title>
 {% endblock %}
 
 {% block content %}
 
-<h1>Answer a hint</h1>
+<h1>{% translate "Answer a hint" %}</h1>
 
 <div class="hint-controls">
     <a class="btn" href="javascript:askName(true)">
-        Your name is <b id="claimer">anonymous</b>.
+        {% translate "Your name is" %} <b id="claimer">{% translate "anonymous" %}</b>.
     </a>
     <script src="{% static "js/hint.js" %}"></script>
-    <a href="/admin/puzzles/hint/{{ hint.id }}/change/" class="btn">View in admin</a>
+    <a href="/admin/puzzles/hint/{{ hint.id }}/change/" class="btn">{% translate "View in admin" %}</a>
 </div>
 
 <table class="hint-table">
     {% if hint.is_followup %}
     <div class="note">
-        You&rsquo;re answering a follow-up hint: the team indicated the last
+        {% blocktranslate %}You&rsquo;re answering a follow-up hint: the team indicated the last
         hint they got wasn&rsquo;t helpful for some reason, and they&rsquo;d
         like clarification. Their previous hints are included here for context.
         <br>The follow-up request, at the bottom, does not consume a hint
         regardless of what status you assign to it. You should clarify whatever
         was confusing or mistargeted in the last response, but feel free to
         request that the team use a real hint instead. Setting this hint to
-        Refunded will also prevent additional follow-ups to the follow-up.
+        Refunded will also prevent additional follow-ups to the follow-up."{% endblocktranslate %}
     </div>
     {% endif %}
     {% for hint in previous_same_team %}
     <tbody style="background-color: #{{ hint.hint_question|hash|slice:':6' }}20">
         <tr>
             <td>
-                {% if hint.is_followup %}<em>(followup){% endif %}
-                {% format_time hint.submitted_datetime '%A, %B %-d at %-I:%M %p %Z' %}
+                {% if hint.is_followup %}<em>({% translate "followup" %}){% endif %}
+                {% format_time hint.submitted_datetime 'DATE_AT_TIME' %}
                 {% if hint.is_followup %}</em>{% endif %}
             </td>
             <td colspan="3">
-                {{ hint.get_status_display }}
-                {% format_time_since hint.answered_datetime now %}
-                ago by {{ hint.claimer }}
+            	{% format_time_since hint.answered_datetime now as answered_since %}
+                {% blocktranslate with status=hint.get_status_display claimer=hint.claimer %}{{ status }} {{ answered_since }} ago by {{ claimer }}{% endblocktranslate %}
             </td>
         </tr>
         <tr>
@@ -58,7 +58,7 @@
         <tr>
             <th>
                 {% if hint.is_followup %}<em>(followup){% endif %}
-                {% format_time hint.submitted_datetime '%A, %B %-d at %-I:%M %p %Z' %}
+                {% format_time hint.submitted_datetime 'DATE_AT_TIME' %}
                 {% if hint.is_followup %}</em>{% endif %}
             </th>
             <th>
@@ -73,42 +73,41 @@
             </th>
             <th>
                 <a href="/admin/puzzles/answersubmission/?team__id__exact={{ hint.team_id }}&puzzle__id__exact={{ hint.puzzle_id }}">
-                    (guesses)
+                    ({% translate "guesses" %})
                 </a>
             </th>
         </tr>
         <tr>
             <td>
                 {% if hint.answered_datetime %}
-                {{ hint.get_status_display }}
-                {% format_time_since hint.answered_datetime now %}
-                ago by {{ hint.claimer }}
+            	{% format_time_since hint.answered_datetime now as answered_since %}
+                {% blocktranslate with status=hint.get_status_display claimer=hint.claimer %}{{ status }} {{ answered_since }} ago by {{ claimer }}{% endblocktranslate %}
                 {% elif hint.claimed_datetime %}
                 <span style="color: red">
-                Claimed {% format_time_since hint.claimed_datetime now %}
-                ago by {{ hint.claimer }}
+            	{% format_time_since hint.claimed_datetime now as claimed_since %}
+                {% blocktranslate with claimer=hint.claimer %}Claimed {{ claimed_since }} ago by {{ claimer }}{% endblocktranslate %}
                 </span>
                 {% elif hint.claimer %}
                 <span style="color: red">
-                Claimed at unknown time (!?) by {{ hint.claimer }}
+                {% translate "Claimed at unknown time (!?) by" %} {{ hint.claimer }}
                 </span>
                 {% else %}
-                <a href="{% url 'hint' hint.id %}?claim=true" class="btn">Claim this hint</a>
+                <a href="{% url 'hint' hint.id %}?claim=true" class="btn">{% translate "Claim this hint" %}</a>
                 {% endif %}
             </td>
             <td>
                 <a href="{% url 'hint-list' %}?team={{ hint.team_id }}">
-                    (all from same team)
+                    ({% translate "all from same team" %})
                 </a>
             </td>
             <td>
                 <a href="{% url 'hint-list' %}?puzzle={{ hint.puzzle_id }}">
-                    (all from same puzzle)
+                    ({% translate "all from same puzzle" %})
                 </a>
             </td>
             <td>
                 <a href="{% url 'hint-list' %}?team={{ hint.team_id }}&puzzle={{ hint.puzzle_id }}">
-                    (both)
+                    ({% translate "both" %})
                 </a>
             </td>
         </tr>
@@ -131,11 +130,11 @@
     {% endfor %}
     <input type="hidden" name="initial_status" value="{{ hint.status }}">
     {% if hint.status == 'NR' %}
-    <button class="btn" name="action" type="submit" value="unclaim" formnovalidate style="filter: hue-rotate(120deg)">Unclaim</button>
+    <button class="btn" name="action" type="submit" value="unclaim" formnovalidate style="filter: hue-rotate(120deg)">{% translate "Unclaim" %}</button>
     {% else %}
-    <a class="btn" href="{% url 'hint-list' %}">Back to list</a>
+    <a class="btn" href="{% url 'hint-list' %}">{% translate "Back to list" %}</a>
     {% endif %}
-    <button class="btn" name="action" type="submit">Submit</button>
+    <button class="btn" name="action" type="submit">{% translate "Submit" %}</button>
 </form>
 
 <table class="hint-table">
@@ -144,9 +143,8 @@
         <tr>
             <td>
                 <a href="{% url 'hint' hint.id %}">
-                    {{ hint.get_status_display }}
-                    {% format_time_since hint.answered_datetime now %}
-                    ago by {{ hint.claimer }}
+            		{% format_time_since hint.answered_datetime now as answered_since %}
+                    {% blocktranslate with status=hint.get_status_display claimer=hint.claimer %}{{ status }} {{ answered_since }} ago by {{ claimer }}{% endblocktranslate %}
                 </a>
             </td>
             <td>
@@ -156,7 +154,7 @@
             </td>
             <td>
                 <a href="javascript:copyHint('h{{ hint.id }}')">
-                    Copy response
+                    {% translate "Copy response" %}
                 </a>
             </td>
         </tr>

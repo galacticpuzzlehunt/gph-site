@@ -37,7 +37,7 @@
 }
 </style>
 
-<h1>{% blocktranslate with puzzle=puzzle.name %}Hints for {{ puzzle }}{% endblocktranslate %}</h1>
+<h1>{% translate "Hints for" %} {{ puzzle.name }}</h1>
 
 <main>
     {% if not hunt_is_over %}
@@ -129,7 +129,7 @@
     {% endif %}
 
     {% if hints %}
-    <h4>Previously requested hints</h4>
+    <h4>{% translate "Previously requested hints" %}</h4>
     {% if can_followup %}
     <button class="btn" onclick="markFollowup()">{% translate "This wasn&rsquo;t helpful" %}</button>
     {% endif %}
@@ -146,11 +146,11 @@
             </td>
             <td>
                 <p>
-					{% format_time hint.submitted_datetime "DATE_AT_TIME" as submitted %}
-                    {% blocktranslate %}Asked {{ submitted }}{% endblocktranslate %}
+					{% format_time hint.submitted_datetime "DATE_AT_TIME" as submitted_time %}
+                    {% blocktranslate %}Asked {{ submitted_time }}{% endblocktranslate %}
                     {% if hint.answered_datetime and hint.status != 'OBS' %}
-					{% format_time hint.answered_datetime "DATE_AT_TIME" as answered %}
-                    <br>{% blocktranslate %}Answered {{ answered }}{% endblocktranslate %}
+					{% format_time hint.answered_datetime "DATE_AT_TIME" as answered_time %}
+                    <br>{% blocktranslate %}Answered {{ answered_time }}{% endblocktranslate %}
                     {% endif %}
                 </p>
                 <p class="hint-info">

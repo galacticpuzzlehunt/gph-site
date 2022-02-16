@@ -1,21 +1,22 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load static %}
 
 {% block page-title %}
-<title>Hints</title>
+<title>{% translate "Hints" %}</title>
 {% endblock %}
 
 {% block content %}
-<h1>Open Hints</h1>
+<h1>{% translate "Open Hints" %}</h1>
 
 <div class="hint-controls">
     <a class="btn" href="javascript:askName(true)">
-        Your name is <b id="claimer">anonymous</b>.
+        {% translate "Your name is" %} <b id="claimer">{% translate "anonymous" %}</b>.
     </a>
     <script src="{% static "js/hint.js" %}"></script>
     <script>getUpdates();</script>
     <form action="/admin/puzzles/hint/" method="get">
-        <input placeholder="Search hints&hellip;" name="q">
+        <input placeholder="{% blocktranslate %}Search hints&hellip;{% endblocktranslate %}" name="q">
     </form>
 </div>
 
@@ -28,10 +29,10 @@
 <table class="hint-table">
     <tr>
         <td colspan="3">
-            <h4>Requested by most teams</h4>
+            <h4>{% translate "Requested by most teams" %}</h4>
         </td>
         <td colspan="2">
-            <h4>Top hint answerers</h4>
+            <h4>{% translate "Top hint answerers" %}</h4>
         </td>
     </tr>
     {% for entry in stats %}

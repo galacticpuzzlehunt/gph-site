@@ -2,7 +2,6 @@ function updateTimestamps() {
     for (const time of document.querySelectorAll('time')) {
         const format = time.getAttribute('data-format');
         if (!format) continue;
-        const title = time.getAttribute('title');
         const options = {hour12: false, timeZoneName: 'short'};
         var escaped = false;
         for (const [code] of format.matchAll(/[a-z\\]/ig)) {
@@ -43,6 +42,7 @@ function updateTimestamps() {
             }
         }
         const local = new Date(time.dateTime).toLocaleString([], options);
+        const title = time.getAttribute('title');
         time.setAttribute('title', title + local);
     }
 }

@@ -14,6 +14,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from puzzles.context import context_cache
 
@@ -746,14 +747,14 @@ class Hint(models.Model):
     OBSOLETE = 'OBS'
 
     STATUSES = (
-        (NO_RESPONSE, 'No response'),
-        (ANSWERED, 'Answered'),
+        (NO_RESPONSE, _('No response')),
+        (ANSWERED, _('Answered')),
 
         # we can't answer for some reason, or think that the hint is too small
-        (REFUNDED, 'Refunded'),
+        (REFUNDED, _('Refunded')),
 
         # puzzle was solved while waiting for hint
-        (OBSOLETE, 'Obsolete'),
+        (OBSOLETE, _('Obsolete')),
     )
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE)

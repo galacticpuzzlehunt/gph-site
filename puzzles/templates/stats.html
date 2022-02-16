@@ -1,25 +1,26 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 
 {% block page-title %}
-<title>Stats: {{ puzzle.name }}</title>
+<title>{% translate "Stats:" %} {{ puzzle.name }}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">{% translate "Back to the puzzle" %}</a>
 {% endblock %}
 
 {% block content %}
 
-<h1>Stats for {{ puzzle.name }}</h1>
+<h1>{% translate "Stats for" %} {{ puzzle.name }}</h1>
 
 <main>
     <div class="row puzzle-stats-panel">
         <div class="six columns">
-            <div class="stat-entry">Total solves: <span class="stat-value">{{ solves }}</span></div>
+            <div class="stat-entry">{% translate "Total solves:" %} <span class="stat-value">{{ solves }}</span></div>
         </div>
         <div class="six columns">
-            <div class="stat-entry">Total guesses: <span class="stat-value">{{ guesses }}</span></div>
+            <div class="stat-entry">{% translate "Total guesses:" %} <span class="stat-value">{{ guesses }}</span></div>
         </div>
     </div>
 
@@ -31,11 +32,11 @@
         <col style="width: 20%">
         <tbody>
             <tr>
-                <th>Team</th>
-                <th>Incorrect guesses</th>
-                <th>Unlock time (EDT)</th>
-                <th>Time to solve</th>
-                <th>Solve time (EDT)</th>
+                <th>{% translate "Team" %}</th>
+                <th>{% translate "Incorrect guesses" %}</th>
+                <th>{% translate "Unlock time" %} ({{ start_time|date:"T" }})</th>
+                <th>{% translate "Time to solve" %}</th>
+                <th>{% translate "Solve time" %} ({{ start_time|date:"T" }})</th>
             </tr>
             {% for solver in solvers %}
             <tr{% if solver.is_current %} class="current-team"{% endif %}>
@@ -53,8 +54,8 @@
         <col style="width: 20%">
         <tbody>
             <tr>
-                <th>Answer</th>
-                <th>Submission count</th>
+                <th>{% translate "Answer" %}</th>
+                <th>{% translate "Submission count" %}</th>
             </tr>
             <tr>
                 <td style="font-family: monospace; font-weight: bold;">{{ puzzle.answer }}</td>

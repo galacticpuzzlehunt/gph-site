@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block page-title %}
-<title>{% blocktranslate with name=puzzle.name %}Call in: {{ name }}{% endblocktranslate %}</title>
+<title>{% translate "Call in:" {{ puzzle.name }}</title>
 {% endblock %}
 
 {% block top-left-actions %}
@@ -11,13 +11,13 @@
 
 {% block content %}
 
-<h1>{% blocktranslate with name=puzzle.name %}Call in an answer for {{ name }}{% endblocktranslate %}</h1>
+<h1>{% translate "Call in an answer for" %} {{ puzzle.name }}</h1>
 
 <main>
 {% if puzzle_answer != None %}
     <div class="solved-panel">
         <h4>{% translate "Solved!" %}</h4>
-        <p>{% blocktranslate with answer=puzzle_answer%}The answer was <b>{{ answer }}</b>.{% endblocktranslate %}</p>
+        <p>{% translate "The answer was"%} <b>{{ puzzle_answer }}</b>.</p>
     </div>
 
     {% if survey %}

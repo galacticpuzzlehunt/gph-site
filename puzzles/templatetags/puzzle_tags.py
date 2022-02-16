@@ -24,17 +24,17 @@ def format_duration(secs):
     mins = int(secs / 60)
     secs -= mins * 60
     if hours > 0:
-        return '{}h{}m'.format(hours, mins)
+        return _('{}h{}m').format(hours, mins)
     elif mins > 0:
-        return '{}m{}s'.format(mins, secs)
+        return _('{}m{}s').format(mins, secs)
     else:
-        return '{}s'.format(secs)
+        return _('{}s').format(secs)
 
 @register.simple_tag
 def format_time_since(timestamp, now):
     text = format_duration((now - timestamp).total_seconds())
-    return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
-        % (timestamp.isoformat(), '%A, %B %-d at %-I:%M %p %Z', text))
+    return mark_safe('<time title="%s" datetime="%s" data-format="%s">%s</time>'
+        % (_('Local time: '), timestamp.isoformat(), formats.get_format('DATE_AT_TIME'), text))
 
 @register.simple_tag
 def days_between(before, after):
@@ -45,7 +45,7 @@ def unix_time(timestamp):
     return timestamp.strftime('%s') if timestamp else ''
 
 @register.simple_tag
-def format_time(timestamp, format='DATETIME_FORMAT'):
+def format_time(timestamp, format='DATE_AT_TIME'):
     if not timestamp:
         return ''
     timestamp2 = timestamp.astimezone(timezone.get_default_timezone())

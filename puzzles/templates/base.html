@@ -91,21 +91,21 @@
             </span>
             {% endif %}
             {% if team and num_hints_remaining > 0 %}
-            <span class="current-stat" title="{% blocktranslate with hints=num_hints_remaining %}Available hints: {{ hints }}{% endblocktranslate %}">
+            <span class="current-stat" title="{% blocktranslate %}Available hints:{% endblocktranslate %} {{ num_hints_remaining }}">
                 {% include 'icon-hint.svg' %}
                 <span class="current-stat-label">{{ num_hints_remaining }}</span>
             </span>
             {% endif %}
             {% if team and num_free_answers_remaining > 0 %}
-            <span class="current-stat" title="{% blocktranslate with answers=num_free_answers_remaining %}Free answers: {{ answers }}{% endblocktranslate %}">
+            <span class="current-stat" title="{% blocktranslate %}Free answers:{% endblocktranslate %}{{ num_free_answers_remaining }}">
                 {% include 'icon-answer.svg' %}
                 <span class="current-stat-label">{{ num_free_answers_remaining }}</span>
             </span>
             {% endif %}
             {% if is_superuser %}
-            <label for="shortcuts" title="{% translate "Admin toolbox" %}>{% translate "Shortcuts" %}</label>
+            <label for="shortcuts" title="{% blocktranslate %}Admin toolbox{% endblocktranslate %}">{% translate "Shortcuts" %}</label>
             {% if unclaimed_hints %}
-            <a class="current-stat" title="{% blocktranslate with need_answers=num_free_answers_remaining %}Hints that need answering: {{ need_answers }}{% endblocktranslate %}" href="{% url 'hint-list' %}" style="color: red">>
+            <a class="current-stat" title="{% blocktranslate %}Hints that need answering:{% endblocktranslate %} {{ num_free_answers_remaining }}" href="{% url 'hint-list' %}" style="color: red">
                 {% include 'icon-hint.svg' %}
                 <span class="current-stat-label">{{ unclaimed_hints }}</span>
             </a>

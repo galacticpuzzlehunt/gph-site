@@ -103,11 +103,11 @@
         <col style="width: 10%">
         <col style="width: 20%">
         <tr>
-            <th>{% translate "Puzzle</th>
+            <th>{% translate "Puzzle" %}</th>
             <th>{% translate "Incorrect guesses" %}</th>
-            <th>{% blocktranslate with timezone=start_time|date:"T" %}Unlock time ({{ timezone }}){% endblocktranslate %}</th>
+            <th>{% translate "Unlock time" %} ({{ start_time|date:"T" }})</th>
             <th>{% translate "Time to solve" %}</th>
-            <th>{% blocktranslate with timezone=start_time|date:"T" %}Solve time ({{ timezone }}){% endblocktranslate %}</th>
+            <th>{% translate "Solve time" %} ({{ start_time|date:"T" }})</th>
         </tr>
         {% for s in submissions %}
         <tr{% if s.submission.used_free_answer %} class="free"{% endif %}>

@@ -1,17 +1,19 @@
 {% load puzzle_tags %}
+{% load i18n %}
 
 <tbody id="h{{ hint.id }}" style="background-color: #{{ hint.hint_question|hash|slice:':6' }}20">
     <tr>
         <th>
-            {% if hint.is_followup %}<em>(followup){% endif %}
+            {% if hint.is_followup %}<em>({% translate "followup" %}){% endif %}
             {% if hint.claimed_datetime %}
             <a href="{% url 'hint' hint.id %}">
-                Claimed {% format_time_since hint.claimed_datetime now %} ago
-                by {{ hint.claimer }}
+            	{% format_time_since hint.claimed_datetime now as claimed_since %}
+                {% blocktranslate with claimer=hint.claimer %}Claimed {{ claimed_since }} ago by {{ claimer }}{% endblocktranslate %}
             </a>
             {% else %}
             <a href="{% url 'hint' hint.id %}?claim=true">
-                CLAIM: Created {% format_time_since hint.submitted_datetime now %} ago
+            	{% format_time_since hint.submitted_datetime now as submitted_since %}
+                {% blocktranslate %}CLAIM: Created {{ submitted_since }} ago{% endblocktranslate %}
             </a>
             {% endif %}
             {% if hint.is_followup %}</em>{% endif %}
@@ -28,7 +30,7 @@
         </th>
         <th>
             <a href="/admin/puzzles/answersubmission/?team__id__exact={{ hint.team_id }}&puzzle__id__exact={{ hint.puzzle_id }}">
-                (guesses)
+                ({% translate "guesses" %})
             </a>
         </th>
     </tr>
@@ -36,22 +38,22 @@
     <tr>
         <td>
             <a href="{% url 'hint' hint.id %}">
-                (view without claiming)
+                ({% translate "view without claiming" %})
             </a>
         </td>
         <td>
             <a href="{% url 'hint-list' %}?team={{ hint.team_id }}">
-                (all from same team)
+                ({% translate "all from same team" %})
             </a>
         </td>
         <td>
             <a href="{% url 'hint-list' %}?puzzle={{ hint.puzzle_id }}">
-                (all from same puzzle)
+                ({% translate "all from same puzzle" %})
             </a>
         </td>
         <td>
             <a href="{% url 'hint-list' %}?team={{ hint.team_id }}&puzzle={{ hint.puzzle_id }}">
-                (both)
+                ({% translate "both" %})
             </a>
         </td>
     </tr>

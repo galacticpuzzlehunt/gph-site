@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load static %}
 {% load puzzle_tags %}
 
 {% block page-title %}
-<title>Hints</title>
+<title>{% translate "Hints" %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'hint-list' %}" class="btn">Back to hint queue</a>
+<a href="{% url 'hint-list' %}" class="btn">{% translate "Back to hint queue" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -19,8 +20,8 @@
         <tr>
             <th>
                 <a href="{% url 'hint' hint.id %}">
-                    {% if hint.is_followup %}<em>(followup){% endif %}
-                    {% format_time hint.submitted_datetime '%A, %B %-d at %-I:%M %p %Z' %}
+                    {% if hint.is_followup %}<em>({% translate "followup" %}){% endif %}
+                    {% format_time hint.submitted_datetime 'DATE_AT_TIME' %}
                     {% if hint.is_followup %}</em>{% endif %}
                 </a>
             </th>
@@ -36,36 +37,35 @@
             </td>
             <td>
                 <a href="/admin/puzzles/hint/{{ hint.id }}/change/">
-                    (view in admin)
+                    ({% translate "view in admin" %})
                 </a>
             </td>
         </tr>
         <tr>
             <td>
                 {% if hint.answered_datetime %}
-                    {{ hint.get_status_display }}
-                    {% format_time_since hint.answered_datetime now %} ago
-                    by {{ hint.claimer }}
+            		{% format_time_since hint.answered_datetime now as answered_since %}
+                    {% blocktranslate with status=hint.get_status_display claimer=hint.claimer %}{{ status }} {{ answered_since }} ago by {{ claimer }}{% endblocktranslate %}
                 {% elif hint.claimed_datetime %}
-                    Claimed {% format_time_since hint.claimed_datetime now %} ago
-                    by {{ hint.claimer }}
+            		{% format_time_since hint.claimed_datetime now as claimed_since %}
+                    {% blocktranslate with claimer=hint.claimer %}Claimed {{ claimed_since }} ago by {{ claimer }}{% endblocktranslate %}
                 {% else %}
-                    Unclaimed
+                    {% translate "Unclaimed" %}
                 {% endif %}
             </td>
             <td>
                 <a href="{% url 'hint-list' %}?team={{ hint.team_id }}">
-                    (all from same team)
+                    ({% translate "all from same team" %})
                 </a>
             </td>
             <td>
                 <a href="{% url 'hint-list' %}?puzzle={{ hint.puzzle_id }}">
-                    (all from same puzzle)
+                    ({% translate "all from same puzzle" %})
                 </a>
             </td>
             <td>
                 <a href="{% url 'hint-list' %}?team={{ hint.team_id }}&puzzle={{ hint.puzzle_id }}">
-                    (both)
+                    ({% translate "both" %})
                 </a>
             </td>
         </tr>

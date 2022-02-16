@@ -27,21 +27,21 @@ def get_shortcuts(context):
 
 def dispatch_shortcut(request):
     action = request.POST.get('action')
-    assert action, 'Missing action'
+    assert action, _('Missing action')
     callback = getattr(Shortcuts, action, None)
-    assert isinstance(callback, types.FunctionType), 'Invalid action %r' % action
+    assert isinstance(callback, types.FunctionType), _('Invalid action %r') % action
     params = dict.fromkeys(inspect.getfullargspec(callback).args)
     if 'puzzle' in params:
         slug = request.POST.get('puzzle')
-        assert slug, 'Missing puzzle'
+        assert slug, _('Missing puzzle')
         puzzle = models.Puzzle.objects.filter(slug=slug).first()
-        assert puzzle, 'Invalid puzzle %r' % slug
+        assert puzzle, _('Invalid puzzle %r') % slug
         params['puzzle'] = puzzle
     if 'team' in params:
-        assert request.context.team, 'Not on a team'
+        assert request.context.team, _('Not on a team')
         params['team'] = request.context.team
     if 'user' in params:
-        assert not request.context.team, 'Already on a team'
+        assert not request.context.team, _('Already on a team')
         params['user'] = request.user
     if 'now' in params:
         params['now'] = request.context.now
@@ -52,20 +52,22 @@ def dispatch_shortcut(request):
 # state for testing purposes. Feel free to add anything you think would be
 # convenient to have in development. These will be rendered in order
 # (hopefully...) in a menu, with the strings as headings.
+# For i18n, the heading in __doc__ must be dynamic to get the
+# translation, so it's set outside of the function to be initialized at runtime
 
 class Shortcuts:
     def create_team(user):
-        _('Create admin team')
         models.Team(
             user=user,
             team_name=user.username,
             is_hidden=True,
         ).save()
+    create_team.__doc__ = _('Create admin team')
 
     def prerelease_testsolver(team):
-        _('Toggle testsolver')
         team.is_prerelease_testsolver ^= True
         team.save()
+    prerelease_testsolver.__doc__ = _('Toggle testsolver')
 
     HINTS = _('Hints (my team)')
 
@@ -85,9 +87,9 @@ class Shortcuts:
         team.save()
 
     def reset_hints(team):
-        _('Reset')
         team.total_hints_awarded = 0
         team.save()
+    reset_hints.__doc__ = _('Reset')
 
     FREE_ANSWERS = _('Free answers (my team)')
 
@@ -107,24 +109,23 @@ class Shortcuts:
         team.save()
 
     def reset_free_answers(team):
-        _('Reset')
         team.total_free_answers_awarded = 0
         team.save()
+    reset_free_answers.__doc__ = _('Reset')
 
     PUZZLE = _('This puzzle')
 
     def show_answer(puzzle):
-        _('Show answer')
         raise Exception(puzzle.answer)
+    show_answer.__doc__ = _('Show answer')
 
     def show_order(puzzle):
-        _('Show order')
         raise Exception(puzzle.order)
+    show_order.__doc__ = _('Show order')
 
     SOLVE = _('Solve this puzzle')
 
     def solve(puzzle, team):
-        _('Solve')
         if not team.answersubmission_set.filter(puzzle=puzzle, is_correct=True).exists():
             team.answersubmission_set.create(
                 puzzle=puzzle,
@@ -132,9 +133,9 @@ class Shortcuts:
                 is_correct=True,
                 used_free_answer=False,
             )
+    solve.__doc__ = _('Solve')
 
     def free_answer(puzzle, team):
-        _('Free')
         if not team.answersubmission_set.filter(puzzle=puzzle, is_correct=True).exists():
             team.answersubmission_set.create(
                 puzzle=puzzle,
@@ -142,61 +143,62 @@ class Shortcuts:
                 is_correct=True,
                 used_free_answer=True,
             )
+    free_answer.__doc__ = _('Free')
 
     def unsolve(puzzle, team):
-        _('Unsolve')
         team.answersubmission_set.filter(puzzle=puzzle, is_correct=True).delete()
+    unsolve.__doc__ = _('Unsolve')
 
     PUZZLE_HINTS = _('Request hint on this puzzle')
 
     def unanswered_hint(puzzle, team):
-        _('Unanswered')
         return team.hint_set.create(
             puzzle=puzzle,
             hint_question='Halp',
         )
+    unanswered_hint.__doc__ = _('Unanswered')
 
     def answered_hint(puzzle, team, now):
-        _('Answered')
         hint = Shortcuts.unanswered_hint(puzzle, team)
         hint.answered_datetime = now
         hint.status = models.Hint.ANSWERED
         hint.response = _('Ok')
         hint.save(update_fields=('answered_datetime', 'status', 'response'))
+    answered_hint.__doc__ = _('Answered')
 
-    PUZZLE_GUESSES = 'Guesses (on this puzzle)'
+    PUZZLE_GUESSES = _('Guesses (on this puzzle)')
 
     def guess_1(puzzle, team):
         '+1'
         grant, _ = team.extraguessgrant_set.get_or_create(puzzle=puzzle,
-            defaults={_('extra_guesses'): 0})
+            defaults={'extra_guesses': 0})
         grant.extra_guesses += 1
         grant.save()
 
     def guess_5(puzzle, team):
         '+5'
         grant, _ = team.extraguessgrant_set.get_or_create(puzzle=puzzle,
-            defaults={_('extra_guesses'): 0})
+            defaults={'extra_guesses': 0})
         grant.extra_guesses += 5
         grant.save()
 
     def guess_0(puzzle, team):
         '=0'
         grant, _ = team.extraguessgrant_set.get_or_create(puzzle=puzzle,
-            defaults={_('extra_guesses'): 0})
+            defaults={'extra_guesses': 0})
         grant.extra_guesses -= team.guesses_remaining(puzzle)
         grant.save()
 
     def reset_guesses(puzzle, team):
-        _('Reset')
         team.extraguessgrant_set.filter(puzzle=puzzle).delete()
+    reset_guesses.__doc__ = _('Reset')
 
-    DELETE = 'Delete all my (on this puzzle)'
+    DELETE = _('Delete all my (on this puzzle)')
 
     def delete_hints(puzzle, team):
-        _('Hints')
         team.hint_set.filter(puzzle=puzzle).delete()
+    delete_hints.__doc__ = _('Hints')
 
     def delete_guesses(puzzle, team):
-        _('Guesses')
         team.answersubmission_set.filter(puzzle=puzzle).delete()
+    delete_guesses.__doc__ = _('Guesses')

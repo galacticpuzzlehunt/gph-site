@@ -867,15 +867,15 @@ def hint(request, id):
         claimer = unquote(claimer)
     if hint.status != Hint.NO_RESPONSE:
         if hint.claimer:
-            form.add_error(None, _('This hint has been answered!'))
-        else:
             form.add_error(None, _('This hint has been answered by {}!').format(hint.claimer))
+        else:
+            form.add_error(None, _('This hint has been answered!'))
     elif hint.claimed_datetime:
         if hint.claimer != claimer:
             if hint.claimer:
-                form.add_error(None, _('This hint is currently claimed!'))
-            else:
                 form.add_error(None, _('This hint is currently claimed by {}!').format(hint.claimer))
+            else:
+                form.add_error(None, _('This hint is currently claimed!'))
     elif request.GET.get('claim'):
         if claimer:
             hint.claimed_datetime = request.context.now

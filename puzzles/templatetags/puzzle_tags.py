@@ -33,8 +33,8 @@ def format_duration(secs):
 @register.simple_tag
 def format_time_since(timestamp, now):
     text = format_duration((now - timestamp).total_seconds())
-    return mark_safe('<time title="%s" datetime="%s" data-format="%s">%s</time>'
-        % (_('Local time: '), timestamp.isoformat(), formats.get_format('DATE_AT_TIME'), text))
+    return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
+        % (timestamp.isoformat(), formats.get_format('DATE_AT_TIME'), text))
 
 @register.simple_tag
 def days_between(before, after):
@@ -50,8 +50,8 @@ def format_time(timestamp, format='DATE_TIME'):
         return ''
     timestamp2 = timestamp.astimezone(timezone.get_default_timezone())
     text = formats.date_format(timestamp2, format=format)
-    return mark_safe('<time title="%s" datetime="%s" data-format="%s">%s</time>'
-        % (_('Local time: '), timestamp.isoformat(), formats.get_format(format), text))
+    return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
+        % (timestamp.isoformat(), formats.get_format(format), text))
 
 @register.simple_tag
 def percentage(a, b):

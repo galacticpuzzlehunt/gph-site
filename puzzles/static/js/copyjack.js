@@ -85,7 +85,7 @@ const copyJack = (copyable, skips) => {
     if (!skips.imglabel) {
       const label = document.createElement("p");
       label.className = "copy-only";
-      label.textContent = "[See original puzzle for image]";
+      label.textContent = gettext("[See original puzzle for image]");
       e.parentNode.insertBefore(label, e.nextSibling);
     }
   });
@@ -139,9 +139,9 @@ const copyContents = async (btnElt, btnText) => {
     f("no-copy", (e) => e.style.removeProperty("display"));
   }
   if (window.getSelection()) window.getSelection().removeAllRanges();
-  btnText.textContent = "Copied to clipboard!";
+  btnText.textContent = gettext("Copied to clipboard!");
   setTimeout(() => {
-    btnText.textContent = "Copy to clipboard";
+    btnText.textContent = gettext("Copy to clipboard");
   }, 3000);
 };
 
@@ -149,7 +149,7 @@ window.addEventListener("load", () => {
   for (const clipboardButton of document.getElementsByClassName("clipboard-button")) {
     // fill contents
     const btnText = document.createElement("span");
-    btnText.textContent = "Copy to clipboard";
+    btnText.textContent = gettext("Copy to clipboard");
     clipboardButton.appendChild(btnText);
     clipboardButton.addEventListener("click", () =>
       copyContents(clipboardButton, btnText)

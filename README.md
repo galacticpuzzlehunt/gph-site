@@ -140,7 +140,8 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
 
   + Generate the translations placeholders for your language lang_COUNTRY:
     + `django-admin makemessages -l lang_COUNTRY`
-  + add your translations in msgstr in the .po files under locale/lang_COUNTRY
+    + `django-admin makemessages -d djangojs -l lang_COUNTRY`
+  + add your translations in msgstr in the django.po and djangojs.po files under locale/lang_COUNTRY
   + Compile the translations:
     + `django-admin compilemessages`
   + create a gph/formats/lang folder and copy an existing one (e.g. en to be translated, see https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-FORMAT_MODULE_PATH). This contains the date/time formats used in django templates (see https://docs.djangoproject.com/en/4.0/ref/templates/builtins/#std:templatefilter-date)

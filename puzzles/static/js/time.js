@@ -42,8 +42,7 @@ function updateTimestamps() {
             }
         }
         const local = new Date(time.dateTime).toLocaleString([], options);
-        const title = time.getAttribute('title');
-        time.setAttribute('title', title + local);
+        time.setAttribute('title', gettext('Local time: ') + local);
     }
 }
 

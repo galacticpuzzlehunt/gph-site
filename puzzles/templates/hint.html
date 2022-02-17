@@ -57,7 +57,7 @@
     <tbody style="background-color: #{{ hint.hint_question|hash|slice:':6' }}20">
         <tr>
             <th>
-                {% if hint.is_followup %}<em>(followup){% endif %}
+                {% if hint.is_followup %}<em>({% translate "followup" %}){% endif %}
                 {% format_time hint.submitted_datetime 'DATE_AT_TIME' %}
                 {% if hint.is_followup %}</em>{% endif %}
             </th>

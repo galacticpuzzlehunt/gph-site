@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-17 13:13-0400\n"
+"POT-Creation-Date: 2022-02-17 17:48-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -163,102 +163,104 @@ msgstr "Lien vers les archives"
 msgid "Registration for this year's %(hunt)s is now open!"
 msgstr "L'inscription pour %(hunt)s est maintenant ouverte !"
 
-#: puzzles/templates/base.html:41
+#: puzzles/templates/base.html:42
 msgid "Home"
 msgstr "Accueil"
 
-#: puzzles/templates/base.html:44 puzzles/templates/rules.html:7
+#: puzzles/templates/base.html:45 puzzles/templates/rules.html:7
 msgid "Rules"
 msgstr "Règlement"
 
-#: puzzles/templates/base.html:48 puzzles/templates/story.html:5
+#: puzzles/templates/base.html:49 puzzles/templates/story.html:5
 msgid "Story"
 msgstr "Intrigue"
 
-#: puzzles/templates/base.html:53
+#: puzzles/templates/base.html:54
 msgid "Puzzles"
 msgstr "Énigmes"
 
-#: puzzles/templates/base.html:57
+#: puzzles/templates/base.html:58
 msgid "Teams"
 msgstr "Équipes"
 
-#: puzzles/templates/base.html:60
+#: puzzles/templates/base.html:61
 msgid "FAQ"
 msgstr "FAQ"
 
-#: puzzles/templates/base.html:64
+#: puzzles/templates/base.html:65
 msgid "Updates"
 msgstr "News"
 
-#: puzzles/templates/base.html:69 puzzles/templates/wrapup.html:48
+#: puzzles/templates/base.html:70 puzzles/templates/wrapup.html:48
 msgid "Wrap-Up"
 msgstr "Compte-rendu"
 
-#: puzzles/templates/base.html:73
+#: puzzles/templates/base.html:74
 msgid "Archive"
 msgstr "Archives"
 
-#: puzzles/templates/base.html:88
+#: puzzles/templates/base.html:89
 msgid "Currently impersonating"
 msgstr "Personnifiant"
 
-#: puzzles/templates/base.html:94
+#: puzzles/templates/base.html:95
 msgid "Available hints:"
 msgstr "Indices disponibles :"
 
-#: puzzles/templates/base.html:100
+#: puzzles/templates/base.html:101
 msgid "Free answers:"
 msgstr "Réponses gratuites :"
 
-#: puzzles/templates/base.html:106
+#: puzzles/templates/base.html:107
 msgid "Admin toolbox"
 msgstr "Boite à outils"
 
-#: puzzles/templates/base.html:106
+#: puzzles/templates/base.html:107
 msgid "Shortcuts"
 msgstr "Outils"
 
-#: puzzles/templates/base.html:108
+#: puzzles/templates/base.html:109
 msgid "Hints that need answering:"
 msgstr "Indices en attente d'une réponse :"
 
-#: puzzles/templates/base.html:114
+#: puzzles/templates/base.html:115
 msgid "Logout"
 msgstr "Se déconnecter"
 
-#: puzzles/templates/base.html:116 puzzles/templates/login.html:19
+#: puzzles/templates/base.html:117 puzzles/templates/login.html:19
 msgid "Login"
 msgstr "Se connecter"
 
-#: puzzles/templates/base.html:117
+#: puzzles/templates/base.html:118
 msgid "Register"
 msgstr "S'inscrire"
 
-#: puzzles/templates/base.html:127
+#: puzzles/templates/base.html:128
 msgid ""
 "Even though you&rsquo;re an admin, you&rsquo;re not currently marked as a "
 "testsolver, so you won&rsquo;t be able to view puzzles."
-msgstr "Bien que vous soyez adminstrateur, vous n'êtes actuellement pas considéré comme béta-testeur et vous pourriez ne pas voir toutes les énigmes."
+msgstr ""
+"Bien que vous soyez adminstrateur, vous n'êtes actuellement pas considéré "
+"comme béta-testeur et vous pourriez ne pas voir toutes les énigmes."
 
-#: puzzles/templates/base.html:137
+#: puzzles/templates/base.html:138
 msgid "Download logs"
 msgstr "Télécharger les logs"
 
-#: puzzles/templates/base.html:138
+#: puzzles/templates/base.html:139
 msgid "Guess"
 msgstr "Réponse"
 
-#: puzzles/templates/base.html:139
+#: puzzles/templates/base.html:140
 msgid "Hint"
 msgstr "Indice"
 
-#: puzzles/templates/base.html:140 puzzles/templates/hunt_stats.html:48
+#: puzzles/templates/base.html:141 puzzles/templates/hunt_stats.html:48
 #: puzzles/templates/team.html:106
 msgid "Puzzle"
 msgstr "Énigme"
 
-#: puzzles/templates/base.html:170
+#: puzzles/templates/base.html:171
 msgid "Powered by"
 msgstr "Réalisé avec"
 
@@ -631,7 +633,8 @@ msgstr ""
 "demander à l'équipe d'utiliser un vrai indice à la place. Mettre cet indice "
 "à Remboursé évitera de créer des suivis additionnels de suivi."
 
-#: puzzles/templates/hint.html:39 puzzles/templates/hint_list_entry.html:7
+#: puzzles/templates/hint.html:39 puzzles/templates/hint.html:60
+#: puzzles/templates/hint_list_entry.html:7
 #: puzzles/templates/hint_list_query.html:23
 msgid "followup"
 msgstr "suivi"
@@ -1761,11 +1764,6 @@ msgstr "{}m {}s"
 #: puzzles/templatetags/puzzle_tags.py:31
 msgid "{}s"
 msgstr "{}s"
-
-#: puzzles/templatetags/puzzle_tags.py:37
-#: puzzles/templatetags/puzzle_tags.py:54
-msgid "Local time: "
-msgstr "Heure locale : "
 
 #: puzzles/views.py:85
 msgid "Invalid puzzle name."

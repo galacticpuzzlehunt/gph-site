@@ -19,7 +19,7 @@ function askName(force) {
     }
 
     if (!name || force) {
-        name = prompt('Who are you? (personal Discord name/username, excluding the #0000 tag; this is for internal use)');
+        name = prompt(gettext('Who are you? (personal Discord name/username, excluding the #0000 tag; this is for internal use)'));
     }
 
     if (name) {
@@ -52,10 +52,10 @@ function updateDurations() {
         const mins = secs / 60 | 0;
         secs -= mins * 60;
         if (hours > 0)
-            time.textContent = `${hours}h${mins}m`;
+            time.textContent = interpolate(gettext('%sh%sm'), [hours, mins]);
         else if (mins > 0)
-            time.textContent = `${mins}m${secs}s`;
+            time.textContent = interpolate(gettext('%sm%ss'), [mins, secs]);
         else
-            time.textContent = `${secs}s`;
+            time.textContent = interpolate(gettext('%ss'), [secs]);
     }
 }

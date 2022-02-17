@@ -124,9 +124,7 @@
             {% csrf_token %}
             {% if not hunt_is_prereleased %}
             <p>
-                Even though you&rsquo;re an admin, you&rsquo;re not currently
-                marked as a testsolver, so you won&rsquo;t be able to view
-                puzzles.
+                {% translate "Even though you&rsquo;re an admin, you&rsquo;re not currently marked as a testsolver, so you won&rsquo;t be able to view puzzles." %}
             </p>
             {% endif %}
             {% for shortcut in shortcuts %}

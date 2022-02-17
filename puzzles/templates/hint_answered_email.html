@@ -1,8 +1,9 @@
+{% load i18n %}
 <p>{{ hint.team }},</p>
 
-<p>Your hint question for the puzzle {{ hint.puzzle }} has been answered.</p>
+<p>{% blocktranslate with puzzle=hint.puzzle %}Your hint question for the puzzle {{ puzzle }} has been answered.{% endblocktranslate %}</p>
 
-<p><b>Question</b>:<br>{{ hint.hint_question|linebreaksbr }}</p>
-<p><b>Response</b>:<br>{{ hint.response|linebreaksbr }}</p>
+<p><b>{% translate "Question:" %}</b><br>{{ hint.hint_question|linebreaksbr }}</p>
+<p><b>{% translate "Response:" %}</b><br>{{ hint.response|linebreaksbr }}</p>
 
-<p>If you still need help, you can make another request <a href="{{ link }}">here</a>.</p>
+<p>{% blocktranslate %}If you still need help, you can make another request <a href="{{ link }}">here</a>.{% endblocktranslate %}</p>

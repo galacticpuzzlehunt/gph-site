@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-16 14:04-0400\n"
+"POT-Creation-Date: 2022-02-17 12:57-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 msgid "No response"
 msgstr "Pas de réponse"
 
-#: puzzles/models.py:751 puzzles/shortcuts.py:165
+#: puzzles/models.py:751 puzzles/shortcuts.py:167
 msgid "Answered"
 msgstr "Répondu"
 
@@ -56,85 +56,95 @@ msgstr "Pas dans une équipe"
 
 #: puzzles/shortcuts.py:44
 msgid "Already on a team"
-msgstr "Déjå dans une équipe"
+msgstr "Déjà dans une équipe"
 
-#: puzzles/shortcuts.py:63
+#: puzzles/shortcuts.py:65
 msgid "Create admin team"
 msgstr "Créer une équipe admin"
 
-#: puzzles/shortcuts.py:68
+#: puzzles/shortcuts.py:70
 msgid "Toggle testsolver"
 msgstr "Basculer statut de testeur"
 
-#: puzzles/shortcuts.py:70
+#: puzzles/shortcuts.py:72
 msgid "Hints (my team)"
 msgstr "Indices (mon équipe)"
 
-#: puzzles/shortcuts.py:90 puzzles/shortcuts.py:112 puzzles/shortcuts.py:192
+#: puzzles/shortcuts.py:92 puzzles/shortcuts.py:114 puzzles/shortcuts.py:194
 msgid "Reset"
 msgstr "Réinitialiser"
 
-#: puzzles/shortcuts.py:92
+#: puzzles/shortcuts.py:94
 msgid "Free answers (my team)"
 msgstr "Réponses gratuites (mon équipe)"
 
-#: puzzles/shortcuts.py:114
+#: puzzles/shortcuts.py:116
 msgid "This puzzle"
 msgstr "Cette énigme"
 
-#: puzzles/shortcuts.py:118
+#: puzzles/shortcuts.py:120
 msgid "Show answer"
 msgstr "Révéler la réponse"
 
-#: puzzles/shortcuts.py:122
+#: puzzles/shortcuts.py:124
 msgid "Show order"
 msgstr "Afficher le rang"
 
-#: puzzles/shortcuts.py:124
+#: puzzles/shortcuts.py:126
 msgid "Solve this puzzle"
 msgstr "Résoudre cette énigme"
 
-#: puzzles/shortcuts.py:134
+#: puzzles/shortcuts.py:136 puzzles/templates/finishers.html:37
 msgid "Solve"
 msgstr "Résoudre"
 
-#: puzzles/shortcuts.py:144
+#: puzzles/shortcuts.py:146
 msgid "Free"
 msgstr "Gratuit"
 
-#: puzzles/shortcuts.py:148
+#: puzzles/shortcuts.py:150
 msgid "Unsolve"
 msgstr "Dé-résoudre"
 
-#: puzzles/shortcuts.py:150
+#: puzzles/shortcuts.py:152
 msgid "Request hint on this puzzle"
 msgstr "Demander un indice sur cette énigme"
 
-#: puzzles/shortcuts.py:157
+#: puzzles/shortcuts.py:159
 msgid "Unanswered"
 msgstr "Non répondu"
 
-#: puzzles/shortcuts.py:163
+#: puzzles/shortcuts.py:165
 msgid "Ok"
 msgstr "OK"
 
-#: puzzles/shortcuts.py:167
+#: puzzles/shortcuts.py:169
 msgid "Guesses (on this puzzle)"
 msgstr "Essais (sur cette énigme)"
 
-#: puzzles/shortcuts.py:194
+#: puzzles/shortcuts.py:196
 msgid "Delete all my (on this puzzle)"
 msgstr "Supprimer tous mes... (sur cette énigme)"
 
-#: puzzles/shortcuts.py:198 puzzles/templates/hint_list.html:6
-#: puzzles/templates/hint_list_query.html:7 puzzles/templates/rules.html:39
+#: puzzles/shortcuts.py:200 puzzles/templates/bigboard.html:193
+#: puzzles/templates/hint_list.html:6 puzzles/templates/hint_list_query.html:7
+#: puzzles/templates/hunt_stats.html:51 puzzles/templates/rules.html:39
 #: puzzles/views.py:728
 msgid "Hints"
 msgstr "Indices"
 
-#: puzzles/shortcuts.py:202
+#: puzzles/shortcuts.py:204 puzzles/templates/bigboard.html:177
+#: puzzles/templates/hunt_stats.html:50
 msgid "Guesses"
 msgstr "Essais"
+
+#: puzzles/templates/404.html:7
+msgid "Not Found"
+msgstr "Pas trouvé"
+
+#: puzzles/templates/404.html:30
+msgid "This page is not a puzzle."
+msgstr "Cette page n'est pas une énigme."
 
 #: puzzles/templates/archive.html:5
 msgid "Hunt Archive"
@@ -161,7 +171,7 @@ msgstr "Accueil"
 msgid "Rules"
 msgstr "Règlement"
 
-#: puzzles/templates/base.html:48
+#: puzzles/templates/base.html:48 puzzles/templates/story.html:5
 msgid "Story"
 msgstr "Intrigue"
 
@@ -181,9 +191,9 @@ msgstr "FAQ"
 msgid "Updates"
 msgstr "News"
 
-#: puzzles/templates/base.html:69
+#: puzzles/templates/base.html:69 puzzles/templates/wrapup.html:48
 msgid "Wrap-Up"
-msgstr "Debrief"
+msgstr "Compte-rendu"
 
 #: puzzles/templates/base.html:73
 msgid "Archive"
@@ -217,13 +227,13 @@ msgstr "Indices en attente d'une réponse :"
 msgid "Logout"
 msgstr "Se déconnecter"
 
-#: puzzles/templates/base.html:116
+#: puzzles/templates/base.html:116 puzzles/templates/login.html:19
 msgid "Login"
 msgstr "Se connecter"
 
 #: puzzles/templates/base.html:117
 msgid "Register"
-msgstr "S'enregistrer"
+msgstr "S'inscrire"
 
 #: puzzles/templates/base.html:139
 msgid "Download logs"
@@ -237,7 +247,8 @@ msgstr "Réponse"
 msgid "Hint"
 msgstr "Indice"
 
-#: puzzles/templates/base.html:142 puzzles/templates/team.html:106
+#: puzzles/templates/base.html:142 puzzles/templates/hunt_stats.html:48
+#: puzzles/templates/team.html:106
 msgid "Puzzle"
 msgstr "Énigme"
 
@@ -245,18 +256,105 @@ msgstr "Énigme"
 msgid "Powered by"
 msgstr "Réalisé avec"
 
+#: puzzles/templates/bigboard.html:7 puzzles/templates/wrapup.html:6
+msgid "Bigboard"
+msgstr "Grand tableau"
+
+#: puzzles/templates/bigboard.html:11 puzzles/templates/biggraph.html:11
+#: puzzles/templates/finishers.html:6 puzzles/templates/hunt_stats.html:5
+msgid "Back to wrap-up"
+msgstr "Retour au compte-rendu"
+
+#: puzzles/templates/bigboard.html:143
+msgid "Hide finished teams"
+msgstr "Cacher les finisseurs"
+
+#: puzzles/templates/bigboard.html:144
+msgid "You can put ?30 after the URL to limit to 30 teams."
+msgstr "Vous pouvez mettre ?30 à la fin de l'URL pour limiter à 30 équipes"
+
+#: puzzles/templates/bigboard.html:158 puzzles/templates/finishers.html:32
+#: puzzles/templates/stats.html:35 puzzles/templates/survey.html:29
+#: puzzles/templates/teams.html:21
+msgid "Team"
+msgstr "Équipe"
+
+#: puzzles/templates/bigboard.html:159
+msgid "#"
+msgstr "Rang"
+
+#: puzzles/templates/bigboard.html:160 puzzles/templates/bigboard.html:169
+#: puzzles/templates/hunt_stats.html:49 puzzles/templates/teams.html:23
+msgid "Solves"
+msgstr "Résolutions"
+
+#: puzzles/templates/bigboard.html:161
+msgid "Metas"
+msgstr "Métas"
+
+#: puzzles/templates/bigboard.html:163
+msgid "Last solve"
+msgstr "Dernière résolution"
+
+#: puzzles/templates/bigboard.html:185
+msgid "Unlocks"
+msgstr "Déverrouillages"
+
+#: puzzles/templates/bigboard.html:209
+#, python-format
+msgid "%%Solve/Guess"
+msgstr "%% essais réussis"
+
+#: puzzles/templates/bigboard.html:217
+#, python-format
+msgid "%%Solve/Unlock"
+msgstr "%% énigmes résolues"
+
+#: puzzles/templates/biggraph.html:7
+msgid "Biggraph"
+msgstr "Grand graphe"
+
+#: puzzles/templates/biggraph.html:34
+#, python-format
+msgid "\"Top %(teams)s Teams\""
+msgstr "\"Top %(teams)s des équipes\""
+
+#: puzzles/templates/bridge.html:4
+msgid "The Bridge"
+msgstr "Le pont"
+
+#: puzzles/templates/bridge.html:16
+msgid "Email recipients list"
+msgstr "Liste des destinataires par e-mail"
+
+#: puzzles/templates/bridge.html:17
+#, python-format
+msgid "There are currently <strong>%(recipients)s</strong> recipient."
+msgid_plural "There are currently <strong>%(recipients)s</strong> recipients."
+msgstr[0] "Il y a actuellement <strong>%(recipients)s</strong> destinataire."
+msgstr[1] "Il y a actuellement <strong>%(recipients)s</strong> destinataires."
+
+#: puzzles/templates/countdown.html:20
+msgid "Refresh the page!"
+msgstr "Rafraîchissez la page !"
+
 #: puzzles/templates/edit_team.html:5
 #, python-format
 msgid "Edit %(team_name)s Members"
 msgstr "Éditer les équipiers de %(team_name)s"
 
 #: puzzles/templates/edit_team.html:33 puzzles/templates/hint.html:137
-#: puzzles/templates/hints.html:125 puzzles/templates/password_change.html:26
-#: puzzles/templates/solve.html:63 puzzles/templates/solve.html:129
+#: puzzles/templates/hints.html:125 puzzles/templates/login.html:40
+#: puzzles/templates/password_change.html:26
+#: puzzles/templates/password_reset.html:26
+#: puzzles/templates/password_reset_confirm.html:27
+#: puzzles/templates/post_hunt_solve.html:41 puzzles/templates/register.html:84
+#: puzzles/templates/register.html:86 puzzles/templates/solve.html:63
+#: puzzles/templates/solve.html:129
 msgid "Submit"
 msgstr "Envoyer"
 
-#: puzzles/templates/edit_team.html:40
+#: puzzles/templates/edit_team.html:40 puzzles/templates/register.html:94
 msgid "Add another team member"
 msgstr "Ajouter un autre équipier"
 
@@ -406,13 +504,35 @@ msgstr ""
 "Contactez-nous à <a href=\"mailto:%(contact)s\">%(contact)s</a> et nous "
 "ferons de notre mieux pour vous répondre."
 
+#: puzzles/templates/finishers.html:21 puzzles/templates/wrapup.html:5
+msgid "Finishers"
+msgstr "Finisseurs"
+
+#: puzzles/templates/finishers.html:33
+msgid "Unlock"
+msgstr "Déverrouillage"
+
+#: puzzles/templates/finishers.html:34
+msgid "Time to wrong"
+msgstr "Temps de non-résolution"
+
+#: puzzles/templates/finishers.html:35 puzzles/templates/stats.html:38
+#: puzzles/templates/team.html:109
+msgid "Time to solve"
+msgstr "Temps de résolution"
+
+#: puzzles/templates/finishers.html:36
+msgid "Total time"
+msgstr "Temps total"
+
 #: puzzles/templates/free_answer.html:5
 msgid "Free answer:"
 msgstr "Réponse gratuite :"
 
 #: puzzles/templates/free_answer.html:9 puzzles/templates/hints.html:10
-#: puzzles/templates/solution.html:10 puzzles/templates/solve.html:9
-#: puzzles/templates/stats.html:10 puzzles/templates/survey.html:9
+#: puzzles/templates/post_hunt_solve.html:9 puzzles/templates/solution.html:10
+#: puzzles/templates/solve.html:9 puzzles/templates/stats.html:10
+#: puzzles/templates/survey.html:9
 msgid "Back to the puzzle"
 msgstr "Retour à l'énigme"
 
@@ -420,11 +540,13 @@ msgstr "Retour à l'énigme"
 msgid "Use a free answer on"
 msgstr "Utiliser une réponse gratuite sur"
 
-#: puzzles/templates/free_answer.html:19 puzzles/templates/solve.html:19
+#: puzzles/templates/free_answer.html:19
+#: puzzles/templates/post_hunt_solve.html:19 puzzles/templates/solve.html:19
 msgid "Solved!"
-msgstr "Résolu !"
+msgstr "Résolue !"
 
 #: puzzles/templates/free_answer.html:20
+#: puzzles/templates/post_hunt_solve.html:20
 #, python-format
 msgid "The answer was <b>%(answer)s</b>."
 msgstr "La réponse était <b>%(answer)s</b>."
@@ -559,6 +681,37 @@ msgstr "Retour à la liste"
 msgid "Copy response"
 msgstr "Copier la réponse"
 
+#: puzzles/templates/hint_answered_email.html:4
+#: puzzles/templates/hint_answered_email.txt:5
+#, python-format
+msgid "Your hint question for the puzzle %(puzzle)s has been answered."
+msgstr "Votre demande d'indice pour l'énigme %(puzzle)s a reçu une réponse."
+
+#: puzzles/templates/hint_answered_email.html:6
+#: puzzles/templates/hint_answered_email.txt:7
+msgid "Question:"
+msgstr "Question :"
+
+#: puzzles/templates/hint_answered_email.html:7
+#: puzzles/templates/hint_answered_email.txt:10
+msgid "Response:"
+msgstr "Réponse :"
+
+#: puzzles/templates/hint_answered_email.html:9
+#, python-format
+msgid ""
+"If you still need help, you can make another request <a href=\"%(link)s"
+"\">here</a>."
+msgstr ""
+"Si vous avez toujours besoin d'aide, vous pouvez nous demander <a href="
+"\"%(link)s\">ici</a>."
+
+#: puzzles/templates/hint_answered_email.txt:13
+#, python-format
+msgid "If you still need help, you can make another request at %(link)s"
+msgstr ""
+"Si vous avez toujours besoin d'aide, vous pouvez nous demander ǟ %(link)s"
+
 #: puzzles/templates/hint_list.html:10
 msgid "Open Hints"
 msgstr "Indices en attente"
@@ -596,7 +749,7 @@ msgstr "voir en admin"
 msgid "Unclaimed"
 msgstr "Non assigné"
 
-#: puzzles/templates/hints.html:6
+#: puzzles/templates/hints.html:6 puzzles/templates/puzzles_list.html:24
 msgid "Hints:"
 msgstr "Indices :"
 
@@ -773,7 +926,7 @@ msgid ""
 "out our <a href=\"%(wrapup_url)s\">wrap-up</a>!"
 msgstr ""
 "Veuillez remplir notre <a href=\"%(feedback_url)s\">formulaire de "
-"commentaires</a> et lire notre <a href=\"%(wrapup_url)s\">debriefing</a>"
+"commentaires</a> et lire notre <a href=\"%(wrapup_url)s\">compte-rendu</a>"
 
 #: puzzles/templates/home.html:66
 #, python-format
@@ -850,9 +1003,175 @@ msgstr "Inscrivez votre équipe !"
 msgid "Register at https://FIXME"
 msgstr ""
 
+#: puzzles/templates/hunt_stats.html:16
+msgid "Hunt Stats"
+msgstr "Stats de la chasse"
+
+#: puzzles/templates/hunt_stats.html:22 puzzles/templates/stats.html:23
+msgid "Total guesses:"
+msgstr "Nombre d'essais :"
+
+#: puzzles/templates/hunt_stats.html:25 puzzles/templates/stats.html:20
+msgid "Total solves:"
+msgstr "Nombre de résolutions :"
+
+#: puzzles/templates/hunt_stats.html:30
+msgid "Total participants:"
+msgstr "Nombre de participants :"
+
+#: puzzles/templates/hunt_stats.html:33
+msgid "Total teams:"
+msgstr "Nombre d'équipes :"
+
+#: puzzles/templates/hunt_stats.html:38
+msgid "Hints asked:"
+msgstr "Indices demandés :"
+
+#: puzzles/templates/hunt_stats.html:41
+msgid "Metas solved:"
+msgstr "Métas résolues :"
+
+#: puzzles/templates/hunt_stats.html:49
+msgid "Total number of correct answers"
+msgstr "Nombre de réponses correctes"
+
+#: puzzles/templates/hunt_stats.html:50
+msgid "Total number of answer attempts"
+msgstr "Nombre d'essais"
+
+#: puzzles/templates/hunt_stats.html:51
+msgid "Total number of hints requested"
+msgstr "Nombre d'indices demandés"
+
+#: puzzles/templates/hunt_stats.html:52
+msgid "Total number of non-backsolves"
+msgstr "Nombre de non rétro-solutions"
+
+#: puzzles/templates/hunt_stats.html:52
+msgid "Forward solves"
+msgstr "Pré-solutions"
+
+#: puzzles/templates/hunt_stats.html:53
+msgid "Forward solve after using no hints on this puzzle"
+msgstr "Pré-solution sans indice sur cette énigme"
+
+#: puzzles/templates/hunt_stats.html:53
+msgid "0&#8288;-&#8288;hint forward"
+msgstr "0&#8288;-&#8288;indice"
+
+#: puzzles/templates/hunt_stats.html:54
+msgid "Forward solve after using one hint on this puzzle"
+msgstr "Pré-solution avec un indice sur cette énigme"
+
+#: puzzles/templates/hunt_stats.html:54
+msgid "1&#8288;-&#8288;hint forward"
+msgstr "1&#8288;-&#8288;indice"
+
+#: puzzles/templates/hunt_stats.html:55
+msgid "Forward solve after using multiple hints on this puzzle"
+msgstr "Pré-solution avec plusieurs indices sur cette énigme"
+
+#: puzzles/templates/hunt_stats.html:55
+msgid "2&#8288;+&#8288;-&#8288;hint forward"
+msgstr "2&#8288;+&#8288;-&#8288;indices"
+
+#: puzzles/templates/hunt_stats.html:56
+msgid "Solved after the round meta or within five minutes of it"
+msgstr "Résolu après la série méta ou dans les cinq minutes"
+
+#: puzzles/templates/hunt_stats.html:56
+msgid "Back solves"
+msgstr "Rétro-solutions"
+
+#: puzzles/templates/hunt_stats.html:57
+msgid "Made at least one guess but none were correct"
+msgstr "A essayé au moins une fois mais sans succès"
+
+#: puzzles/templates/hunt_stats.html:57
+msgid "No solve"
+msgstr "Non résolu"
+
+#: puzzles/templates/login.html:47
+#, python-format
+msgid ""
+"If you haven&rsquo;t created a team yet, <a href=\"%(register_url)s"
+"\">register a new team here</a>."
+msgstr ""
+"Si vous n'avez pas encore créé d'équipe, <a href=\"%(register_url)s"
+"\">inscrivez une nouvelle équipe ici</a>."
+
+#: puzzles/templates/login.html:48
+#, python-format
+msgid ""
+"Forgot your password? <a href=\"%(password_url)s\">Click here to reset "
+"password</a>."
+msgstr ""
+"Mot de passe oublié ? <a href=\"%(password_url)s\">Cliquez ici pour le "
+"réinitialiser</a>."
+
 #: puzzles/templates/password_change.html:5
+#: puzzles/templates/password_reset_confirm.html:6
 msgid "Password Change"
-msgstr "Changement de mot de passe"
+msgstr "Changement du mot de passe"
+
+#: puzzles/templates/password_change_done.html:5
+msgid "Password Change Done"
+msgstr "Changement du mot de passe effectué"
+
+#: puzzles/templates/password_change_done.html:7
+#, python-format
+msgid "You may <a href=\"%(home_url)s\">return to the home page</a>."
+msgstr "Vous pouvez <a href=\"%(home_url)s\">retourner à l'accueil</a>."
+
+#: puzzles/templates/password_reset.html:5
+#: puzzles/templates/password_reset_done.html:5
+msgid "Password Reset"
+msgstr "Réinitialisation du mot de passe"
+
+#: puzzles/templates/password_reset_confirm.html:31
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Le lien de réinitialisation du mot de passe était invalide, peut-être parce "
+"qu'il a déjà été utilisé. Veuillez refaire une demande de réinitialisation "
+"de mot de passe."
+
+#: puzzles/templates/password_reset_done.html:6
+msgid "An email has been sent to your team with a link to reset your password."
+msgstr ""
+"Un e-mail a été envoyé à votre équipe avec un lien pour réinitialiser votre "
+"mot de passe."
+
+#: puzzles/templates/password_reset_email.html:2
+#: puzzles/templates/password_reset_email.txt:3
+#, python-format
+msgid ""
+"A request was made to reset the password for %(team_name)s. Please click the "
+"link below to reset your password:"
+msgstr ""
+"Une demande a été faite pour réinitialiser le mot de passe pour "
+"%(team_name)s. Veuillez cliquer le lien ci-dessous pour réinitialiser votre "
+"mot de passe :"
+
+#: puzzles/templates/password_reset_email.html:6
+#: puzzles/templates/password_reset_email.txt:7
+msgid "Sincerely,"
+msgstr "Amicalement,"
+
+#: puzzles/templates/post_hunt_solve.html:5 puzzles/templates/solve.html:5
+#, python-format
+msgid "Call in: %(puzzle_name)s"
+msgstr "Envoyer : %(puzzle_name)s"
+
+#: puzzles/templates/post_hunt_solve.html:14
+#, python-format
+msgid "Check your answer for %(puzzle_name)s"
+msgstr "Vérifier votre réponse pour %(puzzle_name)s"
+
+#: puzzles/templates/post_hunt_solve.html:26
+msgid "Incorrect!"
+msgstr "Incorrect !"
 
 #: puzzles/templates/puzzle.html:15
 msgid "Call in an answer"
@@ -879,12 +1198,17 @@ msgid "View solution"
 msgstr "Voir solution"
 
 #: puzzles/templates/puzzle.html:28 puzzles/templates/team.html:62
+#: puzzles/templates/wrapup.html:7
 msgid "Stats"
 msgstr "Stats"
 
 #: puzzles/templates/puzzle.html:31
 msgid "Survey responses"
 msgstr "Réponses du sondage"
+
+#: puzzles/templates/puzzle.html:41
+msgid "Solved! Answer:"
+msgstr "Résolue ! Réponse :"
 
 #: puzzles/templates/puzzle.html:54
 #, python-format
@@ -905,8 +1229,8 @@ msgid ""
 "This puzzle template exists, but it doesn&rsquo;t seem to define a puzzle "
 "content block. Check the post production guide?"
 msgstr ""
-"Le template de l'énigme existe, mais il semble ne pas définir de block "
-"puzzle-body pour l'énigme. Vérifiez le guide de post-production ?"
+"Le template de l'énigme existe, mais il semble ne pas définir de bloc puzzle-"
+"body pour l'énigme. Vérifiez le guide de post-production ?"
 
 #: puzzles/templates/puzzles.html:26 puzzles/templates/round.html:21
 msgid ""
@@ -915,6 +1239,100 @@ msgid ""
 msgstr ""
 "Vous êtes un beta testeur, vous pourriez voir des énigmes qui sont "
 "verrouillées pour le public. Soyez prudent !"
+
+#: puzzles/templates/puzzles_list.html:9
+msgid "meta"
+msgstr "méta"
+
+#: puzzles/templates/puzzles_list.html:11
+msgid "new!"
+msgstr "nouveau !"
+
+#: puzzles/templates/puzzles_list.html:20
+msgid "Solution"
+msgstr "Solution"
+
+#: puzzles/templates/puzzles_list.html:32
+#, python-format
+msgid "<b>%(correct)s</b> solve"
+msgid_plural "<b>%(correct)s</b> solves"
+msgstr[0] "<b>%(correct)s</b> résolution"
+msgstr[1] "<b>%(correct)s</b> résolutions"
+
+#: puzzles/templates/puzzles_list.html:33
+#, python-format
+msgid "<b>%(guesses)s</b> guess"
+msgid_plural "<b>%(guesses)s</b> guesses"
+msgstr[0] "<b>%(guesses)s</b> essai"
+msgstr[1] "<b>%(guesses)s</b> essais"
+
+#: puzzles/templates/puzzles_list.html:35
+#, python-format
+msgid "<b>%(teams)s</b> team"
+msgid_plural "<b>%(teams)s</b> teams"
+msgstr[0] "<b>%(teams)s</b> équipe"
+msgstr[1] "<b>%(teams)s</b> équipes"
+
+#: puzzles/templates/register.html:11
+msgid "Register a new team"
+msgstr "Inscrire une nouvelle équipe"
+
+#: puzzles/templates/register.html:14
+#, python-format
+msgid "You&rsquo;re already logged in as %(team_name)s!"
+msgstr "Vous êtes déjà connecté en tant que %(team_name)s !"
+
+#: puzzles/templates/register.html:40
+msgid "Team members"
+msgstr "Équipiers"
+
+#: puzzles/templates/register.html:42
+msgid ""
+"You will also be able to add and remove team members at any later time on "
+"your team&rsquo;s profile page."
+msgstr ""
+"Vous pourrez aussi ajouter et supprimer des équipiers à tout moment dans la "
+"page du profil de votre équipe."
+
+#: puzzles/templates/register.html:43
+msgid ""
+"You'll need to provide an email address for at least one of your team "
+"members."
+msgstr ""
+"Vous devrez fournir une adresse email pour au moins un de vos équipiers."
+
+#: puzzles/templates/register.html:95
+msgid "Remove'"
+msgstr "Supprimer !"
+
+#: puzzles/templates/registration_email.html:2
+#: puzzles/templates/registration_email.txt:3
+#, python-format
+msgid ""
+"You have successfully registered team %(team_name)s for the %(hunt_title)s."
+msgstr "Vous avez bien inscrit l'équipe %(team_name)s pour %(hunt_title)s."
+
+#: puzzles/templates/registration_email.html:4
+#, python-format
+msgid ""
+"If you need to modify your team information, you can do so at <a href="
+"\"%(team_link)s\">%(team_link)s</a>"
+msgstr ""
+"Si vous devez modifier les informations de votre équipe, vous pouvez le "
+"faire à <a href=\"%(team_link)s\">%(team_link)s</a>"
+
+#: puzzles/templates/registration_email.html:6
+#: puzzles/templates/registration_email.txt:7
+msgid "See you at the hunt!"
+msgstr "À bientôt sur la chasse !"
+
+#: puzzles/templates/registration_email.txt:5
+#, python-format
+msgid ""
+"If you need to modify your team information, you can do so at %(team_link)s"
+msgstr ""
+"Si vous devez modifier les informations de votre équipe, vous pouvez le "
+"faire à %(team_link)s"
 
 #: puzzles/templates/round.html:10
 msgid "All puzzles"
@@ -1115,8 +1533,8 @@ msgid ""
 "This solution template exists, but it doesn&rsquo;t seem to define a "
 "solution content block. Check the post production guide?"
 msgstr ""
-"Le template de la solution existe, mais il semble ne pas définir de block "
-"puzzle-body pour l'énigme. Vérifiez le guide de post-production ?"
+"Le template de la solution existe, mais il semble ne pas définir de bloc "
+"solution-body pour l'énigme. Vérifiez le guide de post-production ?"
 
 #: puzzles/templates/solution.html:55
 msgid "Author&rsquo;s Notes"
@@ -1193,19 +1611,6 @@ msgstr "Stats :"
 msgid "Stats for"
 msgstr "Stats pour"
 
-#: puzzles/templates/stats.html:20
-msgid "Total solves:"
-msgstr "Nombre de résolutions :"
-
-#: puzzles/templates/stats.html:23
-msgid "Total guesses:"
-msgstr "Nombre d'essais :"
-
-#: puzzles/templates/stats.html:35 puzzles/templates/survey.html:29
-#: puzzles/templates/teams.html:21
-msgid "Team"
-msgstr "Équipe"
-
 #: puzzles/templates/stats.html:36 puzzles/templates/team.html:107
 msgid "Incorrect guesses"
 msgstr "Essais incorrects"
@@ -1213,10 +1618,6 @@ msgstr "Essais incorrects"
 #: puzzles/templates/stats.html:37 puzzles/templates/team.html:108
 msgid "Unlock time"
 msgstr "Heure de déverrouillage"
-
-#: puzzles/templates/stats.html:38 puzzles/templates/team.html:109
-msgid "Time to solve"
-msgstr "Temps de résolution"
 
 #: puzzles/templates/stats.html:39 puzzles/templates/team.html:110
 msgid "Solve time"
@@ -1229,6 +1630,34 @@ msgstr "Réponse"
 #: puzzles/templates/stats.html:58
 msgid "Submission count"
 msgstr "Nombre d'envois"
+
+#: puzzles/templates/story.html:13
+msgid "Meta Meta"
+msgstr "Méta-méta"
+
+#: puzzles/templates/story.html:14
+msgid "You succeeded!"
+msgstr "Victoire !"
+
+#: puzzles/templates/story.html:20
+msgid "Intro Meta"
+msgstr "Méta de l'intro"
+
+#: puzzles/templates/story.html:21
+msgid "But wait..."
+msgstr "Une minute..."
+
+#: puzzles/templates/story.html:27
+msgid "Hunt Open"
+msgstr "La chasse est ouverte"
+
+#: puzzles/templates/story.html:28
+msgid "Time to solve puzzles..."
+msgstr "C'est l'heure de résoudre des énigmes..."
+
+#: puzzles/templates/story.html:35
+msgid "Get hyped!"
+msgstr "On a hâte !"
 
 #: puzzles/templates/survey.html:5
 msgid "Surveys:"
@@ -1294,10 +1723,6 @@ msgstr "Classement"
 msgid "Rank"
 msgstr "Rang"
 
-#: puzzles/templates/teams.html:23
-msgid "Solves"
-msgstr "Résolutions"
-
 #: puzzles/templates/teams.html:24
 msgid "Finish time"
 msgstr "Heure d'arrivée"
@@ -1305,6 +1730,19 @@ msgstr "Heure d'arrivée"
 #: puzzles/templates/teams.html:35
 msgid "impersonate"
 msgstr "personnifier"
+
+#: puzzles/templates/victory.html:8
+#, python-format
+msgid ""
+"Congratulations on completing the %(title)s!<br>You will receive more "
+"information shortly via email."
+msgstr ""
+"Félicitations pour avoir terminé %(title)s !<br>Vous recevrez bientôt plus "
+"d'informations par e-mail."
+
+#: puzzles/templates/wrapup.html:52
+msgid "Congratulations!"
+msgstr "Félicitations !"
 
 #: puzzles/templatetags/puzzle_tags.py:27
 msgid "{}h{}m"
@@ -1351,7 +1789,7 @@ msgstr "Nom de série invalide."
 
 #: puzzles/views.py:579 puzzles/views.py:660
 msgid "You\\u2019ve already solved this puzzle!"
-msgstr "Vous avez déjå résolu cette énigme !"
+msgstr "Vous avez déjà résolu cette énigme !"
 
 #: puzzles/views.py:582
 msgid "You have no more guesses for this puzzle!"
@@ -1362,7 +1800,7 @@ msgid ""
 "All puzzle answers will have at least one letter A through Z (case does not "
 "matter)."
 msgstr ""
-"Toutes les énigmes auront au moins une lettre de A å Z (la casse n'importe "
+"Toutes les énigmes auront au moins une lettre de A à Z (la casse n'importe "
 "pas)."
 
 #: puzzles/views.py:605
@@ -1370,7 +1808,7 @@ msgstr ""
 msgid ""
 "You\\u2019ve already tried calling in the answer \\u201c%s\\u201d for this "
 "puzzle."
-msgstr "Vous avez déjå essayé la réponse \\u201c%s\\u201d pour cette énigme."
+msgstr "Vous avez déjà essayé la réponse \\u201c%s\\u201d pour cette énigme."
 
 #: puzzles/views.py:620
 #, python-format
@@ -1458,7 +1896,7 @@ msgstr "Cet indice a eu une réponse !"
 
 #: puzzles/views.py:876
 msgid "This hint is currently claimed by {}!"
-msgstr "Cet indice est actuellement assigné å {} !"
+msgstr "Cet indice est actuellement assigné à {} !"
 
 #: puzzles/views.py:878
 msgid "This hint is currently claimed!"

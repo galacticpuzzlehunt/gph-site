@@ -45,7 +45,7 @@ def unix_time(timestamp):
     return timestamp.strftime('%s') if timestamp else ''
 
 @register.simple_tag
-def format_time(timestamp, format='DATE_AT_TIME'):
+def format_time(timestamp, format='DATE_TIME'):
     if not timestamp:
         return ''
     timestamp2 = timestamp.astimezone(timezone.get_default_timezone())

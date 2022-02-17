@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block content %}
 
 <h1 id="countdown" style="text-align: center"></h1>
@@ -16,7 +17,7 @@ setInterval(function() {
         }
         elt.textContent = min + ':' + sec;
     } else {
-        elt.textContent = 'Refresh the page!';
+        elt.textContent = '{% translate "Refresh the page!" %}';
     }
 }, 100);
 </script>

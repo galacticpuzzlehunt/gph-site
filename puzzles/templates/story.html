@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block content %}
 
-<h1>Story</h1>
+<h1>{% translate "Story" %}</h1>
 
 <main>
 
@@ -9,29 +10,29 @@
 
 {% if key == 'meta2_done' %}
 <div class="no-break story-chunk">
-    <h4>Meta Meta</h4>
-    You succeeded!
+    <h4>{% translate "Meta Meta" %}</h4>
+    {% translate "You succeeded!" %}
 </div>
 {% endif %}
 
 {% if key == 'round2_open' %}
 <div class="no-break story-chunk">
-    <h4>Intro Meta</h4>
-    But wait...
+    <h4>{% translate "Intro Meta" %}</h4>
+    {% translate "But wait..." %}
 </div>
 {% endif %}
 
 {% if key == 'round1_open' %}
 <div class="no-break story-chunk">
-    <h4>Hunt Open</h4>
-    Time to solve puzzles...
+    <h4>{% translate "Hunt Open" %}</h4>
+    {% translate "Time to solve puzzles..." %}
 </div>
 {% endif %}
 
 {% if key == 'pre_hunt' %}
 <div class="no-break story-chunk">
     <h4>???</h4>
-    Get hyped!
+    {% translate "Get hyped!" %}
 </div>
 {% endif %}
 

@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 
 {% block top-left-actions %}
-<a href="{% url 'wrapup' %}" class="btn">Back to wrap-up</a>
+<a href="{% url 'wrapup' %}" class="btn">{% translate "Back to wrap-up" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -17,7 +18,7 @@ td {
 }
 </style>
 
-<h1>Finishers</h1>
+<h1>{% translate "Finishers" %}</h1>
 
 <main>
 <table class="sortable gph-list-table">
@@ -28,12 +29,12 @@ td {
     <col style="width: 12%">
     <col style="width: 12%">
     <tr onclick="document.querySelector('tbody').className = 'sorting'">
-        <th>Team</th>
-        <th>Unlock ({{ start_time|date:"T" }})</th>
-        <th>Time to wrong</th>
-        <th>Time to solve</th>
-        <th>Total time</th>
-        <th>Solve ({{ start_time|date:"T" }})</th>
+        <th>{% translate "Team" %}</th>
+        <th>{% translate "Unlock" %} ({{ start_time|date:"T" }})</th>
+        <th>{% translate "Time to wrong" %}</th>
+        <th>{% translate "Time to solve" %}</th>
+        <th>{% translate "Total time" %}</th>
+        <th>{% translate "Solve" %} ({{ start_time|date:"T" }})</th>
     </tr>
     {% for team in data %}
     <tr>

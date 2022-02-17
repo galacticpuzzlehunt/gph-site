@@ -1,28 +1,29 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page-title %}
-<title>Call in: {{ puzzle.name }}</title>
+<title>{% blocktranslate with puzzle_name=puzzle.name %}Call in: {{ puzzle_name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">{% translate "Back to the puzzle" %}</a>
 {% endblock %}
 
 {% block content %}
 
-<h1>Check your answer for {{ puzzle.name }}</h1>
+<h1>{% blocktranslate with puzzle_name=puzzle.name %}Check your answer for {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
     {% if is_correct %}
     <div class="solved-panel">
-        <h4>Solved!</h4>
-        <p>The answer was <b>{{ puzzle.answer }}</b>.</p>
+        <h4>{% translate "Solved!" %}</h4>
+        <p>{% blocktranslate with answer=puzzle.answer %}The answer was <b>{{ answer }}</b>.{% endblocktranslate %}</p>
     </div>
     {% endif %}
 
     {% if is_wrong %}
     <div class="unsolved-panel">
-        <h4>Incorrect!</h4>
+        <h4>{% translate "Incorrect!" %}</h4>
     </div>
     {% endif %}
 
@@ -37,7 +38,7 @@
                 {{ field.errors }}
             </div>
             <div class="four columns">
-                <button class="btn" type="submit">Submit</button>
+                <button class="btn" type="submit">{% translate "Submit" %}</button>
             </div>
         </div>
         {% endfor %}

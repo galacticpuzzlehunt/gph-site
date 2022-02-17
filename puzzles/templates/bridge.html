@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block content %}
-<h1>The Bridge</h1>
+<h1>{% translate "The Bridge" %}</h1>
 
 <main>
     <style>
@@ -12,8 +13,8 @@
             min-width: 100%;
         }
     </style>
-    <h4>Email recipients list</h4>
-    <p>There are currently <strong>{{ recipient_count }}</strong> recipient{{ recipient_count|pluralize }}.</p>
+    <h4>{% translate "Email recipients list" %}</h4>
+    <p>{% blocktranslate count recipients=recipient_count %}There are currently <strong>{{ recipients }}</strong> recipient.{% plural %}There are currently <strong>{{ recipients }}</strong> recipients.{% endblocktranslate %}</p>
     <textarea>{{ recipients_list }}</textarea>
 </main>
 

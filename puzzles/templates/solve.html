@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block page-title %}
-<title>{% translate "Call in:" {{ puzzle.name }}</title>
+<title>{% blocktranslate with puzzle_name=puzzle.name %}Call in: {{ puzzle_name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}

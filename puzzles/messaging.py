@@ -16,6 +16,7 @@ from django.core.mail.message import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from puzzles.context import Context
 from puzzles.hunt_config import (
@@ -55,9 +56,9 @@ def dispatch_discord_alert(webhook, content, username):
     if len(content) >= 2000:
         content = content[:1996] + '...'
     if settings.IS_TEST:
-        logger.info('(Test) Discord alert:\n' + content)
+        logger.info(_('(Test) Discord alert:\n') + content)
         return
-    logger.info('(Real) Discord alert:\n' + content)
+    logger.info(_('(Real) Discord alert:\n') + content)
     requests.post(webhook, data={'username': username, 'content': content})
 
 def dispatch_general_alert(content):
@@ -99,7 +100,7 @@ def send_mail_wrapper(subject, template, context, recipients):
     subject = settings.EMAIL_SUBJECT_PREFIX + subject
     body = render_to_string(template + '.txt', context)
     if settings.IS_TEST:
-        logger.info('Sending mail <{}> to <{}>:\n{}'.format(
+        logger.info(_('Sending mail <{}> to <{}>:\n{}').format(
             subject, ', '.join(recipients), body))
         return
     mail = EmailMultiAlternatives(
@@ -111,9 +112,9 @@ def send_mail_wrapper(subject, template, context, recipients):
         reply_to=[CONTACT_EMAIL])
     try:
         if mail.send() != 1:
-            raise RuntimeError('Unknown failure???')
+            raise RuntimeError(_('Unknown failure???'))
     except Exception:
-        dispatch_general_alert('Could not send mail <{}> to <{}>:\n{}'.format(
+        dispatch_general_alert(_('Could not send mail <{}> to <{}>:\n{}').format(
             subject, ', '.join(recipients), traceback.format_exc()))
 
 
@@ -181,28 +182,28 @@ class DiscordInterface:
         if hint.claimed_datetime:
             embed.color = 0xdddddd
             embed.timestamp = hint.claimed_datetime.isoformat()
-            embed.author.name = 'Claimed by {}'.format(hint.claimer)
+            embed.author.name = _('Claimed by {}').format(hint.claimer)
             if hint.claimer in self.get_avatars():
                 embed.author.icon_url = self.get_avatars()[hint.claimer]
-            debug = 'claimed by {}'.format(hint.claimer)
+            debug = _('claimed by {}').format(hint.claimer)
         else:
             embed.color = 0xff00ff
-            embed.author.name = 'U N C L A I M E D'
+            embed.author.name = _('U N C L A I M E D')
             claim_url = hint.full_url(claim=True)
-            embed.title = 'Claim: ' + claim_url
+            embed.title = _('Claim: ') + claim_url
             embed.url = claim_url
             debug = 'unclaimed'
 
         if self.client is None:
             message = hint.long_discord_message()
-            logger.info('Hint, {}: {}\n{}'.format(debug, hint, message))
-            logger.info('Embed: {}'.format(embed.to_dict()))
+            logger.info(_('Hint, {}: {}\n{}').format(debug, hint, message))
+            logger.info(_('Embed: {}').format(embed.to_dict()))
         elif hint.discord_id:
             try:
                 self.client.channels_messages_modify(
                     self.HINT_CHANNEL, hint.discord_id, embed=embed)
             except Exception:
-                dispatch_general_alert('Discord API failure: modify\n{}'.format(
+                dispatch_general_alert(_('Discord API failure: modify\n{}').format(
                     traceback.format_exc()))
         else:
             message = hint.long_discord_message()
@@ -210,7 +211,7 @@ class DiscordInterface:
                 discord_id = self.client.channels_messages_create(
                     self.HINT_CHANNEL, message, embed=embed).id
             except Exception:
-                dispatch_general_alert('Discord API failure: create\n{}'.format(
+                dispatch_general_alert(_('Discord API failure: create\n{}').format(
                     traceback.format_exc()))
                 return
             hint.discord_id = discord_id
@@ -219,13 +220,13 @@ class DiscordInterface:
     def clear_hint(self, hint):
         HintsConsumer.send_to_all(json.dumps({'id': hint.id}))
         if self.client is None:
-            logger.info('Hint done: {}'.format(hint))
+            logger.info(_('Hint done: {}').format(hint))
         elif hint.discord_id:
             # try:
             #     self.client.channels_messages_delete(
             #         self.HINT_CHANNEL, hint.discord_id)
             # except Exception:
-            #     dispatch_general_alert('Discord API failure: delete\n{}'.format(
+            #     dispatch_general_alert(_('Discord API failure: delete\n{}').format(
             #         traceback.format_exc()))
             # hint.discord_id = ''
             # hint.save(update_fields=('discord_id',))
@@ -245,12 +246,12 @@ class DiscordInterface:
             embed.description = hint.response[:250]
             if hint.claimer in self.get_avatars():
                 embed.author.icon_url = self.get_avatars()[hint.claimer]
-            debug = 'claimed by {}'.format(hint.claimer)
+            debug = _('claimed by {}').format(hint.claimer)
             try:
                 self.client.channels_messages_modify(
                     self.HINT_CHANNEL, hint.discord_id, content=hint.short_discord_message(), embed=embed)
             except Exception:
-                dispatch_general_alert('Discord API failure: modify\n{}'.format(
+                dispatch_general_alert(_('Discord API failure: modify\n{}').format(
                     traceback.format_exc()))
 
 discord_interface = DiscordInterface()
@@ -331,7 +332,7 @@ class HintsConsumer(AdminWebsocketConsumer):
 def show_unlock_notification(context, unlock):
     data = json.dumps({
         'title': str(unlock.puzzle),
-        'text': "You\u2019ve unlocked a new puzzle!",
+        'text': _('You\u2019ve unlocked a new puzzle!'),
         'link': reverse('puzzle', args=(unlock.puzzle.slug,)),
     })
     # There's an awkward edge case where the person/browser tab that actually
@@ -345,7 +346,7 @@ def show_solve_notification(submission):
         return
     data = json.dumps({
         'title': str(submission.puzzle),
-        'text': "You\u2019ve solved a meta!",
+        'text': _('You\u2019ve solved a meta!'),
         'link': reverse('puzzle', args=(submission.puzzle.slug,)),
     })
     # No need to worry here since whoever triggered this is already getting a
@@ -355,7 +356,7 @@ def show_solve_notification(submission):
 def show_hint_notification(hint):
     data = json.dumps({
         'title': str(hint.puzzle),
-        'text': 'Hint answered!',
+        'text': _('Hint answered!'),
         'link': reverse('hints', args=(hint.puzzle.slug,)),
     })
     TeamNotificationsConsumer.send_to_team(hint.team, data)

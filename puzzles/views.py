@@ -190,7 +190,7 @@ def register(request):
                     'secret': settings.RECAPTCHA_SECRETKEY,
                     'response': token,
                 }).json()
-                recaptcha_logger.info('team [%s] token [%s]\n%s' % (
+                recaptcha_logger.info(_('team [%s] token [%s]\n%s') % (
                     request.POST['team_id'], token, response))
             except Exception:
                 pass
@@ -220,7 +220,7 @@ def register(request):
                 reverse('team', args=(data.get('team_name'),))
             )
             send_mail_wrapper(
-                'Team created', 'registration_email',
+                _('Team created'), 'registration_email',
                 {
                     'team_name': data.get('team_name'),
                     'team_link': team_link,
@@ -269,7 +269,7 @@ def password_reset(request):
             ))
 
             send_mail_wrapper(
-                'Password reset', 'password_reset_email',
+                _('Password reset'), 'password_reset_email',
                 {'team_name': team.team_name, 'reset_link': reset_link},
                 team.get_emails())
             return redirect('password_reset_done')
@@ -290,7 +290,7 @@ def team(request, team_name):
         team_query = team_query.exclude(is_hidden=True)
     team = team_query.first()
     if not team:
-        messages.error(request, 'Team \u201c{}\u201d not found.'.format(team_name))
+        messages.error(request, _('Team \u201c{}\u201d not found.').format(team_name))
         return redirect('teams')
 
     # This Team.leaderboard_teams() call is expensive, but is
@@ -421,7 +421,7 @@ def edit_team(request):
             for team_member in team_member_instances:
                 team_member.team = team
                 team_member.save()
-            messages.success(request, 'Team updated!')
+            messages.success(request, _('Team updated!'))
             return redirect('edit-team')
 
         if len(formset) == 0: # Another hack, to avoid showing an empty form
@@ -621,7 +621,7 @@ def solve(request):
                 if puzzle.slug == META_META_SLUG:
                     dispatch_victory_alert(
                         _('Team %s has finished the hunt!') % team +
-                        '\n**Emails:** <%s>' % request.build_absolute_uri(reverse('finishers')))
+                        _('\n**Emails:** <%s>') % request.build_absolute_uri(reverse('finishers')))
                     return redirect('victory')
             else:
                 messages.error(request, _('%s is incorrect.') % normalized_answer)
@@ -846,7 +846,7 @@ def hint(request, id):
             hint.claimed_datetime = None
             hint.claimer = ''
             hint.save()
-            messages.warning(request, 'Unclaimed.')
+            messages.warning(request, _('Unclaimed.'))
         return redirect('hint-list')
     elif request.method == 'POST':
         form = AnswerHintForm(request.POST)

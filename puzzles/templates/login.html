@@ -7,12 +7,6 @@
     #login {
         position: relative;
     }
-
-    .six {
-        position: absolute;
-        top: 0;
-        right: 0;
-    }
 }
 </style>
 
@@ -32,6 +26,17 @@
                 {{ field }}
                 {{ field.errors }}
             </div>
+            {% if not hunt_is_closed %}
+            {% url 'register' as register_url %}
+            {% url 'password_reset' as password_url %}
+            <div class="six columns">
+            {% if field.name == 'username' %}
+                <p>{% blocktranslate %}If you haven&rsquo;t created a team yet, <a href="{{ register_url }}">register a new team here</a>.{% endblocktranslate %}</p>
+            {% else %}
+                <p>{% blocktranslate %}Forgot your password? <a href="{{ password_url }}">Click here to reset password</a>.{% endblocktranslate %}</p>
+            {% endif %}
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -40,14 +45,6 @@
         <button class="btn" type="submit">{% translate "Submit" %}</button>
     </div>
 
-    {% if not hunt_is_closed %}
-    <div class="six columns">
-    	{% url 'register' as register_url %}
-    	{% url 'password_reset' as password_url %}
-        <p>{% blocktranslate %}If you haven&rsquo;t created a team yet, <a href="{{ register_url }}">register a new team here</a>.{% endblocktranslate %}</p>
-        <p>{% blocktranslate %}Forgot your password? <a href="{{ password_url }}">Click here to reset password</a>.{% endblocktranslate %}</p>
-    </div>
-    {% endif %}
 </form>
 
 {% endblock %}

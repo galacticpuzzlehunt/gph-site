@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 18:11-0400\n"
+"POT-Creation-Date: 2022-02-21 14:11-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,6 +15,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: puzzles/__init__.py:13 puzzles/models.py:118
+msgid "puzzles"
+msgstr "énigmes"
 
 #: puzzles/forms.py:21 puzzles/forms.py:198
 msgid "Team Username"
@@ -25,6 +29,8 @@ msgid ""
 "This is the private username your team will use when logging in. It should "
 "be short and not contain special characters."
 msgstr ""
+"Ceci est l'alias que votre équipe utilisera pour se connecter. Il doit être "
+"court et ne pas contenir de caractères spéciaux."
 
 #: puzzles/forms.py:29
 msgid "Team Name"
@@ -33,13 +39,14 @@ msgstr "Nom d'équipe"
 #: puzzles/forms.py:32
 msgid "This is how your team name will appear on the public leaderboard."
 msgstr ""
+"Ceci est le nom sous lequel votre équipe apparaîtra dans le classement."
 
 #: puzzles/forms.py:36
 msgid "Team Password"
 msgstr "Mot de passe de l'équipe"
 
 #: puzzles/forms.py:38
-msgid "You\\u2019ll probably share this with your team."
+msgid "You’ll probably share this with your team."
 msgstr "Vous devriez le communiquer à votre équipe."
 
 #: puzzles/forms.py:41
@@ -47,11 +54,11 @@ msgid "Retype Password"
 msgstr "Re-taper le mot de passe"
 
 #: puzzles/forms.py:54
-msgid "That public team name isn\\u2019t allowed."
+msgid "That public team name isn’t allowed."
 msgstr "Ce nom d'équipe n'est pas permis."
 
 #: puzzles/forms.py:59
-msgid "Passwords don\\u2019t match."
+msgid "Passwords don’t match."
 msgstr "Les mots de passe ne correspondent pas."
 
 #: puzzles/forms.py:64
@@ -73,7 +80,7 @@ msgstr ""
 msgid "Name (required)"
 msgstr "Nom (requis)"
 
-#: puzzles/forms.py:87 puzzles/models.py:501
+#: puzzles/forms.py:87 puzzles/models.py:503
 msgid "Email (optional)"
 msgstr "E-mail (optionnel)"
 
@@ -99,9 +106,9 @@ msgstr "Saisissez votre réponse :"
 
 #: puzzles/forms.py:143
 msgid ""
-"Describe everything you\\u2019ve tried on this puzzle. We will provide a "
-"hint to help you move forward. The more detail you provide, the less likely "
-"it is that we\\u2019ll tell you something you already know."
+"Describe everything you’ve tried on this puzzle. We will provide a hint to "
+"help you move forward. The more detail you provide, the less likely it is "
+"that we’ll tell you something you already know."
 msgstr ""
 "Décrivez tout ce que vous avez essayé sur cette énigme. Nous fournirons un "
 "indice pour vous aider à avancer. Plus vous donnerez de détails, moins vous "
@@ -128,7 +135,7 @@ msgid " (thread closed)"
 msgstr " (discussion terminée)"
 
 #: puzzles/forms.py:205
-msgid "That username doesn\\u2019t exist."
+msgid "That username doesn’t exist."
 msgstr "Cet alias n'existe pas."
 
 #: puzzles/messaging.py:59
@@ -207,51 +214,59 @@ msgstr ""
 msgid "Hint done: {}"
 msgstr "Indice traité : {}"
 
+#: puzzles/messaging.py:238
+msgid "ANS"
+msgstr "REP"
+
+#: puzzles/messaging.py:240
+msgid "REF"
+msgstr "REM"
+
 #: puzzles/messaging.py:335
-msgid "You\\u2019ve unlocked a new puzzle!"
+msgid "You’ve unlocked a new puzzle!"
 msgstr "Vous avez déverrouillé une nouvelle énigme !"
 
 #: puzzles/messaging.py:349
-msgid "You\\u2019ve solved a meta!"
+msgid "You’ve solved a meta!"
 msgstr "Vous avez résolu une méta !"
 
 #: puzzles/messaging.py:359
 msgid "Hint answered!"
 msgstr "Indice reçu !"
 
-#: puzzles/models.py:50 puzzles/models.py:68 puzzles/models.py:500
+#: puzzles/models.py:51 puzzles/models.py:69 puzzles/models.py:502
 msgid "Name"
 msgstr "Nom"
 
-#: puzzles/models.py:51 puzzles/models.py:77
+#: puzzles/models.py:52 puzzles/models.py:78
 msgid "Slug"
 msgstr "Identifiant"
 
-#: puzzles/models.py:54 puzzles/templates/puzzles_list.html:9
+#: puzzles/models.py:55 puzzles/templates/puzzles_list.html:9
 msgid "meta"
 msgstr "méta"
 
-#: puzzles/models.py:55 puzzles/models.py:98
+#: puzzles/models.py:56 puzzles/models.py:99
 msgid "Order"
 msgstr "Rang"
 
-#: puzzles/models.py:58 puzzles/models.py:97
+#: puzzles/models.py:59 puzzles/models.py:98
 msgid "round"
-msgstr "série"
+msgstr "chapitre"
 
-#: puzzles/models.py:59
+#: puzzles/models.py:60
 msgid "rounds"
-msgstr "séries"
+msgstr "chapitres"
 
-#: puzzles/models.py:78
+#: puzzles/models.py:79
 msgid "Slug used in URLs to identify this puzzle (must be unique)"
 msgstr "Identifiant utilisé dans les URLs pour cette énigme (doit être unique)"
 
-#: puzzles/models.py:85
+#: puzzles/models.py:86
 msgid "Body template"
 msgstr "Fichier HTML"
 
-#: puzzles/models.py:86
+#: puzzles/models.py:87
 msgid ""
 "File name of a Django template (including .html) under\n"
 "        puzzle_bodies and solution_bodies containing the puzzle and\n"
@@ -262,83 +277,79 @@ msgstr ""
 "solution_bodies et contenant respectivement l'énigme et la solution. Il vaut "
 "par défaut identifiant + \".html\" s'il n'est pas spécifié."
 
-#: puzzles/models.py:93 puzzles/templates/stats.html:57
+#: puzzles/models.py:94 puzzles/templates/stats.html:57
 msgid "Answer"
 msgstr "Réponse"
 
-#: puzzles/models.py:94
+#: puzzles/models.py:95
 msgid "Answer (fine if unnormalized)"
 msgstr "Réponse (forme non standard acceptée)"
 
-#: puzzles/models.py:99
+#: puzzles/models.py:100
 msgid "Is meta"
 msgstr "Méta ?"
 
-#: puzzles/models.py:103
+#: puzzles/models.py:104
 msgid "Unlock hours"
 msgstr "Heures de déverrouillage"
 
-#: puzzles/models.py:104
+#: puzzles/models.py:105
 msgid "If nonnegative, puzzle unlocks N hours after the hunt starts."
 msgstr ""
 "Si positif ou nul, l'énigme est déverrouilée N heures après le début de la "
 "chasse."
 
-#: puzzles/models.py:105
+#: puzzles/models.py:106
 msgid "Unlock global"
 msgstr "Déverrouillage global"
 
-#: puzzles/models.py:106
+#: puzzles/models.py:107
 msgid "If nonnegative, puzzle unlocks after N main round solves in any round."
 msgstr ""
 "Si positif ou nul, l'énigme est déverrouilée après résolution de N énigmes "
-"dans n'importe quelle série."
+"dans n'importe quel chapitre."
 
-#: puzzles/models.py:107
+#: puzzles/models.py:108
 msgid "Unlock local"
 msgstr "Déverrouillage local"
 
-#: puzzles/models.py:108
+#: puzzles/models.py:109
 msgid "If nonnegative, puzzle unlocks after N main round solves in this round."
 msgstr ""
 "Si positif ou nul, l'énigme est déverrouilée après résolution de N énigmes "
-"dans cette série."
+"dans ce chapitre."
 
-#: puzzles/models.py:111
+#: puzzles/models.py:112
 msgid "Emoji"
 msgstr "Émoji"
 
-#: puzzles/models.py:112
+#: puzzles/models.py:113
 msgid "Emoji to use in Discord integrations involving this puzzle"
 msgstr "Émoji à utiliser dans Discord pour cette énigme"
 
-#: puzzles/models.py:116 puzzles/models.py:522 puzzles/models.py:542
-#: puzzles/models.py:633 puzzles/models.py:652 puzzles/models.py:676
-#: puzzles/models.py:747 puzzles/models.py:792
+#: puzzles/models.py:117 puzzles/models.py:524 puzzles/models.py:544
+#: puzzles/models.py:635 puzzles/models.py:654 puzzles/models.py:679
+#: puzzles/models.py:750 puzzles/models.py:795
 msgid "puzzle"
 msgstr "énigme"
 
-#: puzzles/models.py:117
-msgid "puzzles"
-msgstr "énigmes"
-
-#: puzzles/models.py:167
+#: puzzles/models.py:169
 msgid "Team name"
 msgstr "Nom d'équipe"
 
-#: puzzles/models.py:168
+#: puzzles/models.py:170
 msgid "Public team name for scoreboards and communications"
 msgstr "Nom de l'équipe utilisé dans le classement et les communications"
 
-#: puzzles/models.py:172
+#: puzzles/models.py:174
 msgid "Creation time"
 msgstr "Date de création"
 
-#: puzzles/models.py:175
+#: puzzles/models.py:177
 msgid "Start offset"
 msgstr "Avance sur le début"
 
-#: puzzles/models.py:176
+#: puzzles/models.py:178
 msgid ""
 "How much earlier this team should start, for early-testing\n"
 "        teams; be careful with this!"
@@ -346,11 +357,11 @@ msgstr ""
 "Combien de temps à l'avance cette équipe devrait commencer, pour les béta-"
 "testeurs ; soyez prudent avec ça !"
 
-#: puzzles/models.py:181
+#: puzzles/models.py:183
 msgid "Total hints awarded"
 msgstr "Nombre d'indices"
 
-#: puzzles/models.py:182
+#: puzzles/models.py:184
 msgid ""
 "Number of additional hints to award the team (on top of\n"
 "        the default amount per day)"
@@ -358,11 +369,11 @@ msgstr ""
 "Nombre d'indices additionnels à accorder à l'équipe (en plus du nombre "
 "d'indices par jour)"
 
-#: puzzles/models.py:186
+#: puzzles/models.py:188
 msgid "Total free answers awarded"
 msgstr "Nombre de réponses gratuites"
 
-#: puzzles/models.py:187
+#: puzzles/models.py:189
 msgid ""
 "Number of additional free answers to award the team (on\n"
 "        top of the default amount per day)"
@@ -370,15 +381,15 @@ msgstr ""
 "Nombre de réponses gratuites additionnelles à accorder à l'équipe (en plus "
 "du nombre de réponses gratuitesd par jour)"
 
-#: puzzles/models.py:191
+#: puzzles/models.py:193
 msgid "Last solve time"
 msgstr "Heure de dernière résolution"
 
-#: puzzles/models.py:194
+#: puzzles/models.py:196
 msgid "Is prerelease testsolver"
 msgstr "Beta-testeur ?"
 
-#: puzzles/models.py:195
+#: puzzles/models.py:197
 msgid ""
 "Whether this team is a prerelease testsolver. If true, the\n"
 "        team will have access to puzzles before the hunt starts"
@@ -386,113 +397,113 @@ msgstr ""
 "Si oui, cette équipe est béta-testeur et aura accès aux énigmes avant le "
 "début de la chasse"
 
-#: puzzles/models.py:200
+#: puzzles/models.py:202
 msgid "Is hidden"
 msgstr "Caché ?"
 
-#: puzzles/models.py:201
+#: puzzles/models.py:203
 msgid "If a team is hidden, it will not be visible to the public"
 msgstr "Si une équipe est cachée, elle ne sera pas visible au public"
 
-#: puzzles/models.py:205 puzzles/models.py:498 puzzles/models.py:521
-#: puzzles/models.py:541 puzzles/models.py:632 puzzles/models.py:746
-#: puzzles/models.py:791
+#: puzzles/models.py:207 puzzles/models.py:500 puzzles/models.py:523
+#: puzzles/models.py:543 puzzles/models.py:634 puzzles/models.py:749
+#: puzzles/models.py:794
 msgid "team"
 msgstr "équipe"
 
-#: puzzles/models.py:206
+#: puzzles/models.py:208
 msgid "teams"
 msgstr "équipes"
 
-#: puzzles/models.py:492
+#: puzzles/models.py:494
 msgid "Team created: {}"
 msgstr "Équipe créée : {}"
 
-#: puzzles/models.py:504
+#: puzzles/models.py:506
 msgid "team member"
 msgstr "équipier"
 
-#: puzzles/models.py:505
+#: puzzles/models.py:507
 msgid "team members"
 msgstr "équipiers"
 
-#: puzzles/models.py:514
+#: puzzles/models.py:516
 msgid "Team {} added member {} ({})"
 msgstr "L'équipe {} a ajouté un membre {} ({})"
 
-#: puzzles/models.py:524
+#: puzzles/models.py:526
 msgid "Unlock datetime"
 msgstr "Heure de déverrouillage"
 
-#: puzzles/models.py:525
+#: puzzles/models.py:527
 msgid "View datetime"
 msgstr "Heure d'ouverture"
 
-#: puzzles/models.py:534
+#: puzzles/models.py:536
 msgid "puzzle unlock"
 msgstr "déverrouillage d'énigme"
 
-#: puzzles/models.py:535
+#: puzzles/models.py:537
 msgid "puzzle unlocks"
 msgstr "déverrouillages d'énigme"
 
-#: puzzles/models.py:544
+#: puzzles/models.py:546
 msgid "Submitted answer"
 msgstr "Réponse envoyée"
 
-#: puzzles/models.py:545
+#: puzzles/models.py:547
 msgid "Is correct"
 msgstr "Correcte ?"
 
-#: puzzles/models.py:546 puzzles/models.py:795
+#: puzzles/models.py:548 puzzles/models.py:798
 msgid "Submitted datetime"
 msgstr "Heure d'envoi"
 
-#: puzzles/models.py:547
+#: puzzles/models.py:549
 msgid "Used free answer"
 msgstr "A utilisé une réponse gratuite ?"
 
-#: puzzles/models.py:552
+#: puzzles/models.py:554
 msgid "correct"
 msgstr "correct"
 
-#: puzzles/models.py:552
+#: puzzles/models.py:554
 msgid "wrong"
 msgstr "incorrect"
 
-#: puzzles/models.py:557
+#: puzzles/models.py:559
 msgid "answer submission"
 msgstr "envoi de réponse"
 
-#: puzzles/models.py:558
+#: puzzles/models.py:560
 msgid "answer submissions"
 msgstr "envois de réponse"
 
-#: puzzles/models.py:572
+#: puzzles/models.py:574
 #, python-format
 msgid "%dd"
 msgstr "%dd"
 
-#: puzzles/models.py:574
+#: puzzles/models.py:576
 #, python-format
 msgid "%02ds"
 msgstr "%02ds"
 
-#: puzzles/models.py:577
+#: puzzles/models.py:579
 #, python-format
 msgid "%02dm"
 msgstr "%02dm"
 
-#: puzzles/models.py:580
+#: puzzles/models.py:582
 #, python-format
 msgid "%dh"
 msgstr "%dh"
 
-#: puzzles/models.py:581
+#: puzzles/models.py:583
 msgid " {} ago"
 msgstr " il y a {}"
 
-#: puzzles/models.py:585
+#: puzzles/models.py:587
 msgid ""
 "\n"
 "Hints:"
@@ -500,60 +511,60 @@ msgstr ""
 "\n"
 "Indices :"
 
-#: puzzles/models.py:592
+#: puzzles/models.py:594
 msgid ":question: {} Team {} used a free answer on {}!{}"
 msgstr ":question: {} L'équipe {} a utilisé une réponse gratuite sur {} ! {}"
 
-#: puzzles/models.py:606
+#: puzzles/models.py:608
 msgid "{} {} Team {} submitted `{}` for {}: {}{}"
 msgstr "{} {} L'équipe {} a envoyé `{}` pour {}: {} {}"
 
-#: puzzles/models.py:609
+#: puzzles/models.py:611
 msgid "Correct!"
 msgstr "Correct !"
 
-#: puzzles/models.py:609
+#: puzzles/models.py:611
 msgid "Incorrect."
 msgstr "Incorrect."
 
-#: puzzles/models.py:635
+#: puzzles/models.py:637
 msgid "Extra guesses"
 msgstr "Essais supplémentaires"
 
-#: puzzles/models.py:638
+#: puzzles/models.py:640
 #, python-format
 msgid "%s has %d extra guesses for puzzle %s"
 msgstr "%s a %d essais supplémentaires pour l'énigme %s"
 
-#: puzzles/models.py:644
+#: puzzles/models.py:646
 msgid "extra guess grant"
 msgstr "essai supplémentaire"
 
-#: puzzles/models.py:645
+#: puzzles/models.py:647
 msgid "extra guess grants"
 msgstr "essais supplémentaires"
 
-#: puzzles/models.py:654 puzzles/templates/base.html:139
+#: puzzles/models.py:656 puzzles/templates/base.html:139
 msgid "Guess"
-msgstr "Réponse"
+msgstr "Essai"
 
-#: puzzles/models.py:655 puzzles/models.py:809
+#: puzzles/models.py:657 puzzles/models.py:812
 msgid "Response"
 msgstr "Réponse"
 
-#: puzzles/models.py:658
+#: puzzles/models.py:660
 msgid "puzzle message"
-msgstr ""
+msgstr "message de l'énigme"
 
-#: puzzles/models.py:659
+#: puzzles/models.py:661
 msgid "puzzle messages"
-msgstr ""
+msgstr "messages de l'énigme"
 
-#: puzzles/models.py:677
+#: puzzles/models.py:680
 msgid "Updates text"
 msgstr "Texte de l'annonce"
 
-#: puzzles/models.py:677
+#: puzzles/models.py:680
 msgid ""
 "\n"
 "        Text to show on the Updates (errata) page. If blank, it will not "
@@ -566,11 +577,11 @@ msgstr ""
 "blanc, il n'y apparaîtra pas. Utilisez $PUZZLE pour référencer l'énigme. "
 "HTML accepté."
 
-#: puzzles/models.py:681
+#: puzzles/models.py:684
 msgid "Puzzle text"
 msgstr "Texte de l'énigme"
 
-#: puzzles/models.py:681
+#: puzzles/models.py:684
 msgid ""
 "\n"
 "        Text to show on the puzzle page. If blank, it will not appear there. "
@@ -581,108 +592,108 @@ msgstr ""
 "Texte qui apparaîtra sur la page de l'énigme. Si vous le laissez blanc, il "
 "n'y apparaîtra pas."
 
-#: puzzles/models.py:684
+#: puzzles/models.py:687
 msgid "Timestamp"
 msgstr "Date et heure"
 
-#: puzzles/models.py:685
+#: puzzles/models.py:688
 msgid "Published"
 msgstr "Publié ?"
 
-#: puzzles/models.py:688
+#: puzzles/models.py:691
 #, python-format
 msgid "%s erratum @ %s"
 msgstr "Erratum d'énigme %s @ %s"
 
-#: puzzles/models.py:713
+#: puzzles/models.py:716
 msgid "erratum"
 msgstr "erratum"
 
-#: puzzles/models.py:714
+#: puzzles/models.py:717
 msgid "errata"
 msgstr "errata"
 
-#: puzzles/models.py:752
+#: puzzles/models.py:755
 msgid "fun"
 msgstr "amusante"
 
-#: puzzles/models.py:753
+#: puzzles/models.py:756
 msgid "hard"
 msgstr "difficile"
 
-#: puzzles/models.py:754
+#: puzzles/models.py:757
 msgid "Anything else:"
 msgstr "Autre commentaire :"
 
-#: puzzles/models.py:761
+#: puzzles/models.py:764
 msgid "survey"
 msgstr "sondage"
 
-#: puzzles/models.py:762
+#: puzzles/models.py:765
 msgid "surveys"
 msgstr "sondages"
 
-#: puzzles/models.py:781
+#: puzzles/models.py:784
 msgid "No response"
 msgstr "Pas de réponse"
 
-#: puzzles/models.py:782 puzzles/shortcuts.py:167
+#: puzzles/models.py:785 puzzles/shortcuts.py:167
 msgid "Answered"
 msgstr "Répondu"
 
-#: puzzles/models.py:785
+#: puzzles/models.py:788
 msgid "Refunded"
 msgstr "Remboursé"
 
-#: puzzles/models.py:788
+#: puzzles/models.py:791
 msgid "Obsolete"
 msgstr "Obsolète"
 
-#: puzzles/models.py:793
+#: puzzles/models.py:796
 msgid "Is followup"
 msgstr "Suivi ?"
 
-#: puzzles/models.py:796
+#: puzzles/models.py:799
 msgid "Hint question"
 msgstr "Question"
 
-#: puzzles/models.py:797 puzzles/models.py:842
+#: puzzles/models.py:800 puzzles/models.py:845
 msgid "none"
 msgstr "aucun"
 
-#: puzzles/models.py:797
+#: puzzles/models.py:800
 msgid "Notify emails"
 msgstr "E-mails de notification"
 
-#: puzzles/models.py:799
+#: puzzles/models.py:802
 msgid "Claimed datetime"
 msgstr "Heure d'assignation"
 
-#: puzzles/models.py:804
+#: puzzles/models.py:807
 msgid "Claimer"
 msgstr "Responsable"
 
-#: puzzles/models.py:805
+#: puzzles/models.py:808
 msgid "Discord id"
 msgstr "ID sur Discord"
 
-#: puzzles/models.py:807
+#: puzzles/models.py:810
 msgid "Answered datetime"
 msgstr "Heure de la réponse"
 
-#: puzzles/models.py:808
+#: puzzles/models.py:811
 msgid "Status"
 msgstr "Statut"
 
-#: puzzles/models.py:812
+#: puzzles/models.py:815
 msgid "hint"
 msgstr "indice"
 
-#: puzzles/models.py:813
+#: puzzles/models.py:816
 msgid "hints"
 msgstr "indices"
 
-#: puzzles/models.py:853
+#: puzzles/models.py:856
 msgid ""
 "{} requested on {} {} by {}\n"
 "```{}```\n"
@@ -690,15 +701,15 @@ msgstr ""
 "{} demandé sur {} {} par {}\n"
 "```{}```\n"
 
-#: puzzles/models.py:856
+#: puzzles/models.py:859
 msgid "*Followup hint*"
 msgstr "*Suivi d'indice*"
 
-#: puzzles/models.py:856 puzzles/templates/base.html:140
+#: puzzles/models.py:859 puzzles/templates/base.html:140
 msgid "Hint"
 msgstr "Indice"
 
-#: puzzles/models.py:863
+#: puzzles/models.py:866
 msgid ""
 "**Team:** {} ({})\n"
 "**Puzzle:** {} ({})\n"
@@ -706,7 +717,7 @@ msgstr ""
 "**Équipe : {} ({})\n"
 "**Énigme : {} ({})\n"
 
-#: puzzles/models.py:891
+#: puzzles/models.py:894
 msgid "Hint answered for {}"
 msgstr "Indice reçu pour {}"
 
@@ -1036,7 +1047,7 @@ msgstr "Envoyer"
 msgid "Add another team member"
 msgstr "Ajouter un autre équipier"
 
-#: puzzles/templates/edit_team.html:41
+#: puzzles/templates/edit_team.html:41 puzzles/templates/register.html:95
 msgid "Remove"
 msgstr "Supprimer"
 
@@ -1456,8 +1467,8 @@ msgstr ""
 #, python-format
 msgid "Your remaining <b>%(hints)s hint</b>"
 msgid_plural "Your remaining <b>%(hints)s hints</b>"
-msgstr[0] "Vous avez <b>%(hints)s indice restant</b>"
-msgstr[1] "Vous avez <b>%(hints)s indices restants</b>"
+msgstr[0] "Vos <b>%(hints)s indice restant</b>"
+msgstr[1] "Vos <b>%(hints)s indices restants</b>"
 
 #: puzzles/templates/hints.html:54
 msgid "can be used on <b>any puzzle in the hunt.</b>"
@@ -1679,8 +1690,8 @@ msgid "Register your team!"
 msgstr "Inscrivez votre équipe !"
 
 #: puzzles/templates/home.html:118
-msgid "Register at https://FIXME"
-msgstr ""
+msgid "Register at"
+msgstr "Inscrivez-vous à"
 
 #: puzzles/templates/hunt_stats.html:16
 msgid "Hunt Stats"
@@ -1756,7 +1767,7 @@ msgstr "2&#8288;+&#8288;-&#8288;indices"
 
 #: puzzles/templates/hunt_stats.html:56
 msgid "Solved after the round meta or within five minutes of it"
-msgstr "Résolu après la série méta ou dans les cinq minutes"
+msgstr "Résolu après la méta du chapitre ou dans les cinq minutes"
 
 #: puzzles/templates/hunt_stats.html:56
 msgid "Back solves"
@@ -1769,6 +1780,14 @@ msgstr "A essayé au moins une fois mais sans succès"
 #: puzzles/templates/hunt_stats.html:57
 msgid "No solve"
 msgstr "Non résolu"
+
+#: puzzles/templates/icon-answer.svg:4
+msgid "A"
+msgstr "R"
+
+#: puzzles/templates/icon-hint.svg:4
+msgid "H"
+msgstr "I"
 
 #: puzzles/templates/login.html:47
 #, python-format
@@ -1975,10 +1994,6 @@ msgid ""
 "members."
 msgstr ""
 "Vous devrez fournir une adresse email pour au moins un de vos équipiers."
-
-#: puzzles/templates/register.html:95
-msgid "Remove'"
-msgstr "Supprimer !"
 
 #: puzzles/templates/registration_email.html:2
 #: puzzles/templates/registration_email.txt:3
@@ -2194,6 +2209,14 @@ msgstr "Solution :"
 msgid "Answer:"
 msgstr "Réponse :"
 
+#: puzzles/templates/solution.html:39
+msgid "Written by"
+msgstr "Écrit par"
+
+#: puzzles/templates/solution.html:41
+msgid "aliens"
+msgstr "des inconnus"
+
 #: puzzles/templates/solution.html:47
 #, python-format
 msgid ""
@@ -2256,8 +2279,8 @@ msgstr "Vous n'avez pas d'indice restant pour cette énigme."
 #, python-format
 msgid "You have %(guesses)s guess remaining for this puzzle."
 msgid_plural "You have %(guesses)s guesses remaining for this puzzle."
-msgstr[0] "Vous avez %(guesses)s essai restant pour cette énigme."
-msgstr[1] "Vous avez %(guesses)s essais restants pour cette énigme."
+msgstr[0] "Il vous reste %(guesses)s essai sur cette énigme."
+msgstr[1] "Il vous reste %(guesses)s essais sur cette énigme."
 
 #: puzzles/templates/solve.html:139
 #, python-format
@@ -2463,11 +2486,11 @@ msgid "Password reset"
 msgstr "Mot de passe réinitialisé"
 
 #: puzzles/views.py:293
-msgid "Team \\u201c{}\\u201d not found."
+msgid "Team “{}” not found."
 msgstr "Équipe \\u201c{}\\u201d non trouvée."
 
 #: puzzles/views.py:384
-msgid "You\\u2019re not logged in."
+msgid "You’re not logged in."
 msgstr "Vous n'êtes pas connecté."
 
 #: puzzles/views.py:424
@@ -2476,10 +2499,10 @@ msgstr "Équipe mise à jour !"
 
 #: puzzles/views.py:467
 msgid "Invalid round name."
-msgstr "Nom de série invalide."
+msgstr "Nom de chapitre invalide."
 
 #: puzzles/views.py:579 puzzles/views.py:660
-msgid "You\\u2019ve already solved this puzzle!"
+msgid "You’ve already solved this puzzle!"
 msgstr "Vous avez déjà résolu cette énigme !"
 
 #: puzzles/views.py:582
@@ -2496,9 +2519,7 @@ msgstr ""
 
 #: puzzles/views.py:605
 #, python-format
-msgid ""
-"You\\u2019ve already tried calling in the answer \\u201c%s\\u201d for this "
-"puzzle."
+msgid "You’ve already tried calling in the answer “%s” for this puzzle."
 msgstr "Vous avez déjà essayé la réponse \\u201c%s\\u201d pour cette énigme."
 
 #: puzzles/views.py:620
@@ -2530,7 +2551,7 @@ msgid "Thanks!"
 msgstr "Merci !"
 
 #: puzzles/views.py:658
-msgid "You can\\u2019t use a free answer on a metapuzzle."
+msgid "You can’t use a free answer on a metapuzzle."
 msgstr "Vous ne pouvez utiliser de réponse gratuite sur une méta-énigme."
 
 #: puzzles/views.py:671
@@ -2568,7 +2589,7 @@ msgstr ""
 #: puzzles/views.py:817
 msgid ""
 "Your request for a hint has been submitted and the puzzle hunt staff has "
-"been notified\\u2014we will respond to it soon!"
+"been notified—we will respond to it soon!"
 msgstr ""
 "Votre demande d'indice a été envoyée et le personnel de la chasse a été "
 "notifié - nous y répondrons bientôt !"

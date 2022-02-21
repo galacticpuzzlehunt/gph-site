@@ -1,6 +1,7 @@
 import collections
 import datetime
 import re
+import unicodedata
 from urllib.parse import quote_plus
 
 from django import forms
@@ -145,7 +146,8 @@ class Puzzle(models.Model):
 
     @staticmethod
     def normalize_answer(s):
-        return s and re.sub(r'[^A-Z]', '', s.upper())
+        nfkd_form = unicodedata.normalize('NFKD', s)
+        return ''.join([c.upper() for c in nfkd_form if c.isalpha() and not unicodedata.combining(c)])
 
 
 @context_cache
@@ -667,7 +669,8 @@ class PuzzleMessage(models.Model):
 
     @staticmethod
     def semiclean_guess(s):
-        return s and re.sub(r'[^A-Z0-9]', '', s.upper())
+        nfkd_form = unicodedata.normalize('NFKD', s)
+        return ''.join([c.upper() for c in nfkd_form if c.isalnum() and not unicodedata.combining(c)])
 
 
 class Erratum(models.Model):

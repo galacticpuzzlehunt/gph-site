@@ -235,9 +235,9 @@ class DiscordInterface:
             # (nb. I tried to make these colors color-blind friendly)
 
             embed = MessageEmbed()
-            if hint.status == 'ANS':
+            if hint.status == _('ANS'):
                 embed.color = 0xaaffaa
-            elif hint.status == 'REF':
+            elif hint.status == _('REF'):
                 embed.color = 0xcc6600
             # nothing for obsolete
 
@@ -332,7 +332,7 @@ class HintsConsumer(AdminWebsocketConsumer):
 def show_unlock_notification(context, unlock):
     data = json.dumps({
         'title': str(unlock.puzzle),
-        'text': _('You\u2019ve unlocked a new puzzle!'),
+        'text': _(u'You\u2019ve unlocked a new puzzle!'),
         'link': reverse('puzzle', args=(unlock.puzzle.slug,)),
     })
     # There's an awkward edge case where the person/browser tab that actually
@@ -346,7 +346,7 @@ def show_solve_notification(submission):
         return
     data = json.dumps({
         'title': str(submission.puzzle),
-        'text': _('You\u2019ve solved a meta!'),
+        'text': _(u'You\u2019ve solved a meta!'),
         'link': reverse('puzzle', args=(submission.puzzle.slug,)),
     })
     # No need to worry here since whoever triggered this is already getting a

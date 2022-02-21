@@ -35,7 +35,7 @@ class RegisterForm(forms.Form):
     password = forms.CharField(
         label=_('Team Password'),
         widget=forms.PasswordInput,
-        help_text=_('You\u2019ll probably share this with your team.'),
+        help_text=_(u'You\u2019ll probably share this with your team.'),
     )
     password2 = forms.CharField(
         label=_('Retype Password'),
@@ -51,12 +51,12 @@ class RegisterForm(forms.Form):
 
         if looks_spammy(team_name):
             raise forms.ValidationError(
-                _('That public team name isn\u2019t allowed.')
+                _(u'That public team name isn\u2019t allowed.')
             )
 
         if password != password2:
             raise forms.ValidationError(
-                _('Passwords don\u2019t match.')
+                _(u'Passwords don\u2019t match.')
             )
 
         if User.objects.filter(username=team_id).exists():
@@ -98,7 +98,7 @@ def validate_team_emails(formset):
         if not name:
             raise forms.ValidationError(_('All team members must have names.'))
         if looks_spammy(name):
-            raise forms.ValidationError('That team member name isn\u2019t allowed.')
+            raise forms.ValidationError(u'That team member name isn\u2019t allowed.')
         email = form.cleaned_data.get('email')
         if email:
             emails.append(email)
@@ -140,10 +140,10 @@ class SubmitAnswerForm(forms.Form):
 class RequestHintForm(forms.Form):
     hint_question = forms.CharField(
         label=(
-            _('Describe everything you\u2019ve tried on this puzzle. We will '
-            'provide a hint to help you move forward. The more detail you '
-            'provide, the less likely it is that we\u2019ll tell you '
-            'something you already know.')
+            _(u'Describe everything you\u2019ve tried on this puzzle. We will '
+            u'provide a hint to help you move forward. The more detail you '
+            u'provide, the less likely it is that we\u2019ll tell you '
+            u'something you already know.')
         ),
         widget=forms.Textarea,
     )
@@ -202,6 +202,6 @@ class PasswordResetForm(forms.Form):
         team_id = cleaned_data.get('team_id')
         team = Team.objects.filter(user__username=team_id).first()
         if team is None:
-            raise forms.ValidationError(_('That username doesn\u2019t exist.'))
+            raise forms.ValidationError(_(u'That username doesn\u2019t exist.'))
         cleaned_data['team'] = team
         return cleaned_data

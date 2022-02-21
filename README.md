@@ -139,7 +139,7 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
 - ... provide the site in my language?
 
   + Generate the translations placeholders for your language `lang_COUNTRY` (e.g. en_US):
-    + `django-admin makemessages -l lang_COUNTRY`
+    + `django-admin makemessages -e html,txt,py,svg -l lang_COUNTRY`
     + `django-admin makemessages -d djangojs -l lang_COUNTRY`
   + add your translations in msgstr in the django.po and djangojs.po files under locale/`lang_COUNTRY`
   + Compile the translations:

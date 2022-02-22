@@ -15,9 +15,9 @@ CONTACT_EMAIL = 'FIXME@example.com'
 MESSAGING_SENDER_EMAIL = 'no-reply@FIXME.example.com'
 
 # Change this to True to reveal the story page to everyone.
-STORY_PAGE_VISIBLE = True
+STORY_PAGE_VISIBLE = False
 # Change this to True when the wrapup exists.
-WRAPUP_PAGE_VISIBLE = True
+WRAPUP_PAGE_VISIBLE = False
 # Change this to True to start showing solve and guess counts on each puzzle.
 # Full stats are automatically available to superusers and after hunt end.
 INITIAL_STATS_AVAILABLE = False
@@ -75,7 +75,7 @@ INTRO_HINTS = 2
 ONE_HINT_AT_A_TIME = True
 
 # These options are exactly analogous to the above.
-FREE_ANSWERS_ENABLED = True
+FREE_ANSWERS_ENABLED = False
 FREE_ANSWERS_PER_DAY = (1, 2, 2)
 FREE_ANSWER_TIME = HUNT_START_TIME + datetime.timedelta(days=6)
 TEAM_AGE_BEFORE_FREE_ANSWERS = datetime.timedelta(days=3)

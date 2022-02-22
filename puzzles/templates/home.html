@@ -52,10 +52,10 @@ h3 {
 {% if hunt_is_over %}
 <div class="feedback">
 {% if hunt_is_closed %}
-{% blocktranslate %}The {{ hunt_title }} has now come to a close. Thanks for puzzling with us!{% endblocktranslate %}
+{% blocktranslate with title=hunt_title %}The {{ title }} has now come to a close. Thanks for puzzling with us!{% endblocktranslate %}
 {% else %}
 {% format_time close_time "DATE_AT_TIME" as hunt_close %}
-{% blocktranslate %}The {{ hunt_title }} is now over, but you can still register and progress through the hunt until {{ hunt_close }}.{% endblocktranslate %}
+{% blocktranslate with title=hunt_title %}The {{ title }} is now over, but you can still register and progress through the hunt until {{ hunt_close }}.{% endblocktranslate %}
 {% endif %}
 <br>
 {% with feedback_url="https://FIXME" %}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 10:24-0400\n"
+"POT-Creation-Date: 2022-02-22 12:00-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1594,19 +1594,18 @@ msgstr "Votre indice vous a été remboursé."
 
 #: puzzles/templates/home.html:55
 #, python-format
-msgid ""
-"The %(hunt_title)s has now come to a close. Thanks for puzzling with us!"
+msgid "The %(title)s has now come to a close. Thanks for puzzling with us!"
 msgstr ""
-"La chasse \"%(hunt_title)s\" est maintenant terminée. Merci de nous avoir "
+"La chasse \"%(title)s\" est maintenant terminée. Merci de nous avoir "
 "rejoints !"
 
 #: puzzles/templates/home.html:58
 #, python-format
 msgid ""
-"The %(hunt_title)s is now over, but you can still register and progress "
-"through the hunt until %(hunt_close)s."
+"The %(title)s is now over, but you can still register and progress through "
+"the hunt until %(hunt_close)s."
 msgstr ""
-"La chasse \"%(hunt_title)s\" est maintenant terminée, mais vous pouvez "
+"La chasse \"%(title)s\" est maintenant terminée, mais vous pouvez "
 "encore vous inscrire et progresser dans la chasse jusqu'au %(hunt_close)s."
 
 #: puzzles/templates/home.html:64

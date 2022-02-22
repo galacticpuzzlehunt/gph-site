@@ -6,12 +6,6 @@
     #login {
         position: relative;
     }
-
-    .six {
-        position: absolute;
-        top: 0;
-        right: 0;
-    }
 }
 </style>
 
@@ -31,6 +25,17 @@
                 {{ field }}
                 {{ field.errors }}
             </div>
+            {% if not hunt_is_closed %}
+            <div class="six columns">
+                {% if field.name == 'username' %}
+                    <p>If you haven&rsquo;t created a team yet,
+                    <a href="{% url 'register' %}">register a new team here</a>.</p>
+                {% else %}
+                    <p>Forgot your password?
+                    <a href="{% url 'password_reset' %}">Click here to reset password</a>.</p>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -38,15 +43,6 @@
     <div class="form-section">
         <button class="btn" type="submit">Submit</button>
     </div>
-
-    {% if not hunt_is_closed %}
-    <div class="six columns">
-        <p>If you haven&rsquo;t created a team yet,
-        <a href="{% url 'register' %}">register a new team here</a>.
-        <p>Forgot your password?
-        <a href="{% url 'password_reset' %}">Click here to reset password</a>.
-    </div>
-    {% endif %}
 </form>
 
 {% endblock %}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 14:11-0400\n"
+"POT-Creation-Date: 2022-02-22 10:24-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -785,7 +785,7 @@ msgstr "Résoudre cette énigme"
 
 #: puzzles/shortcuts.py:136 puzzles/templates/finishers.html:37
 msgid "Solve"
-msgstr "Résoudre"
+msgstr "Résolution"
 
 #: puzzles/shortcuts.py:146
 msgid "Free"
@@ -793,7 +793,7 @@ msgstr "Gratuit"
 
 #: puzzles/shortcuts.py:150
 msgid "Unsolve"
-msgstr "Dé-résoudre"
+msgstr "Dé-résolution"
 
 #: puzzles/shortcuts.py:152
 msgid "Request hint on this puzzle"
@@ -916,7 +916,7 @@ msgstr "Indices en attente d'une réponse :"
 msgid "Logout"
 msgstr "Se déconnecter"
 
-#: puzzles/templates/base.html:117 puzzles/templates/login.html:19
+#: puzzles/templates/base.html:117 puzzles/templates/login.html:13
 msgid "Login"
 msgstr "Se connecter"
 
@@ -1033,7 +1033,7 @@ msgid "Edit %(team_name)s Members"
 msgstr "Éditer les équipiers de %(team_name)s"
 
 #: puzzles/templates/edit_team.html:33 puzzles/templates/hint.html:137
-#: puzzles/templates/hints.html:125 puzzles/templates/login.html:40
+#: puzzles/templates/hints.html:125 puzzles/templates/login.html:45
 #: puzzles/templates/password_change.html:26
 #: puzzles/templates/password_reset.html:26
 #: puzzles/templates/password_reset_confirm.html:27
@@ -1789,7 +1789,7 @@ msgstr "R"
 msgid "H"
 msgstr "I"
 
-#: puzzles/templates/login.html:47
+#: puzzles/templates/login.html:34
 #, python-format
 msgid ""
 "If you haven&rsquo;t created a team yet, <a href=\"%(register_url)s"
@@ -1798,7 +1798,7 @@ msgstr ""
 "Si vous n'avez pas encore créé d'équipe, <a href=\"%(register_url)s"
 "\">inscrivez une nouvelle équipe ici</a>."
 
-#: puzzles/templates/login.html:48
+#: puzzles/templates/login.html:36
 #, python-format
 msgid ""
 "Forgot your password? <a href=\"%(password_url)s\">Click here to reset "

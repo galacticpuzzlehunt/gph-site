@@ -41,8 +41,10 @@
             </td>
             <td colspan="3">
                 {{ hint.get_status_display }}
+                {% if hint.answered_datetime %}
                 {% format_time_since hint.answered_datetime now %}
                 ago by {{ hint.claimer }}
+                {% endif %}
             </td>
         </tr>
         <tr>
@@ -145,8 +147,10 @@
             <td>
                 <a href="{% url 'hint' hint.id %}">
                     {{ hint.get_status_display }}
+                    {% if hint.answered_datetime %}
                     {% format_time_since hint.answered_datetime now %}
                     ago by {{ hint.claimer }}
+                    {% endif %}
                 </a>
             </td>
             <td>

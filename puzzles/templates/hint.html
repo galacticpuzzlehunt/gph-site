@@ -41,8 +41,10 @@
                 {% if hint.is_followup %}</em>{% endif %}
             </td>
             <td colspan="3">
+                {% if hint.answered_datetime %}
             	{% format_time_since hint.answered_datetime now as answered_since %}
                 {% blocktranslate with status=hint.get_status_display claimer=hint.claimer %}{{ status }} {{ answered_since }} ago by {{ claimer }}{% endblocktranslate %}
+                {% endif %}
             </td>
         </tr>
         <tr>
@@ -143,8 +145,10 @@
         <tr>
             <td>
                 <a href="{% url 'hint' hint.id %}">
+                    {% if hint.answered_datetime %}
             		{% format_time_since hint.answered_datetime now as answered_since %}
                     {% blocktranslate with status=hint.get_status_display claimer=hint.claimer %}{{ status }} {{ answered_since }} ago by {{ claimer }}{% endblocktranslate %}
+                    {% endif %}
                 </a>
             </td>
             <td>

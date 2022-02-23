@@ -586,7 +586,7 @@ def notify_on_answer_submission(sender, instance, created, **kwargs):
         if len(hints):
             hint_line = _('\nHints:') + ','.join('%s (%s%s)' % (
                 format_time_ago(hint.submitted_datetime),
-                hint.status,
+                dict(hint.STATUSES)[hint.status],
                 format_time_ago(hint.answered_datetime),
             ) for hint in hints)
         if instance.used_free_answer:

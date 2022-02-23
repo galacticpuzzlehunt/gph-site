@@ -235,13 +235,13 @@ class DiscordInterface:
             # (nb. I tried to make these colors color-blind friendly)
 
             embed = MessageEmbed()
-            if hint.status == _('ANS'):
+            if hint.status == 'ANS':
                 embed.color = 0xaaffaa
-            elif hint.status == _('REF'):
+            elif hint.status == 'REF':
                 embed.color = 0xcc6600
             # nothing for obsolete
 
-            embed.author.name = '{} by {}'.format(hint.status, hint.claimer)
+            embed.author.name = _('{} by {}').format(dict(hint.STATUSES)[hint.status], hint.claimer)
             embed.author.url = hint.full_url()
             embed.description = hint.response[:250]
             if hint.claimer in self.get_avatars():

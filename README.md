@@ -146,6 +146,7 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
     + `django-admin compilemessages`
   + create a gph/formats/`lang` (e.g. en) folder and copy an existing one (e.g. en to be translated, see https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-FORMAT_MODULE_PATH). This contains the date/time formats used in django templates (see https://docs.djangoproject.com/en/4.0/ref/templates/builtins/#std:templatefilter-date)
   + set LANGUAGE_CODE in base/settings.py as `lang-country` (e.g. en-us)
+  + note that the compiled .mo translated files are not in the repo, make sure to make them part of the deploy to your site
   + See https://docs.djangoproject.com/en/4.0/topics/i18n/ for more info
 
 

@@ -1624,7 +1624,7 @@ msgid ""
 "know what you thought about the hunt."
 msgstr ""
 "Veuillez remplir notre <a href=\"%(feedback_url)s\">formulaire de "
-"commentaires</a>pour nous dire ce que vous avez pensé de la chasse"
+"commentaires</a> pour nous dire ce que vous avez pensé de la chasse"
 
 #: puzzles/templates/home.html:74
 msgid "What"

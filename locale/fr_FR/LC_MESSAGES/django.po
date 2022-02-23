@@ -216,7 +216,7 @@ msgstr "Indice traité : {}"
 
 #: puzzles/messaging.py:244
 msgid "{} by {}"
-msgstr ""
+msgstr "{} par {}"
 
 #: puzzles/messaging.py:335
 msgid "You’ve unlocked a new puzzle!"

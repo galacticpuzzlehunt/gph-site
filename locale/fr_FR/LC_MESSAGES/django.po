@@ -1157,7 +1157,7 @@ msgstr "Considérez quelles informations vous n'avez pas utilisées."
 msgid ""
 "It can be useful to put everything you have into your favorite search engine."
 msgstr ""
-"Il peut être utile de mettre tout ce que vous avez dans un engin de "
+"Il peut être utile de mettre tout ce que vous avez dans un moteur de "
 "recherche."
 
 #: puzzles/templates/faq.html:29

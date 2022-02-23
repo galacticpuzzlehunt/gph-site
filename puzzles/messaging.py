@@ -235,9 +235,9 @@ class DiscordInterface:
             # (nb. I tried to make these colors color-blind friendly)
 
             embed = MessageEmbed()
-            if hint.status == 'ANS':
+            if hint.status == hint.ANSWERED:
                 embed.color = 0xaaffaa
-            elif hint.status == 'REF':
+            elif hint.status == hint.REFUNDED:
                 embed.color = 0xcc6600
             # nothing for obsolete
 

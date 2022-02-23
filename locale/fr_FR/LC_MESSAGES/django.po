@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-22 12:00-0400\n"
+"POT-Creation-Date: 2022-02-23 10:30-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -214,13 +214,9 @@ msgstr ""
 msgid "Hint done: {}"
 msgstr "Indice traité : {}"
 
-#: puzzles/messaging.py:238
-msgid "ANS"
-msgstr "REP"
-
-#: puzzles/messaging.py:240
-msgid "REF"
-msgstr "REM"
+#: puzzles/messaging.py:244
+msgid "{} by {}"
+msgstr ""
 
 #: puzzles/messaging.py:335
 msgid "You’ve unlocked a new puzzle!"
@@ -656,10 +652,6 @@ msgstr "Suivi ?"
 #: puzzles/models.py:799
 msgid "Hint question"
 msgstr "Question"
-
-#: puzzles/models.py:800 puzzles/models.py:845
-msgid "none"
-msgstr "aucun"
 
 #: puzzles/models.py:800
 msgid "Notify emails"
@@ -1605,8 +1597,8 @@ msgid ""
 "The %(title)s is now over, but you can still register and progress through "
 "the hunt until %(hunt_close)s."
 msgstr ""
-"La chasse \"%(title)s\" est maintenant terminée, mais vous pouvez "
-"encore vous inscrire et progresser dans la chasse jusqu'au %(hunt_close)s."
+"La chasse \"%(title)s\" est maintenant terminée, mais vous pouvez encore "
+"vous inscrire et progresser dans la chasse jusqu'au %(hunt_close)s."
 
 #: puzzles/templates/home.html:64
 #, python-format

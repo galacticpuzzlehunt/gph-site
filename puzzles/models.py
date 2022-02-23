@@ -797,7 +797,7 @@ class Hint(models.Model):
 
     submitted_datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Submitted datetime'))
     hint_question = models.TextField(verbose_name=_('Hint question'))
-    notify_emails = models.CharField(default=_('none'), max_length=255, verbose_name=_('Notify emails'))
+    notify_emails = models.CharField(default='none', max_length=255, verbose_name=_('Notify emails'))
 
     claimed_datetime = models.DateTimeField(null=True, blank=True, verbose_name=_('Claimed datetime'))
     # Making these null=True, blank=False is painful and apparently not
@@ -842,7 +842,7 @@ class Hint(models.Model):
     def recipients(self):
         if self.notify_emails == 'all':
             return self.team.get_emails()
-        if self.notify_emails == _('none'):
+        if self.notify_emails == 'none':
             return []
         return [self.notify_emails]
 

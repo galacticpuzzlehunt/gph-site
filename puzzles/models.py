@@ -826,7 +826,7 @@ class Hint(models.Model):
             abbr(self.hint_question),
         )
         if self.status != self.NO_RESPONSE:
-            o = o + ' {}'.format(self.status)
+            o = o + ' {}'.format(dict(self.STATUSES)[self.status])
         return o
 
     @property

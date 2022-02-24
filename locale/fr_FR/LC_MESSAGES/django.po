@@ -1138,7 +1138,7 @@ msgid ""
 "Thoroughly check the work that you&rsquo;ve already done. Fixing a small "
 "mistake or incorrect assumption can greatly help with getting unstuck."
 msgstr ""
-"Vérifiez bien ce que vous avez déj́à fait. Corriger une petite erreur ou une "
+"Vérifiez bien ce que vous avez déjà fait. Corriger une petite erreur ou une "
 "hypothèse incorrecte peut aider grandement à se débloquer."
 
 #: puzzles/templates/faq.html:26
@@ -1169,7 +1169,7 @@ msgid ""
 "Remember that after hints are released, you can also use them to get a nudge "
 "in the right direction."
 msgstr ""
-"Rappelez vous que lorsque les indices sont disponibles, vous pouvez les "
+"Rappelez-vous que lorsque les indices sont disponibles, vous pouvez les "
 "utiliser pour obtenir un coup de pouce."
 
 #: puzzles/templates/faq.html:37
@@ -2052,7 +2052,7 @@ msgid ""
 "new puzzles is by solving puzzles and progressing through the hunt, although "
 "puzzles may also be unlocked over time."
 msgstr ""
-"Certaines énigmes seront disponibles au début de la chasse, la façon "
+"Certaines énigmes seront disponibles au début de la chasse. La façon "
 "habituelle de déverrouiller de nouvelles énigmes est de résoudre des énigmes "
 "et d'avancer dans la chasse, bien que des énigmes peuvent aussi être "
 "débloquées au fil du temps."
@@ -2094,7 +2094,7 @@ msgstr ""
 "chaque énigme. Si vous n'en avez plus et avez une raison légitime d'en "
 "demander plus, veuillez nous contacter. Cependant, nous n'accèderons pas à "
 "votre requête si nous voyons que vous essayiez par exemple de deviner des "
-"réponses thématiques au hasard, ou d'utiliser de force brute sur tous les "
+"réponses thématiques au hasard, ou d'attaquer par force brute tous les "
 "mots de 10 lettres."
 
 #: puzzles/templates/rules.html:43
@@ -2130,7 +2130,7 @@ msgstr ""
 "Vous pouvez utiliser un indice pour obtenir de l'aide sur une énigme. Cela "
 "peut être un coup de pouce (c-à-d vous nous faites état de votre situation "
 "et nous essaierons de vous débloquer), ou une réponse à une question (ex : "
-"\"Quelles réponses sont fausses dans ce mots-croisés ?\")."
+"\"Quelles réponses sont fausses dans ce mots croisés ?\")."
 
 #: puzzles/templates/rules.html:49
 msgid "You can only have <strong>one open hint request</strong> at a time."
@@ -2170,8 +2170,7 @@ msgstr ""
 msgid ""
 "We reserve the right to disqualify any team for unsportsmanlike conduct."
 msgstr ""
-"Nous nous réservons le droit de disqualifier toute équipe pour conduite anti-"
-"sportive."
+"Nous nous réservons le droit de disqualifier toute équipe pour conduite antisportive."
 
 #: puzzles/templates/rules.html:63
 msgid ""
@@ -2189,7 +2188,7 @@ msgid ""
 "will get back to you as soon as we can."
 msgstr ""
 "Si vous avez des questions sur ce règlement, ou si vous voulez nous "
-"contacter pour quelque raison que ce soit, écrivez nous à <a href=\"mailto:"
+"contacter pour quelque raison que ce soit, écrivez-nous à <a href=\"mailto:"
 "%(contact)s\">%(contact)s</a>. Nous vous répondrons aussi vite que possible."
 
 #: puzzles/templates/solution.html:6 puzzles/templates/solution.html:32

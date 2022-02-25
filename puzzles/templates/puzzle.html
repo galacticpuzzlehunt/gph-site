@@ -50,8 +50,8 @@
         {% if not erratum.published %}
         <strong>[<a href="{% url 'admin:puzzles_erratum_change' erratum.id %}">{% translate "UNPUBLISHED" %}</a>]</strong>
         {% endif %}
-        {% format_time erratum.timestamp "DATE_AT_TIME" as hint_time %},
-        {% blocktranslate %}On {{ hint_time }}{% endblocktranslate %}
+        {% format_time erratum.timestamp "DATE_AT_TIME" as hint_time %}
+        {% blocktranslate %}On {{ hint_time }}{% endblocktranslate %},
         {{ erratum.puzzle_text|safe }}
     </div>
     {% endif %}

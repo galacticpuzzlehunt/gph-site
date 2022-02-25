@@ -1470,7 +1470,7 @@ msgstr ""
 #: puzzles/templates/hints.html:58
 msgid "that you may use to ask for a hint on any puzzle."
 msgstr ""
-"que vous pouvez utiliser pour demander un indice sour n'importe quelle "
+"que vous pouvez utiliser pour demander un indice sur n'importe quelle "
 "énigme."
 
 #: puzzles/templates/hints.html:63
@@ -1902,7 +1902,7 @@ msgstr "Résolue ! Réponse :"
 #: puzzles/templates/puzzle.html:54
 #, python-format
 msgid "On %(hint_time)s"
-msgstr "Le %(hint_time)s, "
+msgstr "Le %(hint_time)s"
 
 #: puzzles/templates/puzzle.html:63
 #, python-format

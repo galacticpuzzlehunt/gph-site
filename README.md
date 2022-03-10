@@ -148,6 +148,7 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
   + set LANGUAGE_CODE in base/settings.py as `lang-country` (e.g. en-us)
   + note that the compiled .mo translated files are not in the repo, make sure to make them part of the deploy to your site
   + See https://docs.djangoproject.com/en/4.0/topics/i18n/ for more info
+  + contact [enigmatix](gaulois.team@gmail.com) if you need help with localization of your site
 
 
 # Repository Details

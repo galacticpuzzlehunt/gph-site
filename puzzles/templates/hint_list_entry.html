@@ -7,12 +7,12 @@
             {% if hint.is_followup %}<em>({% translate "followup" %}){% endif %}
             {% if hint.claimed_datetime %}
             <a href="{% url 'hint' hint.id %}">
-            	{% format_time_since hint.claimed_datetime now as claimed_since %}
+                {% format_time_since hint.claimed_datetime now as claimed_since %}
                 {% blocktranslate with claimer=hint.claimer %}Claimed {{ claimed_since }} ago by {{ claimer }}{% endblocktranslate %}
             </a>
             {% else %}
             <a href="{% url 'hint' hint.id %}?claim=true">
-            	{% format_time_since hint.submitted_datetime now as submitted_since %}
+                {% format_time_since hint.submitted_datetime now as submitted_since %}
                 {% blocktranslate %}CLAIM: Created {{ submitted_since }} ago{% endblocktranslate %}
             </a>
             {% endif %}

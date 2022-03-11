@@ -21,7 +21,7 @@
                 <th>{% translate "Team" %}</th>
                 {% if hunt_has_started %}
                     <th>{% translate "Solves" %}</th>
-            		<th>{% translate "Finish time" %} ({{ start_time|date:"T" }})</th>
+                    <th>{% translate "Finish time" %} ({{ start_time|date:"T" }})</th>
                 {% endif %}
             </tr>
             {% for team in teams %}

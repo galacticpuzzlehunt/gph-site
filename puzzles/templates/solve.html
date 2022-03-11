@@ -22,8 +22,11 @@
 
     {% if survey %}
     <h4>{% translate "Optional survey" %}</h4>
-    <div class="note">{% translate "This survey will submit on behalf of your whole team, so make sure you don&rsquo;t have two responders overwriting each other&rsquo;s comments.  You can come back to this page at any time to edit your response." %}
-    </div>
+    <div class="note">{% blocktranslate %}This survey will submit on behalf of 
+your whole team, so make sure you don&rsquo;t have two responders 
+overwriting each other&rsquo;s comments.  
+You can come back to this page at any time to edit your response.{% endblocktranslate %}
+</div>
 
     <form method="post" class="call-in-answer-panel">
         {% csrf_token %}
@@ -34,7 +37,7 @@
         {% for field in survey %}
             {% if 'adjective' in field.field.widget.attrs %}
             <div class="six columns rating">
-            	{% blocktranslate with max_value=field.field.max_value adjective=field.field.widget.attrs.adjective %}On a scale from 1 to {{ max_value }}, how {{ adjective }} was this puzzle?{% endblocktranslate %}
+                {% blocktranslate with max_value=field.field.max_value adjective=field.field.widget.attrs.adjective %}On a scale from 1 to {{ max_value }}, how {{ adjective }} was this puzzle?{% endblocktranslate %}
                 <p>
                 {% spaceless %}
                 {% for option in field %}

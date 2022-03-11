@@ -147,7 +147,7 @@ class Puzzle(models.Model):
     @staticmethod
     def normalize_answer(s):
         nfkd_form = unicodedata.normalize('NFKD', s)
-        return ''.join([c.upper() for c in nfkd_form if c.isalpha() and not unicodedata.combining(c)])
+        return ''.join([c.upper() for c in nfkd_form if c.isalpha()])
 
 
 @context_cache

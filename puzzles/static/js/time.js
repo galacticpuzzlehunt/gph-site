@@ -5,10 +5,10 @@ function updateTimestamps() {
         const options = {hour12: false, timeZoneName: 'short'};
         var escaped = false;
         for (const [code] of format.matchAll(/[a-z\\]/ig)) {
-        	if (escaped) {
-        		escaped = false;
-        		continue;
-        	}
+            if (escaped) {
+                escaped = false;
+                continue;
+            }
             switch (code) {
                 case 'l': options.weekday = 'long'; break;
                 case 'D': options.weekday = 'short'; break;
@@ -23,17 +23,17 @@ function updateTimestamps() {
                 case 'd': options.day = '2-digit'; break;
                 case 'j': options.day = 'numeric'; break;
                 case 'G': options.hour = 'numeric'; 
-                		options.hour12 = false;
-                		break;
+                        options.hour12 = false;
+                        break;
                 case 'H': options.hour = '2-digit'; 
-                		options.hour12 = false;
-                		break;
+                        options.hour12 = false;
+                        break;
                 case 'g': options.hour = 'numeric'; 
-                		options.hour12 = true;
-                		break;
+                        options.hour12 = true;
+                        break;
                 case 'h': options.hour = '2-digit'; 
-                		options.hour12 = true;
-                		break;
+                        options.hour12 = true;
+                        break;
                 case 'i': options.minute = '2-digit'; break;
                 case 'A': 
                 case 'a': options.hour12 = 'true'; break;

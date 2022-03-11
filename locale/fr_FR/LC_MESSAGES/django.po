@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-23 17:19-0400\n"
+"POT-Creation-Date: 2022-03-11 13:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -934,8 +934,12 @@ msgid "Puzzle"
 msgstr "Énigme"
 
 #: puzzles/templates/base.html:171
-msgid "Powered by"
-msgstr "Réalisé avec"
+msgid ""
+"Powered by <a href=\"https://github.com/galacticpuzzlehunt/gph-site\">gph-"
+"site</a>"
+msgstr ""
+"Réalisé avec <a href=\"https://github.com/galacticpuzzlehunt/gph-site\">gph-"
+"site</a>"
 
 #: puzzles/templates/bigboard.html:7 puzzles/templates/wrapup.html:6
 msgid "Bigboard"
@@ -1010,7 +1014,7 @@ msgstr "Liste des destinataires par e-mail"
 
 #: puzzles/templates/bridge.html:17
 #, python-format
-msgid "There are currently <strong>%(recipients)s</strong> recipient."
+msgid "There is currently <strong>%(recipients)s</strong> recipient."
 msgid_plural "There are currently <strong>%(recipients)s</strong> recipients."
 msgstr[0] "Il y a actuellement <strong>%(recipients)s</strong> destinataire."
 msgstr[1] "Il y a actuellement <strong>%(recipients)s</strong> destinataires."
@@ -1024,14 +1028,14 @@ msgstr "Rafraîchissez la page !"
 msgid "Edit %(team_name)s Members"
 msgstr "Éditer les équipiers de %(team_name)s"
 
-#: puzzles/templates/edit_team.html:33 puzzles/templates/hint.html:137
+#: puzzles/templates/edit_team.html:33 puzzles/templates/hint.html:139
 #: puzzles/templates/hints.html:125 puzzles/templates/login.html:45
 #: puzzles/templates/password_change.html:26
 #: puzzles/templates/password_reset.html:26
 #: puzzles/templates/password_reset_confirm.html:27
 #: puzzles/templates/post_hunt_solve.html:41 puzzles/templates/register.html:84
-#: puzzles/templates/register.html:86 puzzles/templates/solve.html:63
-#: puzzles/templates/solve.html:129
+#: puzzles/templates/register.html:86 puzzles/templates/solve.html:66
+#: puzzles/templates/solve.html:132
 msgid "Submit"
 msgstr "Envoyer"
 
@@ -1080,8 +1084,8 @@ msgid ""
 "phrase. Puzzles can come in many different forms; the only real commonality "
 "is that you usually receive no direct instructions, so it&rsquo;s up to you "
 "to figure out how to make sense of the information you&rsquo;re given. You "
-"can read a longer introduction to puzzlehunts <a href=\\\"https://blog.vero."
-"site/post/puzzlehunts\\\" target=\\\"_blank\\\">here</a>."
+"can read a longer introduction to puzzlehunts <a href=\"https://blog.vero."
+"site/post/puzzlehunts\" target=\"_blank\">here</a>."
 msgstr ""
 "Si vous n'avez jamais entendu parler de chasse au trésor, voilà un petit "
 "résumé : dans une énigme typique, vous recevez des informations et devez en "
@@ -1096,21 +1100,19 @@ msgstr ""
 msgid ""
 "If you are new to puzzles and are interested in seeing some examples, or if "
 "you&rsquo;re looking for some practice, we recommend looking at puzzles from "
-"other online hunts such as <a target=\\\"_blank\\\" href=\\\"https://"
-"galacticpuzzlehunt.com/\\\">Galactic Puzzle Hunt</a>, <a target=\\\"_blank\\"
-"\" href =\\\"https://teammatehunt.com/\\\">Teammate Hunt</a>, <a target=\\"
-"\"_blank\\\" href=\\\"https://puzzlepotluck.com/\\\">Puzzle Potluck</a>, or "
-"<a target=\\\"_blank\\\" href=\\\"https://reddothunt.sg/2018\\\">REDDOThunt</"
-"a>.\""
+"other online hunts such as <a target=\"_blank\" href=\"https://"
+"galacticpuzzlehunt.com/\">Galactic Puzzle Hunt</a>, <a target=\"_blank\" "
+"href =\"https://teammatehunt.com/\">Teammate Hunt</a>, <a target=\"_blank\" "
+"href=\"https://puzzlepotluck.com/\">Puzzle Potluck</a>, or <a target=\"_blank"
+"\" href=\"https://reddothunt.sg/2018\">REDDOThunt</a>."
 msgstr ""
 "Si vous découvrez les énigmes et êtes intéressé de voir des exemples, ou si "
 "vous cherchez à vous exercer, nous recommandons de jeter un coup d'œil aux "
-"énigmes d'autres chasses en ligne telles que <a target=\\\"_blank\\\" href=\\"
-"\"https://galacticpuzzlehunt.com/\\\">Galactic Puzzle Hunt</a>, <a target=\\"
-"\"_blank\\\" href =\\\"https://teammatehunt.com/\\\">Teammate Hunt</a>, <a "
-"target=\\\"_blank\\\" href=\\\"https://puzzlepotluck.com/\\\">Puzzle "
-"Potluck</a>, ou <a target=\\\"_blank\\\" href=\\\"https://reddothunt."
-"sg/2018\\\">REDDOThunt</a>."
+"énigmes d'autres chasses en ligne telles que <a target=\"_blank\" "
+"href=https://galacticpuzzlehunt.com/\">Galactic Puzzle Hunt</a>, <a "
+"target=_blank\" href =\"https://teammatehunt.com/\">Teammate Hunt</a>, <a "
+"target=\"_blank\" href=\"https://puzzlepotluck.com/\">Puzzle Potluck</a>, ou "
+"<a target=\"_blank\" href=\"https://reddothunt.sg/2018\">REDDOThunt</a>."
 
 #: puzzles/templates/faq.html:17
 msgid "I think there&rsquo;s a mistake in this puzzle!"
@@ -1260,12 +1262,9 @@ msgid "No"
 msgstr "Non"
 
 #: puzzles/templates/hint.html:7
-msgid "Hint:"
-msgstr "Indice :"
-
-#: puzzles/templates/hint.html:7
-msgid "from"
-msgstr "de"
+#, python-format
+msgid "Hint: %(puzzle)s from %(team)s"
+msgstr "Indice: %(puzzle)s de %(team)s"
 
 #: puzzles/templates/hint.html:12
 msgid "Answer a hint"
@@ -1306,60 +1305,60 @@ msgstr ""
 "demander à l'équipe d'utiliser un vrai indice à la place. Mettre cet indice "
 "à Remboursé évitera de créer des suivis additionnels de suivi."
 
-#: puzzles/templates/hint.html:39 puzzles/templates/hint.html:60
+#: puzzles/templates/hint.html:39 puzzles/templates/hint.html:62
 #: puzzles/templates/hint_list_entry.html:7
 #: puzzles/templates/hint_list_query.html:23
 msgid "followup"
 msgstr "suivi"
 
-#: puzzles/templates/hint.html:45 puzzles/templates/hint.html:84
-#: puzzles/templates/hint.html:147 puzzles/templates/hint_list_query.html:48
+#: puzzles/templates/hint.html:46 puzzles/templates/hint.html:86
+#: puzzles/templates/hint.html:150 puzzles/templates/hint_list_query.html:48
 #, python-format
 msgid "%(status)s %(answered_since)s ago by %(claimer)s"
 msgstr "%(status)s il y a %(answered_since)s par %(claimer)s"
 
-#: puzzles/templates/hint.html:76 puzzles/templates/hint_list_entry.html:33
+#: puzzles/templates/hint.html:78 puzzles/templates/hint_list_entry.html:33
 msgid "guesses"
 msgstr "essais"
 
-#: puzzles/templates/hint.html:88 puzzles/templates/hint_list_entry.html:11
+#: puzzles/templates/hint.html:90 puzzles/templates/hint_list_entry.html:11
 #: puzzles/templates/hint_list_query.html:51
 #, python-format
 msgid "Claimed %(claimed_since)s ago by %(claimer)s"
 msgstr "Assigné il y a %(claimed_since)s à %(claimer)s"
 
-#: puzzles/templates/hint.html:92
+#: puzzles/templates/hint.html:94
 msgid "Claimed at unknown time (!?) by"
 msgstr "Assigné à une heure inconnue (!?) par"
 
-#: puzzles/templates/hint.html:95
+#: puzzles/templates/hint.html:97
 msgid "Claim this hint"
 msgstr "Assigner cet indice"
 
-#: puzzles/templates/hint.html:100 puzzles/templates/hint_list_entry.html:46
+#: puzzles/templates/hint.html:102 puzzles/templates/hint_list_entry.html:46
 #: puzzles/templates/hint_list_query.html:58
 msgid "all from same team"
 msgstr "tous de la même équipe"
 
-#: puzzles/templates/hint.html:105 puzzles/templates/hint_list_entry.html:51
+#: puzzles/templates/hint.html:107 puzzles/templates/hint_list_entry.html:51
 #: puzzles/templates/hint_list_query.html:63
 msgid "all from same puzzle"
 msgstr "tous de la même énigme"
 
-#: puzzles/templates/hint.html:110 puzzles/templates/hint_list_entry.html:56
+#: puzzles/templates/hint.html:112 puzzles/templates/hint_list_entry.html:56
 #: puzzles/templates/hint_list_query.html:68
 msgid "both"
 msgstr "les deux"
 
-#: puzzles/templates/hint.html:133
+#: puzzles/templates/hint.html:135
 msgid "Unclaim"
 msgstr "Désassigner"
 
-#: puzzles/templates/hint.html:135
+#: puzzles/templates/hint.html:137
 msgid "Back to list"
 msgstr "Retour à la liste"
 
-#: puzzles/templates/hint.html:157
+#: puzzles/templates/hint.html:161
 msgid "Copy response"
 msgstr "Copier la réponse"
 
@@ -1470,8 +1469,7 @@ msgstr ""
 #: puzzles/templates/hints.html:58
 msgid "that you may use to ask for a hint on any puzzle."
 msgstr ""
-"que vous pouvez utiliser pour demander un indice sur n'importe quelle "
-"énigme."
+"que vous pouvez utiliser pour demander un indice sur n'importe quelle énigme."
 
 #: puzzles/templates/hints.html:63
 #, python-format
@@ -2094,8 +2092,8 @@ msgstr ""
 "chaque énigme. Si vous n'en avez plus et avez une raison légitime d'en "
 "demander plus, veuillez nous contacter. Cependant, nous n'accèderons pas à "
 "votre requête si nous voyons que vous essayiez par exemple de deviner des "
-"réponses thématiques au hasard, ou d'attaquer par force brute tous les "
-"mots de 10 lettres."
+"réponses thématiques au hasard, ou d'attaquer par force brute tous les mots "
+"de 10 lettres."
 
 #: puzzles/templates/rules.html:43
 #, python-format
@@ -2170,7 +2168,8 @@ msgstr ""
 msgid ""
 "We reserve the right to disqualify any team for unsportsmanlike conduct."
 msgstr ""
-"Nous nous réservons le droit de disqualifier toute équipe pour conduite antisportive."
+"Nous nous réservons le droit de disqualifier toute équipe pour conduite "
+"antisportive."
 
 #: puzzles/templates/rules.html:63
 msgid ""
@@ -2246,33 +2245,34 @@ msgstr "Sondage optionnel"
 
 #: puzzles/templates/solve.html:25
 msgid ""
-"This survey will submit on behalf of your whole team, so make sure you "
-"don&rsquo;t have two responders overwriting each other&rsquo;s comments.  "
+"This survey will submit on behalf of \n"
+"your whole team, so make sure you don&rsquo;t have two responders \n"
+"overwriting each other&rsquo;s comments.  \n"
 "You can come back to this page at any time to edit your response."
 msgstr ""
 "Ce sondage sera envoyé au nom de toute votre équipe, assurez-vous que deux "
 "équipiers n'écrasent pas les commentaires de l'autre. Vous pouvez revenir "
 "sur cette page à tout moment pour éditer votre réponse."
 
-#: puzzles/templates/solve.html:37
+#: puzzles/templates/solve.html:40
 #, python-format
 msgid "On a scale from 1 to %(max_value)s, how %(adjective)s was this puzzle?"
 msgstr ""
 "Sur une échelle de 1 à %(max_value)s, avez-vous trouvé cette énigme "
 "%(adjective)s ?"
 
-#: puzzles/templates/solve.html:112
+#: puzzles/templates/solve.html:115
 msgid "You have no more guesses remaining for this puzzle!"
 msgstr "Vous n'avez pas d'indice restant pour cette énigme."
 
-#: puzzles/templates/solve.html:134
+#: puzzles/templates/solve.html:137
 #, python-format
 msgid "You have %(guesses)s guess remaining for this puzzle."
 msgid_plural "You have %(guesses)s guesses remaining for this puzzle."
 msgstr[0] "Il vous reste %(guesses)s essai sur cette énigme."
 msgstr[1] "Il vous reste %(guesses)s essais sur cette énigme."
 
-#: puzzles/templates/solve.html:139
+#: puzzles/templates/solve.html:142
 #, python-format
 msgid "You have <b><a href=\"%(slug)s\">%(answers)s free answer</a></b>"
 msgid_plural "You have <b><a href=\"%(slug)s\">%(answers)s free answer</a></b>"
@@ -2281,13 +2281,13 @@ msgstr[0] ""
 msgstr[1] ""
 "Vous avez <b><a href=\"%(slug)s\">%(answers)s réponses gratuites</a></b>"
 
-#: puzzles/templates/solve.html:141
+#: puzzles/templates/solve.html:144
 msgid " that you may use to instantly solve any non-meta puzzle."
 msgstr ""
 " que vous pouvez utiliser pour résoudre instantanément n'importe quelle "
 "énigme non-méta."
 
-#: puzzles/templates/solve.html:146
+#: puzzles/templates/solve.html:149
 msgid "Previous guesses"
 msgstr "Essais précédents"
 
@@ -2477,7 +2477,7 @@ msgstr "Mot de passe réinitialisé"
 
 #: puzzles/views.py:293
 msgid "Team “{}” not found."
-msgstr "Équipe \\u201c{}\\u201d non trouvée."
+msgstr "Équipe “{}” non trouvée."
 
 #: puzzles/views.py:384
 msgid "You’re not logged in."
@@ -2510,7 +2510,7 @@ msgstr ""
 #: puzzles/views.py:605
 #, python-format
 msgid "You’ve already tried calling in the answer “%s” for this puzzle."
-msgstr "Vous avez déjà essayé la réponse \\u201c%s\\u201d pour cette énigme."
+msgstr "Vous avez déjà essayé la réponse “%s” pour cette énigme."
 
 #: puzzles/views.py:620
 #, python-format
@@ -2549,12 +2549,12 @@ msgid "Free answer used!"
 msgstr "Réponse gratuite utilisée !"
 
 #: puzzles/views.py:732
-msgid " from "
-msgstr " de "
+msgid " from {}"
+msgstr " de {}"
 
 #: puzzles/views.py:736
-msgid " on "
-msgstr " sur "
+msgid " on {}"
+msgstr " sur {}"
 
 #: puzzles/views.py:787
 msgid "Sorry, hints are closed."

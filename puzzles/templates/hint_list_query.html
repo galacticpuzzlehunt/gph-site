@@ -44,10 +44,10 @@
         <tr>
             <td>
                 {% if hint.answered_datetime %}
-            		{% format_time_since hint.answered_datetime now as answered_since %}
+                    {% format_time_since hint.answered_datetime now as answered_since %}
                     {% blocktranslate with status=hint.get_status_display claimer=hint.claimer %}{{ status }} {{ answered_since }} ago by {{ claimer }}{% endblocktranslate %}
                 {% elif hint.claimed_datetime %}
-            		{% format_time_since hint.claimed_datetime now as claimed_since %}
+                    {% format_time_since hint.claimed_datetime now as claimed_since %}
                     {% blocktranslate with claimer=hint.claimer %}Claimed {{ claimed_since }} ago by {{ claimer }}{% endblocktranslate %}
                 {% else %}
                     {% translate "Unclaimed" %}

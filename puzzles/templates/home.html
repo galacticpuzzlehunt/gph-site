@@ -92,16 +92,16 @@ h3 {
     <div class="four columns">
         <h3>{% translate "Who" %}</h3>
         <p>
-			{% with organizer="FIXME" %}
+            {% with organizer="FIXME" %}
             {% if hunt_is_closed %}
             {% blocktranslate %}This was a puzzlehunt run by {{ organizer }}.{% endblocktranslate %}
             {% else %}
-			{% url 'rules' as rules_url %}
-			{% url 'faq' as faq_url %}
+            {% url 'rules' as rules_url %}
+            {% url 'faq' as faq_url %}
             {% blocktranslate %}This is a puzzlehunt run by {{ organizer }}.{% endblocktranslate %}
             {% blocktranslate %}Registration is open! Be sure to check out the <a href="{{ rules_url }}">rules</a> and <a href="{{ faq_url }}">FAQ</a> for more information.{% endblocktranslate %}
             {% endif %}
-			{% endwith %}
+            {% endwith %}
             {% comment %}
             {% blocktranslate with previous_hunts="FIXME" %}It is the follow-up to the previous <a href="{{ archive_link }}">{{ previous_hunts }} Puzzle Hunts</a>.{% endblocktranslate %}
             {% endcomment %}

@@ -290,7 +290,7 @@ def team(request, team_name):
         team_query = team_query.exclude(is_hidden=True)
     team = team_query.first()
     if not team:
-        messages.error(request, _(u'Team \u201c{}\u201d not found.').format(team_name))
+        messages.error(request, _('Team “{}” not found.').format(team_name))
         return redirect('teams')
 
     # This Team.leaderboard_teams() call is expensive, but is
@@ -381,7 +381,7 @@ def teams_unhidden(request):
 def edit_team(request):
     team = request.context.team
     if team is None:
-        messages.error(request, _(u'You\u2019re not logged in.'))
+        messages.error(request, _('You’re not logged in.'))
         return redirect('login')
     team_members_formset = modelformset_factory(
         TeamMember,
@@ -576,10 +576,10 @@ def solve(request):
 
     if request.method == 'POST' and 'answer' in request.POST:
         if request.context.puzzle_answer:
-            messages.error(request, _(u'You\u2019ve already solved this puzzle!'))
+            messages.error(request, _('You’ve already solved this puzzle!'))
             return redirect('solve', puzzle.slug)
         if request.context.guesses_remaining <= 0:
-            messages.error(request, _(u'You have no more guesses for this puzzle!'))
+            messages.error(request, _('You have no more guesses for this puzzle!'))
             return redirect('solve', puzzle.slug)
 
         semicleaned_guess = PuzzleMessage.semiclean_guess(request.POST.get('answer'))
@@ -602,8 +602,8 @@ def solve(request):
             form.add_error(None, _('All puzzle answers will have '
                 'at least one letter A through Z (case does not matter).'))
         elif tried_before:
-            form.add_error(None, _(u'You\u2019ve already tried calling in the '
-                u'answer \u201c%s\u201d for this puzzle.') % normalized_answer)
+            form.add_error(None, _('You’ve already tried calling in the '
+                'answer “%s” for this puzzle.') % normalized_answer)
         elif form.is_valid():
             AnswerSubmission(
                 team=team,
@@ -655,9 +655,9 @@ def free_answer(request):
     team = request.context.team
     if request.method == 'POST':
         if puzzle.is_meta:
-            messages.error(request, _(u'You can\u2019t use a free answer on a metapuzzle.'))
+            messages.error(request, _('You can’t use a free answer on a metapuzzle.'))
         elif request.context.puzzle_answer:
-            messages.error(request, _(u'You\u2019ve already solved this puzzle!'))
+            messages.error(request, _('You’ve already solved this puzzle!'))
         elif team.num_free_answers_remaining <= 0:
             messages.error(request, _('You have no free answers to use.'))
         elif request.POST.get('use') == 'Yes':
@@ -729,11 +729,11 @@ def hint_list(request):
         if 'team' in request.GET:
             team = Team.objects.get(id=request.GET['team'])
             hints = hints.filter(team=team)
-            query_description += _(" from ") + team.team_name
+            query_description += _(" from {}".format(team.team_name))
         if 'puzzle' in request.GET:
             puzzle = Puzzle.objects.get(id=request.GET['puzzle'])
             hints = hints.filter(puzzle=puzzle)
-            query_description += _(" on ") + puzzle.name
+            query_description += _(" on {}".format(puzzle.name))
         return render(request, 'hint_list_query.html', {
             'query_description': query_description,
             'hints': hints,
@@ -814,8 +814,8 @@ def hints(request):
                 is_followup=is_followup,
             ).save()
             messages.success(request, _(
-                u'Your request for a hint has been submitted and the puzzle '
-                u'hunt staff has been notified\u2014we will respond to it soon!'
+                'Your request for a hint has been submitted and the puzzle '
+                'hunt staff has been notified—we will respond to it soon!'
             ))
             return redirect('hints', puzzle.slug)
     else:

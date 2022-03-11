@@ -106,7 +106,6 @@ urlpatterns = [
     path('bridge/puzzle.log', views.puzzle_log, name='puzzle-log'),
     path('shortcuts', views.shortcuts, name='shortcuts'),
     path('robots.txt', views.robots),
-    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     # see https://docs.djangoproject.com/en/4.0/topics/i18n/translation/#note-on-performance
     path('jsi18n/', cache_page(86400, key_prefix='js18n-V1')
         (JavaScriptCatalog.as_view()), name='javascript-catalog'),

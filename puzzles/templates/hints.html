@@ -146,10 +146,10 @@
             </td>
             <td>
                 <p>
-					{% format_time hint.submitted_datetime "DATE_AT_TIME" as submitted_time %}
+                    {% format_time hint.submitted_datetime "DATE_AT_TIME" as submitted_time %}
                     {% blocktranslate %}Asked {{ submitted_time }}{% endblocktranslate %}
                     {% if hint.answered_datetime and hint.status != 'OBS' %}
-					{% format_time hint.answered_datetime "DATE_AT_TIME" as answered_time %}
+                    {% format_time hint.answered_datetime "DATE_AT_TIME" as answered_time %}
                     <br>{% blocktranslate %}Answered {{ answered_time }}{% endblocktranslate %}
                     {% endif %}
                 </p>

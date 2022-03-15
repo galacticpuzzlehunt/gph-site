@@ -7,6 +7,8 @@ from django import template
 from django.template.base import NodeList
 from django.template.loader_tags import BlockNode
 from django.utils import timezone
+from django.utils import formats
+from django.utils.translation import gettext as _
 from django.utils.html import strip_spaces_between_tags
 from django.utils.safestring import mark_safe
 
@@ -22,17 +24,17 @@ def format_duration(secs):
     mins = int(secs / 60)
     secs -= mins * 60
     if hours > 0:
-        return '{}h{}m'.format(hours, mins)
+        return _('{}h{}m').format(hours, mins)
     elif mins > 0:
-        return '{}m{}s'.format(mins, secs)
+        return _('{}m{}s').format(mins, secs)
     else:
-        return '{}s'.format(secs)
+        return _('{}s').format(secs)
 
 @register.simple_tag
 def format_time_since(timestamp, now):
     text = format_duration((now - timestamp).total_seconds())
     return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
-        % (timestamp.isoformat(), '%A, %B %-d at %-I:%M %p %Z', text))
+        % (timestamp.isoformat(), formats.get_format('DATE_AT_TIME'), text))
 
 @register.simple_tag
 def days_between(before, after):
@@ -43,16 +45,13 @@ def unix_time(timestamp):
     return timestamp.strftime('%s') if timestamp else ''
 
 @register.simple_tag
-def format_time(timestamp, format='%b %-d, %H:%M'):
+def format_time(timestamp, format='DATE_TIME'):
     if not timestamp:
         return ''
     timestamp2 = timestamp.astimezone(timezone.get_default_timezone())
-    try:
-        text = timestamp2.strftime(format)
-    except ValueError:
-        text = timestamp2.strftime(format.replace('%-', '%'))
+    text = formats.date_format(timestamp2, format=format)
     return mark_safe('<time datetime="%s" data-format="%s">%s</time>'
-        % (timestamp.isoformat(), format, text))
+        % (timestamp.isoformat(), formats.get_format(format), text))
 
 @register.simple_tag
 def percentage(a, b):

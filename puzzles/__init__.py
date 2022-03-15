@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
 import sys
 
 
@@ -9,5 +10,6 @@ assert sys.version_info.major == 3, 'Use Python 3'
 
 class PuzzlesConfig(AppConfig):
     name = 'puzzles'
+    verbose_name = _('puzzles')
 
 default_app_config = 'puzzles.PuzzlesConfig'

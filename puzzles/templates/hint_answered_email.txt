@@ -1,13 +1,14 @@
+{% load i18n %}
 {% autoescape off %}
 {{ hint.team }},
 
-Your hint question for the puzzle {{ hint.puzzle }} has been answered.
+{% blocktranslate with puzzle=hint.puzzle %}Your hint question for the puzzle {{ puzzle }} has been answered.{% endblocktranslate %}
 
-Question:
+{% translate "Question:" %}
 {{ hint.hint_question }}
 
-Response:
+{% translate "Response:" %}
 {{ hint.response }}
 
-If you still need help, you can make another request at {{ link }}
+{% blocktranslate %}If you still need help, you can make another request at {{ link }}{% endblocktranslate %}
 {% endautoescape %}

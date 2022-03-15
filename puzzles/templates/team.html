@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 {% load humanize %}
 
@@ -8,13 +9,13 @@
 
 {% block top-left-actions %}
 {% if modify_info_available %}
-<a href="{% url 'edit-team' %}" class="btn">Edit team members</a>
-<a href="{% url 'password_change' %}" class="btn">Change password</a>
+<a href="{% url 'edit-team' %}" class="btn">{% translate "Edit team members" %}</a>
+<a href="{% url 'password_change' %}" class="btn">{% translate "Change password" %}</a>
 {% elif request.context.is_superuser %}
-<a href="/admin/puzzles/team/{{ view_team.id }}/change/" class="btn">Django admin</a>
-<a href="/admin/puzzles/answersubmission/?team__id__exact={{ view_team.id }}" class="btn">All guesses</a>
-<a href="{% url 'hint-list' %}?team={{ view_team.id }}" class="btn">All hints</a>
-<a href="{% url 'impersonate-start' view_team.user_id %}" class="btn" style="filter: hue-rotate(120deg)">Impersonate</a>
+<a href="/admin/puzzles/team/{{ view_team.id }}/change/" class="btn">{% translate "Django admin" %}</a>
+<a href="/admin/puzzles/answersubmission/?team__id__exact={{ view_team.id }}" class="btn">{% translate "All guesses" %}</a>
+<a href="{% url 'hint-list' %}?team={{ view_team.id }}" class="btn">{% translate "All hints" %}</a>
+<a href="{% url 'impersonate-start' view_team.user_id %}" class="btn" style="filter: hue-rotate(120deg)">{% translate "Impersonate" %}</a>
 {% endif %}
 {% endblock %}
 
@@ -58,21 +59,21 @@
     <div class="team-info-panel">
         <div class="row">
             <div class="six columns">
-                <h4>Stats</h4>
-                <div class="stat-entry">Rank: <span class="stat-value">{{ rank }}</span></div>
-                <div class="stat-entry">Puzzles solved: <span class="stat-value">{{ solves }}</span></div>
+                <h4>{% translate "Stats" %}</h4>
+                <div class="stat-entry">{% translate "Rank:" %} <span class="stat-value">{{ rank }}</span></div>
+                <div class="stat-entry">{% translate "Puzzles solved:" %} <span class="stat-value">{{ solves }}</span></div>
                 {% if view_info_available %}
                 {% if view_team.num_hints_remaining > 0 %}
-                <div class="stat-entry">Hints available: <span class="stat-value">{{ view_team.num_hints_remaining }}</span></div>
+                <div class="stat-entry">{% translate "Hints available:" %} <span class="stat-value">{{ view_team.num_hints_remaining }}</span></div>
                 {% endif %}
                 {% if view_team.num_free_answers_remaining > 0 %}
-                <div class="stat-entry">Free answers available: <span class="stat-value">{{ view_team.num_free_answers_remaining }}</span></div>
+                <div class="stat-entry">{% translate "Free answers available: " %}<span class="stat-value">{{ view_team.num_free_answers_remaining }}</span></div>
                 {% endif %}
                 {% endif %}
             </div>
             <div class="six columns">
                 <div class="team-members">
-                    <h4>Team Members:</h4>
+                    <h4>{% translate "Team Members:" %}</h4>
                     <div class="stat-entry">
                         {% for team_member in view_team.teammember_set.all %}
                         {{ team_member.name }}{% if forloop.revcounter != 1 %}, {% endif %}
@@ -102,11 +103,11 @@
         <col style="width: 10%">
         <col style="width: 20%">
         <tr>
-            <th>Puzzle</th>
-            <th>Incorrect guesses</th>
-            <th>Unlock time ({{ start_time|date:"T" }})</th>
-            <th>Time to solve</th>
-            <th>Solve time ({{ start_time|date:"T" }})</th>
+            <th>{% translate "Puzzle" %}</th>
+            <th>{% translate "Incorrect guesses" %}</th>
+            <th>{% translate "Unlock time" %} ({{ start_time|date:"T" }})</th>
+            <th>{% translate "Time to solve" %}</th>
+            <th>{% translate "Solve time" %} ({{ start_time|date:"T" }})</th>
         </tr>
         {% for s in submissions %}
         <tr{% if s.submission.used_free_answer %} class="free"{% endif %}>

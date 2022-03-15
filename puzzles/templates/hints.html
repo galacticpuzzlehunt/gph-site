@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 
 {% block page-title %}
-<title>Hints: {{ puzzle.name }}</title>
+<title>{% translate "Hints:" %} {{ puzzle.name }}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">{% translate "Back to the puzzle" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -36,53 +37,47 @@
 }
 </style>
 
-<h1>Hints for {{ puzzle.name }}</h1>
+<h1>{% translate "Hints for" %} {{ puzzle.name }}</h1>
 
 <main>
     {% if not hunt_is_over %}
     <ul>
     {% if team.num_intro_hints_remaining > 0 %}
-        <li>You have <b>{{ team.num_intro_hints_remaining }}
-            hint{{ team.num_intro_hints_remaining|pluralize }}
-            {% include 'icon-hint.svg' %}</b> that you may use to ask for
-            a hint on <b>any of the first {{ intro_count }} puzzles</b>.
+        <li>{% blocktranslate count hints=team.num_intro_hints_remaining %}You have <b>{{ hints }} hint</b>{% plural %}You have <b>{{ hints }} hints</b>{% endblocktranslate %}
+            {% include 'icon-hint.svg' %}
+            {% blocktranslate %}that you may use to ask for a hint on <b>any of the first {{ intro_count }} puzzles.</b>{% endblocktranslate %}
     {% endif %}
     {% if team.num_nonintro_hints_remaining > 0 %}
     {% if team.num_intro_hints_remaining > 0 %}
-        <li>Your remaining <b>{{ team.num_nonintro_hints_remaining }}
-            hint{{ team.num_nonintro_hints_remaining|pluralize }}
-            {% include 'icon-hint.svg' %}</b> can be used on
-            <b>any puzzle in the hunt</b>.
+        <li>{% blocktranslate count hints=team.num_nonintro_hints_remaining %}Your remaining <b>{{ hints }} hint</b>{% plural %}Your remaining <b>{{ hints }} hints</b>{% endblocktranslate %}
+            {% include 'icon-hint.svg' %}
+            {% blocktranslate %}can be used on <b>any puzzle in the hunt.</b>{% endblocktranslate %}
     {% else %}
-        <li>You have <b>{{ team.num_nonintro_hints_remaining }}
-            hint{{ team.num_nonintro_hints_remaining|pluralize }}
-            {% include 'icon-hint.svg' %}</b> that you may use to ask for
-            a hint on any puzzle.
+        <li>{% blocktranslate count hints=team.num_nonintro_hints_remaining %}You have <b>{{ hints }} hint</b>{% plural %}You have <b>{{ hints }} hints</b>{% endblocktranslate %}
+            {% include 'icon-hint.svg' %}
+            {% blocktranslate %}that you may use to ask for a hint on any puzzle.{% endblocktranslate %}
     {% endif %}
     {% endif %}
     {% if team.num_free_answers_remaining > 0 %}
     {% if relevant_hints_remaining > 0 %}
-        <li>You can also use your <b>{{ team.num_free_answers_remaining }}
-            free answer{{ team.num_free_answers_remaining|pluralize }}
-            {% include 'icon-answer.svg' %}</b> as a hint if you run out of
-            hints.
+        <li>{% blocktranslate count answers=team.num_free_answers_remaining %}You can also use your <b>{{ answers }} free answer</b>{% plural %}You can also use your <b>{{ answers }} free answers</b>{% endblocktranslate %}
+            {% include 'icon-answer.svg' %}
+            {% blocktranslate %}as a hint if you run out of hints.{% endblocktranslate %}
     {% else %}
-        <li>You have no usable hints, but you do have
-            <b>{{ team.num_free_answers_remaining }}
-            free answer{{ team.num_free_answers_remaining|pluralize }}
-            {% include 'icon-answer.svg' %}</b> that you may use as a hint.
+        <li>{% blocktranslate count answers=team.num_free_answers_remaining %}You have no usable hints, but you do have <b>{{ answers }} free answer</b>{% plural %}You have no usable hints, but you do have <b>{{ answers }} free answers</b>{% endblocktranslate %}
+            {% include 'icon-answer.svg' %}
+            {% blocktranslate %}that you may use as a hint.{% endblocktranslate %}
     {% endif %}
     {% endif %}
     {% if one_hint_at_a_time %}
-        <li>You may have <b>one hint</b> open at a time. You must wait until
-            that hint is answered to ask another.
+        <li>{% blocktranslate %}You may have <b>one hint</b> open at a time. You must wait until that hint is answered to ask another.{% endblocktranslate %}
     {% endif %}
-        <li>See the <a href="{% url 'rules' %}#Hints">rules page</a> for
-            details on when hints will be released.
+        {% url 'rules' as rules %}
+        <li>{% blocktranslate %}See the <a href="{{ rules }}#Hints">rules page</a> for details on when hints will be released.{% endblocktranslate %}
     </ul>
     {% endif %}
 
-    <h4>Request a hint</h4>
+    <h4>{% translate "Request a hint" %}</h4>
     {% if error %}
     <p class="hint-error">{{ error }}</p>
     {% endif %}
@@ -90,9 +85,7 @@
     {% if not error or can_followup %}
     {% if puzzle_answer is not None %}
     <div class="note">
-        You&rsquo;ve already solved this puzzle, but you can ask for a hint
-        anyway if you&rsquo;d like (for example, if you&rsquo;re not sure about
-        a step or you backsolved it). The restrictions above still apply.
+        {% blocktranslate %}You&rsquo;ve already solved this puzzle, but you can ask for a hint anyway if you&rsquo;d like (for example, if you&rsquo;re not sure about a step or you backsolved it). The restrictions above still apply.{% endblocktranslate %}
     </div>
     {% endif %}
     <form method="post" class="call-in-answer-panel{% if error %} hint-hidden{% endif %}">
@@ -106,10 +99,7 @@
         {% if can_followup %}
         <input type="hidden" name="is_followup" value="">
         <div class="note hint-hidden">
-            You&rsquo;re asking us for a follow-up to your last hint. This
-            won&rsquo;t consume one of your hints; we&rsquo;ll see if we can be
-            more helpful based on your submission, but we may ask you to use
-            a new regular hint instead.
+            {% blocktranslate %}You&rsquo;re asking us for a follow-up to your last hint. This won&rsquo;t consume one of your hints; we&rsquo;ll see if we can be more helpful based on your submission, but we may ask you to use a new regular hint instead.{% endblocktranslate %}
         </div>
         <script>
         function markFollowup() {
@@ -132,43 +122,45 @@
 
         <div class="row">
             <button class="btn" type="submit">
-                Submit (&minus; <span id="hint-cost">1</span> {% include 'icon-hint.svg' %})
+                {% translate "Submit" %} (&minus; <span id="hint-cost">1</span> {% include 'icon-hint.svg' %})
             </button>
         </div>
     </form>
     {% endif %}
 
     {% if hints %}
-    <h4>Previously requested hints</h4>
+    <h4>{% translate "Previously requested hints" %}</h4>
     {% if can_followup %}
-    <button class="btn" onclick="markFollowup()">This wasn&rsquo;t helpful</button>
+    <button class="btn" onclick="markFollowup()">{% translate "This wasn&rsquo;t helpful" %}</button>
     {% endif %}
     <table class="hint-table">
         {% for hint in hints %}
         <tr class="submitted-text">
             <td>
-                <b>Q:</b><pre>{{ hint.hint_question }}</pre><br>
+                <b>{% translate "Q:" %}</b><pre>{{ hint.hint_question }}</pre><br>
                 {% if hint.status == 'NR' %}
-                <b>A:</b><pre class="hint-info">No response yet.</pre>
+                <b>{% translate "A:" %}</b><pre class="hint-info">{% translate "No response yet." %}</pre>
                 {% elif hint.response %}
-                <b>A:</b><pre class="hint-response">{{ hint.response }}</pre>
+                <b>{% translate "A:" %}</b><pre class="hint-response">{{ hint.response }}</pre>
                 {% endif %}
             </td>
             <td>
                 <p>
-                    Asked {% format_time hint.submitted_datetime '%A, %B %-d at %-I:%M %p %Z' %}
+                    {% format_time hint.submitted_datetime "DATE_AT_TIME" as submitted_time %}
+                    {% blocktranslate %}Asked {{ submitted_time }}{% endblocktranslate %}
                     {% if hint.answered_datetime and hint.status != 'OBS' %}
-                    <br>Answered {% format_time hint.answered_datetime '%A, %B %-d at %-I:%M %p %Z' %}
+                    {% format_time hint.answered_datetime "DATE_AT_TIME" as answered_time %}
+                    <br>{% blocktranslate %}Answered {{ answered_time }}{% endblocktranslate %}
                     {% endif %}
                 </p>
                 <p class="hint-info">
                     {% if hint.status == 'OBS' %}
-                    Looks like you solved this puzzle before we could send you
-                    a response! Your use of the hint was refunded.
+                    {% translate "Looks like you solved this puzzle before we could send you
+                    a response! Your use of the hint was refunded." %}
                     {% elif hint.is_followup %}
-                    This was a follow-up hint.
+                    {% translate "This was a follow-up hint." %}
                     {% elif hint.status == 'REF' %}
-                    Your use of the hint was refunded.
+                    {% translate "Your use of the hint was refunded." %}
                     {% endif %}
                 </p>
             </td>

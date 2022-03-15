@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block page-title %}
-<title>Surveys: {{ puzzle.name }}</title>
+<title>{% translate "Surveys:" %} {{ puzzle.name }}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'puzzle' puzzle.slug %}" class="btn">Back to the puzzle</a>
+<a href="{% url 'puzzle' puzzle.slug %}" class="btn">{% translate "Back to the puzzle" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -16,7 +17,7 @@ th {
 }
 </style>
 
-<h1>Survey responses for {{ puzzle.name }}</h1>
+<h1>{% translate "Survey responses for" %} {{ puzzle.name }}</h1>
 
 <main>
     <table class="sortable gph-list-table">
@@ -24,8 +25,8 @@ th {
             {% for field in fields %}
             <th>{{ field.field.adjective|title }} ({{ field.average|floatformat:2 }} <small>/ {{ field.max }}</small>)</th>
             {% endfor %}
-            <th>Comments</th>
-            <th>Team</th>
+            <th>{% translate "Comments" %}</th>
+            <th>{% translate "Team" %}</th>
         </tr>
         {% for survey in surveys %}
         <tr>

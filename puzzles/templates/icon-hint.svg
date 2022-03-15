@@ -1,4 +1,5 @@
+{% load i18n %}
 <svg width="32" height="32" version="1.1" viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg" class="hunt-icon">
   <path d="M1 4 A3 3 0 0 1 7 4 3 3 0 0 1 1 4z" style="stroke:currentColor;fill:none;stroke-width: 0.5"/>
-  <path d="M3.1 2.6 3.1 5.4 3.1 4 4.9 4 4.9 2.6 4.9 5.4" style="stroke:currentColor;fill:none;stroke-width: 0.5;stroke-linecap: round;stroke-linejoin: round;"/>
+  <text x="4" y="4" font-family="Verdana" font-size="4" dy="0.35em" text-anchor="middle" style="stroke:currentColor;fill:currentColor;stroke-width: 0.3">{% translate "H" %}</text>
 </svg>

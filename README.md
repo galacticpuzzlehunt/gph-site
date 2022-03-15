@@ -136,6 +136,22 @@ We will try to respond to emails or pull requests when we can, but this isn't gu
 
   + We now have somewhat experimental websocket support! Take a look at the consumer classes in `messaging.py`; there are prototypes for two-way communication with a single browser tab, or for broadcasting to all members of a team or all logged-in admins. If you want something different, say for a "Teamwork Time" puzzle where team members interact with each other, it shouldn't be hard to add. Then add your consumer to `routing.py` and use `openSocket` in JS to connect to it.
 
+- ... provide the site in my language?
+
+  + Generate the translations placeholders for your language `lang_COUNTRY` (e.g. en_US):
+    + `django-admin makemessages -e html,txt,py,svg -l lang_COUNTRY`
+    + `django-admin makemessages -d djangojs -l lang_COUNTRY`
+  + add your translations in msgstr in the django.po and djangojs.po files under locale/`lang_COUNTRY`
+  + Compile the translations:
+    + `django-admin compilemessages`
+  + create a gph/formats/`lang` (e.g. en) folder and copy an existing one (e.g. en to be translated, see https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-FORMAT_MODULE_PATH). This contains the date/time formats used in django templates (see https://docs.djangoproject.com/en/4.0/ref/templates/builtins/#std:templatefilter-date)
+  + set LANGUAGE_CODE in base/settings.py as `lang-country` (e.g. en-us)
+  + note that the compiled .mo translated files are not in the repo, make sure to make them part of the deploy to your site
+  + see https://docs.djangoproject.com/en/4.0/topics/i18n/ for more info
+  + note that django-admin makemessages doesn't handle escaped characters correctly in python strings, make sure to use the actual unicode character or its html sequence instead of its escaped code value (e.g. `’` instead of `\u2019`)
+  + contact [enigmatix](mailto:gaulois.team@gmail.com) if you need help with localization of your site
+
+
 # Repository Details
 
 The GPH server is built on Django. We use Ansible to manage deploys to our cloud VMs and nginx as the web server in production, but you're free to use whatever web server setup makes sense for you.

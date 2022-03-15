@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block top-left-actions %}
-<a href="{% url 'finishers' %}" class="btn">Finishers</a>
-<a href="{% url 'bigboard' %}" class="btn">Bigboard</a>
-<a href="{% url 'hunt-stats' %}" class="btn">Stats</a>
+<a href="{% url 'finishers' %}" class="btn">{% translate "Finishers" %}</a>
+<a href="{% url 'bigboard' %}" class="btn">{% translate "Bigboard" %}</a>
+<a href="{% url 'hunt-stats' %}" class="btn">{% translate "Stats" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -44,11 +45,11 @@
   }
 </style>
 
-<h1>Wrap-Up</h1>
+<h1>{% translate "Wrap-Up" %}</h1>
 
 <main>
 
-<p>Congratulations!</p>
+<p>{% translate "Congratulations!" %}</p>
 
 </main>
 

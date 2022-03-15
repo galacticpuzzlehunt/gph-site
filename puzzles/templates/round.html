@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 
 {% block page-title %}
@@ -6,7 +7,7 @@
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'puzzles' %}" class="btn">All puzzles</a>
+<a href="{% url 'puzzles' %}" class="btn">{% translate "All puzzles" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -17,13 +18,12 @@
 
 {% if hunt_is_prereleased %}
 <h3 style="text-align: center">
-    You are a pre-release testsolver, so you may be seeing puzzles that are
-    locked for the general public. Please be careful!
+    {% translate "You are a pre-release testsolver, so you may be seeing puzzles that are locked for the general public. Please be careful!" %}
 </h3>
 {% endif %}
 
 {% block round-body %}
-<p style="text-align: center">Imagine some cool art goes here.</p>
+<p style="text-align: center">{% translate "Imagine some cool art goes here." %}</p>
 {% endblock %}
 
 {% include 'puzzles_list.html' with round=round %}

@@ -1,9 +1,10 @@
 {% load static %}
+{% load i18n %}
 <!doctype html>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Not Found</title>
+    <title>{% translate "Not Found" %}</title>
     <link rel="icon" sizes="16x16 32x32 48x48 64x64" href="{% static "images/favicon.ico" %}" type="image/vnd.microsoft.icon">
     <style>
 html {
@@ -26,6 +27,6 @@ a {
 <body>
     <a href="{% url 'index' %}">404</a>
     <br>
-    This page is not a puzzle.
+    {% translate "This page is not a puzzle." %}
 </body>
 </html>

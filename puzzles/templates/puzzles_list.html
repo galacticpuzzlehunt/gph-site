@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="puzzles-list">
     {% for data in round.puzzles %}
     <div class="puzzles-entry{% if data.puzzle.is_meta %} puzzles-meta{% endif %}">
@@ -5,9 +6,9 @@
             <b {% if data.puzzle.name|length > 30 %}style="font-size: 82%"{% endif %}>{{ data.puzzle.name }}</b>
         </a>
         {% if data.puzzle.is_meta %}
-        <div class="puzzles-new">meta</div>
+        <div class="puzzles-new">{% translate "meta" %}</div>
         {% elif data.new %}
-        <div class="puzzles-new">new!</div>
+        <div class="puzzles-new">{% translate "new!" %}</div>
         {% endif %}
         {% if 'answer' in data %}
         <div class="puzzles-answer solved-title-answer">
@@ -16,11 +17,11 @@
         {% endif %}
         {% if data.full_stats %}
         <div class="{% if team %}puzzles-solution{% else %}puzzles-answer{% endif %}">
-            <a href="{% url 'solution' data.puzzle.slug %}">Solution</a>
+            <a href="{% url 'solution' data.puzzle.slug %}">{% translate "Solution" %}</a>
         </div>
         {% elif 'hints' in data %}
         <div class="puzzles-solution">
-            <a href="{% url 'hints' data.puzzle.slug %}">Hints: {{ data.hints }}</a>
+            <a href="{% url 'hints' data.puzzle.slug %}">{% translate "Hints:" %} {{ data.hints }}</a>
         </div>
         {% endif %}
         {% if 'solve_stats' in data %}
@@ -28,10 +29,10 @@
             {% if data.full_stats %}
             <a href="{% url 'stats' data.puzzle.slug %}">
             {% endif %}
-            <b>{{ data.solve_stats.correct }}</b> solve{{ data.solve_stats.correct|pluralize }}
-            | <b>{{ data.solve_stats.guesses }}</b> guess{{ data.solve_stats.guesses|pluralize:"es" }}
+            {% blocktranslate count correct=data.solve_stats.correct %}<b>{{ correct }}</b> solve{% plural %}<b>{{ correct }}</b> solves{% endblocktranslate %}
+            | {% blocktranslate count guesses=data.solve_stats.guesses %}<b>{{ guesses }}</b> guess{% plural %}<b>{{ guesses }}</b> guesses{% endblocktranslate %}
             {% if data.full_stats %}
-            | <b>{{ data.solve_stats.teams }}</b> team{{ data.solve_stats.teams|pluralize }}
+            | {% blocktranslate count teams=data.solve_stats.teams %}<b>{{ teams }}</b> team{% plural %}<b>{{ teams }}</b> teams{% endblocktranslate %}
             </a>
             {% endif %}
         </div>

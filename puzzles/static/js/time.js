@@ -3,22 +3,46 @@ function updateTimestamps() {
         const format = time.getAttribute('data-format');
         if (!format) continue;
         const options = {hour12: false, timeZoneName: 'short'};
-        for (const [code] of format.matchAll(/%-?[a-z]/ig))
-            switch (code) {
-                case '%A': options.weekday = 'long'; break;
-                case '%Y': options.year = 'numeric'; break;
-                case '%B': options.month = 'long'; break;
-                case '%b': options.month = 'short'; break;
-                case '%-d': options.day = 'numeric'; break;
-                case '%H': options.hour = '2-digit'; break;
-                case '%-I': options.hour = 'numeric'; break;
-                case '%M': options.minute = '2-digit'; break;
-                case '%p': options.hour12 = true; break;
-                case '%Z': break;
-                default: console.error('Unrecognized strftime code ' + code);
+        var escaped = false;
+        for (const [code] of format.matchAll(/[a-z\\]/ig)) {
+            if (escaped) {
+                escaped = false;
+                continue;
             }
+            switch (code) {
+                case 'l': options.weekday = 'long'; break;
+                case 'D': options.weekday = 'short'; break;
+                case 'Y': options.year = 'numeric'; break;
+                case 'y': options.year = '2-digit'; break;
+                case 'F': options.month = 'long'; break;
+                case 'm': options.month = '2-digit'; break;
+                case 'n': options.month = 'numeric'; break;
+                case 'M': 
+                case 'N': 
+                case 'b': options.month = 'short'; break;
+                case 'd': options.day = '2-digit'; break;
+                case 'j': options.day = 'numeric'; break;
+                case 'G': options.hour = 'numeric'; 
+                        options.hour12 = false;
+                        break;
+                case 'H': options.hour = '2-digit'; 
+                        options.hour12 = false;
+                        break;
+                case 'g': options.hour = 'numeric'; 
+                        options.hour12 = true;
+                        break;
+                case 'h': options.hour = '2-digit'; 
+                        options.hour12 = true;
+                        break;
+                case 'i': options.minute = '2-digit'; break;
+                case 'A': 
+                case 'a': options.hour12 = 'true'; break;
+                case 'T': break;
+                case '\\': escaped = true; break;
+            }
+        }
         const local = new Date(time.dateTime).toLocaleString([], options);
-        time.setAttribute('title', 'Local time: ' + local);
+        time.setAttribute('title', gettext('Local time: ') + local);
     }
 }
 

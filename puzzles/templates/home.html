@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 
 {% block content %}
@@ -51,60 +52,69 @@ h3 {
 {% if hunt_is_over %}
 <div class="feedback">
 {% if hunt_is_closed %}
-The {{ hunt_title }} has now come to a close. Thanks for puzzling with us!
+{% blocktranslate with title=hunt_title %}The {{ title }} has now come to a close. Thanks for puzzling with us!{% endblocktranslate %}
 {% else %}
-The {{ hunt_title }} is now over, but you can still register and progress
-through the hunt until {% format_time close_time '%A, %B %-d' %}.
+{% format_time close_time "DATE_AT_TIME" as hunt_close %}
+{% blocktranslate with title=hunt_title %}The {{ title }} is now over, but you can still register and progress through the hunt until {{ hunt_close }}.{% endblocktranslate %}
 {% endif %}
 <br>
-Please fill out our <a href="https://FIXME">feedback form</a>
+{% with feedback_url="https://FIXME" %}
 {% if wrapup_page_visible %}
-and check out our <a href="{% url 'wrapup' %}">wrap-up</a>!
-{% else %}
-to let us know what you thought about the hunt.
+{% url 'wrapup' as wrapup_url %}
+{% blocktranslate %}Please fill out our <a href="{{ feedback_url }}">feedback form</a> and check out our <a href="{{ wrapup_url }}">wrap-up</a>!{% endblocktranslate %}
+{% else %} 
+{% blocktranslate %}Please fill out our <a href="{{ feedback_url }}">feedback form</a> to let us know what you thought about the hunt.{% endblocktranslate %}
 {% endif %}
+{% endwith %}
 </div>
 {% endif %}
 
 <div class="row">
     <div class="four columns">
-        <h3>What</h3>
-        <p>
-            A mysterious list of puzzles has appeared on the internet!
-            If you can solve them, you could win prizes and bragging rights!<sup>*</sup>.
+        <h3>{% translate "What" %}</h3>
+        <p>{% translate "A mysterious list of puzzles has appeared on the internet!  If you can solve them, you could win prizes and bragging rights!<sup>*" %}</sup>
         </p>
-        <p><small><sup>*</sup>there are no prizes</small></p>
+        <p><small><sup>*</sup>{% translate "there are no prizes" %}</small></p>
     </div>
     <div class="four columns">
-        <h3>When</h3>
+        <h3>{% translate "When" %}</h3>
         <p>
-            The hunt {% if hunt_is_over %}began{% else %}will begin{% endif %} on
-            {% format_time start_time '%B %-d, %Y at %-I:%M %p %Z' %},
-            and {% if hunt_is_over %}ended{% else %}it will end{% endif %}
-            {% days_between start_time end_time %} days later on
-            {% format_time end_time '%B %-d, %Y at %-I:%M %p %Z' %}.
-        </p>
-    </div>
-    <div class="four columns">
-        <h3>Who</h3>
-        <p>
-            This {% if hunt_is_closed %}was{% else %}is{% endif %} a puzzlehunt run by FIXME.
-            {# It is the follow-up to the previous <a href="{{ archive_link }}">FIXME Puzzle Hunts</a>. #}
-            {% if not hunt_is_closed %}
-            Registration is open! Be sure to check out the
-            <a href="{% url 'rules' %}">rules</a> and <a href="{% url 'faq' %}">FAQ</a>
-            for more information.
+            {% format_time start_time "DATE_AT_TIME" as hunt_start %}
+            {% format_time end_time "DATE_AT_TIME" as hunt_end %}
+            {% if hunt_is_over %}
+            {% blocktranslate %}The hunt began on {{ hunt_start }}, and ended on {{ hunt_end }}.{% endblocktranslate %}
+            {% else %}
+            {% days_between start_time end_time as num_days %}
+            {% blocktranslate %}The hunt will begin on {{ hunt_start }}, and it will end {{ num_days }} days later on {{ hunt_end }}.{% endblocktranslate %}
             {% endif %}
+        </p>
+    </div>
+    <div class="four columns">
+        <h3>{% translate "Who" %}</h3>
+        <p>
+            {% with organizer="FIXME" %}
+            {% if hunt_is_closed %}
+            {% blocktranslate %}This was a puzzlehunt run by {{ organizer }}.{% endblocktranslate %}
+            {% else %}
+            {% url 'rules' as rules_url %}
+            {% url 'faq' as faq_url %}
+            {% blocktranslate %}This is a puzzlehunt run by {{ organizer }}.{% endblocktranslate %}
+            {% blocktranslate %}Registration is open! Be sure to check out the <a href="{{ rules_url }}">rules</a> and <a href="{{ faq_url }}">FAQ</a> for more information.{% endblocktranslate %}
+            {% endif %}
+            {% endwith %}
+            {% comment %}
+            {% blocktranslate with previous_hunts="FIXME" %}It is the follow-up to the previous <a href="{{ archive_link }}">{{ previous_hunts }} Puzzle Hunts</a>.{% endblocktranslate %}
+            {% endcomment %}
         </p>
     </div>
 </div>
 
 {% if not hunt_is_closed %}
 <div class="register">
-    <a href="{% url 'register' %}" class="btn">Register your team!</a>
+    <a href="{% url 'register' %}" class="btn">{% translate "Register your team!" %}</a>
 </div>
 <h3 class="print-register">
-    <a>Register at https://FIXME/</a>
+    <a>{% translate "Register at" %} https://FIXME</a>
 </h3>
 {% endif %}
 

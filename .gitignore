@@ -4,6 +4,9 @@
 # pyc files
 /**/*.pyc
 
+# translation compiled files
+/**/*.mo
+
 # Auto-collected static files folder
 /static/
 

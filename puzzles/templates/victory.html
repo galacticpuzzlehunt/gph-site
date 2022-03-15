@@ -1,11 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 
 {% block content %}
 <main style="text-align: center">
     <h3>
-        Congratulations on completing the {{ hunt_title }}!<br>
-        You will receive more information shortly via email.
+        {% blocktranslate with title=hunt_title %}Congratulations on completing the {{ title }}!<br>You will receive more information shortly via email.{% endblocktranslate %}
     </h3>
 </main>
 {% endblock %}

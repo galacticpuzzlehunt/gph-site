@@ -20,6 +20,8 @@ from django.conf import settings
 from django.urls import path, re_path, include, register_converter
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.views.i18n import JavaScriptCatalog
+from django.views.decorators.cache import cache_page
 
 from puzzles import puzzlehandlers
 from puzzles import views
@@ -104,4 +106,8 @@ urlpatterns = [
     path('bridge/puzzle.log', views.puzzle_log, name='puzzle-log'),
     path('shortcuts', views.shortcuts, name='shortcuts'),
     path('robots.txt', views.robots),
+    # see https://docs.djangoproject.com/en/4.0/topics/i18n/translation/#note-on-performance
+    path('jsi18n/', cache_page(86400, key_prefix='js18n-V1')
+        (JavaScriptCatalog.as_view()), name='javascript-catalog'),
+
 ]

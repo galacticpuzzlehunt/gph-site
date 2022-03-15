@@ -1,6 +1,7 @@
-<p>You have successfully registered team {{ team_name }} for the {{ hunt_title }}.</p>
+{% load i18n %}
+<p>{% blocktranslate %}You have successfully registered team {{ team_name }} for the {{ hunt_title }}.{% endblocktranslate %}</p>
 
-<p>If you need to modify your team information, you can do so at <a href="{{ team_link }}">{{ team_link }}</a></p>
+<p>{% blocktranslate %}If you need to modify your team information, you can do so at <a href="{{ team_link }}">{{ team_link }}</a>{% endblocktranslate %}</p>
 
-<p>See you at the hunt!<br>
+<p>{% translate "See you at the hunt!" %}<br>
 {{ hunt_organizers }}</p>

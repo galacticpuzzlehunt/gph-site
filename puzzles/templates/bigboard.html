@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 {% load humanize %}
 
 {% block page-title %}
-<title>Bigboard</title>
+<title>{% translate "Bigboard" %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'wrapup' %}" class="btn">Back to wrap-up</a>
+<a href="{% url 'wrapup' %}" class="btn">{% translate "Back to wrap-up" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -139,8 +140,8 @@ small {
 }
 </style>
 
-<input type="checkbox" id="hide"><label for="hide">Hide finished teams</label>
-<p>You can put ?30 after the URL to limit to 30 teams.</p>
+<input type="checkbox" id="hide"><label for="hide">{% translate "Hide finished teams" %}</label>
+<p>{% translate "You can put ?30 after the URL to limit to 30 teams." %}</p>
 
 <table>
 {% spacelesser %}
@@ -154,18 +155,18 @@ small {
 <col{% if puzzle.puzzle.is_meta %} class="end"{% endif %}>
 {% endfor %}
 <tr>
-    <th>Team
-    <th>#
-    <th>Solves
-    <th>Metas
+    <th>{% translate "Team" %}
+    <th>{% translate "#" %}
+    <th>{% translate "Solves" %}
+    <th>{% translate "Metas" %}
     <th>{% include 'icon-hint.svg' %}
-    <th>Last solve
+    <th>{% translate "Last solve" %}
     {% for puzzle in puzzles %}
     <th><a class="puzzle-title-header-link" data-puzzle-name="{{ puzzle.puzzle.name }}" href="{% url 'stats' puzzle.puzzle.slug %}">{{ puzzle.puzzle.short_name }}</a>
     {% endfor %}
 </tr>
 <tr>
-    <td>Solves
+    <td>{% translate "Solves" %}
     <td>
     <td colspan="4">
     {% for puzzle in puzzles %}
@@ -173,7 +174,7 @@ small {
     {% endfor %}
 </tr>
 <tr>
-    <td>Guesses
+    <td>{% translate "Guesses" %}
     <td>
     <td colspan="4">
     {% for puzzle in puzzles %}
@@ -181,7 +182,7 @@ small {
     {% endfor %}
 </tr>
 <tr>
-    <td>Unlocks
+    <td>{% translate "Unlocks" %}
     <td>
     <td colspan="4">
     {% for puzzle in puzzles %}
@@ -189,7 +190,7 @@ small {
     {% endfor %}
 </tr>
 <tr>
-    <td>Hints
+    <td>{% translate "Hints" %}
     <td>
     <td colspan="4">
     {% for puzzle in puzzles %}
@@ -205,7 +206,7 @@ small {
     {% endfor %}
 </tr>{% endif %}
 <tr>
-    <td>%Solve/Guess
+    <td>{% translate "%Solve/Guess" %}
     <td>
     <td colspan="4">
     {% for puzzle in puzzles %}
@@ -213,7 +214,7 @@ small {
     {% endfor %}
 </tr>
 <tr>
-    <td>%Solve/Unlock
+    <td>{% translate "%Solve/Unlock" %}
     <td>
     <td colspan="4">
     {% for puzzle in puzzles %}

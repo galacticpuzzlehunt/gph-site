@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load puzzle_tags %}
 {% load static %}
 
@@ -11,23 +12,23 @@
 <a href="{% url 'round' round.slug %}" class="btn">{{ round.name }}</a>
 {% endif %}
 {% if team and not hunt_is_closed %}
-<a href="{% url 'solve' puzzle.slug %}" class="btn">Call in an answer</a>
+<a href="{% url 'solve' puzzle.slug %}" class="btn">{% translate "Call in an answer" %}</a>
 {% if not puzzle.is_meta and num_free_answers_remaining > 0 and puzzle_answer is None %}
-<a href="{% url 'free-answer' puzzle.slug %}" class="btn">Use free answer</a>
+<a href="{% url 'free-answer' puzzle.slug %}" class="btn">{% translate "Use free answer" %}</a>
 {% endif %}
 {% endif %}
 {% if can_view_hints %}
-<a href="{% url 'hints' puzzle.slug %}" class="btn">{% if can_ask_for_hints %}Ask for a hint{% else %}View hints{% endif %}</a>
+<a href="{% url 'hints' puzzle.slug %}" class="btn">{% if can_ask_for_hints %}{% translate "Ask for a hint" %}{% else %}{% translate "View hints" %}{% endif %}</a>
 {% endif %}
 {% if hunt_is_closed or not team and hunt_is_over %}
-<a href="{% url 'post-hunt-solve' puzzle.slug %}" class="btn">Check your answer spoiler-free</a>
+<a href="{% url 'post-hunt-solve' puzzle.slug %}" class="btn">{% translate "Check your answer spoiler-free" %}</a>
 {% endif %}
 {% if hunt_is_over or is_superuser %}
-<a href="{% url 'solution' puzzle.slug %}" class="btn">View solution</a>
-<a href="{% url 'stats' puzzle.slug %}" class="btn">Stats</a>
+<a href="{% url 'solution' puzzle.slug %}" class="btn">{% translate "View solution" %}</a>
+<a href="{% url 'stats' puzzle.slug %}" class="btn">{% translate "Stats" %}</a>
 {% endif %}
 {% if is_superuser %}
-<a href="{% url 'survey' puzzle.slug %}" class="btn">Survey responses</a>
+<a href="{% url 'survey' puzzle.slug %}" class="btn">{% translate "Survey responses" %}</a>
 {% endif %}
 {% endblock %}
 
@@ -37,7 +38,7 @@
     {% block puzzle-title %}
     {{ puzzle.name }}
     {% if puzzle_answer %}
-    <div class="solved-title-marker">Solved! Answer: <span class="solved-title-answer">{{ puzzle_answer }}</span></div>
+    <div class="solved-title-marker">{% translate "Solved! Answer:" %} <span class="solved-title-answer">{{ puzzle_answer }}</span></div>
     {% endif %}
     {% endblock %}
 </h1>
@@ -47,9 +48,10 @@
     {% if erratum.puzzle == puzzle and erratum.puzzle_text %}
     <div class="puzzle-erratum">
         {% if not erratum.published %}
-        <strong>[<a href="{% url 'admin:puzzles_erratum_change' erratum.id %}">UNPUBLISHED</a>]</strong>
+        <strong>[<a href="{% url 'admin:puzzles_erratum_change' erratum.id %}">{% translate "UNPUBLISHED" %}</a>]</strong>
         {% endif %}
-        On {% format_time erratum.timestamp '%A, %B %-d at %-I:%M %p %Z' %},
+        {% format_time erratum.timestamp "DATE_AT_TIME" as hint_time %}
+        {% blocktranslate %}On {{ hint_time }}{% endblocktranslate %},
         {{ erratum.puzzle_text|safe }}
     </div>
     {% endif %}
@@ -58,11 +60,10 @@
     {% block puzzle-body-override %}
     {% puzzleblock puzzle-body %}
     {% if puzzle_body %}{{ puzzle_body }}{% elif template_name %}
-    This puzzle doesn&rsquo;t seem to exist yet.
-    Searched for a puzzle template named <code>{{ template_name }}</code>
+    {% blocktranslate %}This puzzle doesn&rsquo;t seem to exist yet.
+    Searched for a puzzle template named <code>{{ template_name }}</code>{% endblocktranslate %}
     {% else %}
-    This puzzle template exists, but it doesn&rsquo;t seem to define
-    a puzzle content block. Check the post production guide?
+    {% translate "This puzzle template exists, but it doesn&rsquo;t seem to define a puzzle content block. Check the post production guide?" %}
     {% endif %}
     {% endblock %}
 </main>

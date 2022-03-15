@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block content %}
 
-<h2>Edit {{ team.team_name }} Members</h2>
+<h2>{% blocktranslate with team_name=team.team_name %}Edit {{ team_name }} Members{% endblocktranslate %}</h2>
 
 <form id="register" method="post">
     {% csrf_token %}
@@ -29,15 +30,15 @@
     </div>
 
     <div class="form-section">
-        <button class="btn" type="submit">Submit</button>
+        <button class="btn" type="submit">{% translate "Submit" %}</button>
     </div>
 </form>
 
 <script>
 $('.team-members-formset').formset({
    prefix: '{{ team_members_formset.prefix }}',
-   addText: 'Add another team member',
-   deleteText: 'Remove',
+   addText: '{% translate "Add another team member" %}',
+   deleteText: '{% translate "Remove" %}',
    addCssClass: 'formset-add-link',
 });
 $('.formset-add-link').click(function() {

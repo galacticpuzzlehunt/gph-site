@@ -3,7 +3,7 @@
 {% load puzzle_tags %}
 
 {% block page-title %}
-<title>{% translate "Hints:" %} {{ puzzle.name }}</title>
+<title>{% blocktranslate with puzzle_name=puzzle.name %}Hints: {{ puzzle_name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
@@ -37,7 +37,7 @@
 }
 </style>
 
-<h1>{% translate "Hints for" %} {{ puzzle.name }}</h1>
+<h1>{% blocktranslate with puzzle_name=puzzle.name %}Hints for {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
     {% if not hunt_is_over %}

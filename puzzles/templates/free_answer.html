@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block page-title %}
-<title>{% translate "Free answer:" %} {{ puzzle.name }}</title>
+<title>{% blocktranslate with puzzle_name=puzzle.name %}Free answer: {{ puzzle_name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
@@ -11,7 +11,7 @@
 
 {% block content %}
 
-<h1>{% translate "Use a free answer on" %} {{ puzzle.name }}</h1>
+<h1>{% blocktranslate with puzzle_name=puzzle.name %}Use a free answer on {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
     {% if puzzle_answer != None %}

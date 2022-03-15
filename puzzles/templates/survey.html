@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block page-title %}
-<title>{% translate "Surveys:" %} {{ puzzle.name }}</title>
+<title>{% blocktranslate with puzzle_name=puzzle.name %}Surveys: {{ puzzle_name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
@@ -17,7 +17,7 @@ th {
 }
 </style>
 
-<h1>{% translate "Survey responses for" %} {{ puzzle.name }}</h1>
+<h1>{% blocktranslate with puzzle_name=puzzle.name %}Survey responses for {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
     <table class="sortable gph-list-table">

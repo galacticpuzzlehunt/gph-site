@@ -11,7 +11,7 @@
 
 {% block content %}
 
-<h1>{% translate "Call in an answer for" %} {{ puzzle.name }}</h1>
+<h1>{% blocktranslate with puzzle_name=puzzle.name %}Call in an answer for {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
 {% if puzzle_answer != None %}

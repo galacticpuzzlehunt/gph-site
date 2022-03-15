@@ -241,7 +241,7 @@ class DiscordInterface:
                 embed.color = 0xcc6600
             # nothing for obsolete
 
-            embed.author.name = _('{} by {}').format(dict(hint.STATUSES)[hint.status], hint.claimer)
+            embed.author.name = _('{} by {}').format(hint.get_status_display(), hint.claimer)
             embed.author.url = hint.full_url()
             embed.description = hint.response[:250]
             if hint.claimer in self.get_avatars():

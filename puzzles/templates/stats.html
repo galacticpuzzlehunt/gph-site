@@ -3,7 +3,7 @@
 {% load puzzle_tags %}
 
 {% block page-title %}
-<title>{% translate "Stats:" %} {{ puzzle.name }}</title>
+<title>{% blocktranslate with puzzle_name=puzzle.name %}Stats: {{ puzzle_name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
@@ -12,7 +12,7 @@
 
 {% block content %}
 
-<h1>{% translate "Stats for" %} {{ puzzle.name }}</h1>
+<h1>{% blocktranslate with puzzle_name=puzzle.name %}Stats for {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
     <div class="row puzzle-stats-panel">

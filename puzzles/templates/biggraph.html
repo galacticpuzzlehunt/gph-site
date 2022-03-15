@@ -31,7 +31,7 @@
 echarts.init(document.getElementById('biggraph')).setOption({
 	title: {
 		left: "center",
-		text: {% blocktranslate with teams=teams|length|escapejs %}"Top {{ teams }} Teams"{% endblocktranslate %},
+		text: "{% blocktranslate with teams=teams|length|escapejs %}Top {{ teams }} Teams{% endblocktranslate %}",
 	},
 	tooltip: {
 		trigger: "axis",

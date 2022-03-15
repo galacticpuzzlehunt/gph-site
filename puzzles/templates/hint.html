@@ -91,7 +91,7 @@
                 </span>
                 {% elif hint.claimer %}
                 <span style="color: red">
-                {% translate "Claimed at unknown time (!?) by" %} {{ hint.claimer }}
+                {% blocktranslate with claimer=hint.claimer %}Claimed at unknown time (!?) by {{ claimer }}{% endblocktranslate %}
                 </span>
                 {% else %}
                 <a href="{% url 'hint' hint.id %}?claim=true" class="btn">{% translate "Claim this hint" %}</a>

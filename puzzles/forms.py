@@ -98,7 +98,7 @@ def validate_team_emails(formset):
         if not name:
             raise forms.ValidationError(_('All team members must have names.'))
         if looks_spammy(name):
-            raise forms.ValidationError('That team member name isn’t allowed.')
+            raise forms.ValidationError(_('That team member name isn’t allowed.'))
         email = form.cleaned_data.get('email')
         if email:
             emails.append(email)

@@ -104,9 +104,12 @@
             </span>
             {% endif %}
             {% if is_superuser %}
-            <label for="shortcuts" title="{% translate 'Admin toolbox' %}">{% if not hunt_is_prereleased %}&#x26A0;&#xFE0F;{% endif %}{% translate "Shortcuts" %}</label>
+            <label for="shortcuts" title="{% translate 'Admin toolbox' %}">
+                {% if not hunt_is_prereleased %}&#x26A0;&#xFE0F;{% endif %}
+                {% translate "Shortcuts" %}
+            </label>
             {% if unclaimed_hints %}
-            <a class="current-stat" title="{% translate 'Hints that need answering:' %} {{ num_free_answers_remaining }}" href="{% url 'hint-list' %}" style="color: red">
+            <a class="current-stat" title="{% translate 'Hints that need answering:' %} {{ unclaimed_hints }}" href="{% url 'hint-list' %}" style="color: red">
                 {% include 'icon-hint.svg' %}
                 <span class="current-stat-label">{{ unclaimed_hints }}</span>
             </a>

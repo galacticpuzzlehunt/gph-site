@@ -586,7 +586,7 @@ def notify_on_answer_submission(sender, instance, created, **kwargs):
         if len(hints):
             hint_line = _('\nHints:') + ','.join('%s (%s%s)' % (
                 format_time_ago(hint.submitted_datetime),
-                dict(hint.STATUSES)[hint.status],
+                hint.STATUS_DISPLAY[hint.status],
                 format_time_ago(hint.answered_datetime),
             ) for hint in hints)
         if instance.used_free_answer:
@@ -670,7 +670,7 @@ class PuzzleMessage(models.Model):
     @staticmethod
     def semiclean_guess(s):
         nfkd_form = unicodedata.normalize('NFKD', s)
-        return ''.join([c.upper() for c in nfkd_form if c.isalnum() and not unicodedata.combining(c)])
+        return ''.join([c.upper() for c in nfkd_form if c.isalnum()])
 
 
 class Erratum(models.Model):
@@ -791,6 +791,8 @@ class Hint(models.Model):
         (OBSOLETE, _('Obsolete')),
     )
 
+    STATUS_DISPLAY = dict(STATUSES)
+
     team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name=_('team'))
     puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE, verbose_name=_('puzzle'))
     is_followup = models.BooleanField(default=False, verbose_name=_('Is followup'))
@@ -826,7 +828,7 @@ class Hint(models.Model):
             abbr(self.hint_question),
         )
         if self.status != self.NO_RESPONSE:
-            o = o + ' {}'.format(dict(self.STATUSES)[self.status])
+            o = o + ' {}'.format(self.STATUS_DISPLAY[self.status])
         return o
 
     @property

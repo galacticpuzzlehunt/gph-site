@@ -725,15 +725,15 @@ def hint_list(request):
             .select_related()
             .order_by('-submitted_datetime')
         )
-        query_description = _("Hints")
+        query_description = _('Hints')
         if 'team' in request.GET:
             team = Team.objects.get(id=request.GET['team'])
             hints = hints.filter(team=team)
-            query_description += _(" from {}").format(team.team_name)
+            query_description += _(' from {}').format(team.team_name)
         if 'puzzle' in request.GET:
             puzzle = Puzzle.objects.get(id=request.GET['puzzle'])
             hints = hints.filter(puzzle=puzzle)
-            query_description += _(" on {}").format(puzzle.name)
+            query_description += _(' on {}').format(puzzle.name)
         return render(request, 'hint_list_query.html', {
             'query_description': query_description,
             'hints': hints,

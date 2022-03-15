@@ -41,7 +41,7 @@
             {% format_time hint_time "TIME" as hint_time %}
             <li>{% blocktranslate %}Starting on <strong>{{ hint_date }}</strong>, teams will receive hints at <strong>{{ hint_time }}</strong> each day until the end of the hunt. The number of hints given each day will be at our discretion based on how the hunt is going.{% endblocktranslate %}</li>
             {% if intro_hints %}
-            <li>{% blocktranslate with hints=intro_hints plural=intro_hints|pluralize%}The first <strong>{{ hints }} hint{{ plural }}</strong> your team receives may only be used on the first set of puzzles in the hunt.{% endblocktranslate %}</li>
+            <li>{% blocktranslate count hints=intro_hints %}The first <strong>{{ hints }} hint</strong> your team receives may only be used on the first set of puzzles in the hunt.{% plural %}The first <strong>{{ hints }} hints</strong> your team receives may only be used on the first set of puzzles in the hunt.{% endblocktranslate %}</li>
             {% endif %}
             <li>{% blocktranslate %}You can use a hint to get help on a puzzle. This can be something like a nudge in the right direction (i.e. you give us your progress on the puzzle and we&rsquo;ll try to get you unstuck) or an answer to a question (e.g. &ldquo;Which answers to these crossword clues are wrong?&rdquo;).{% endblocktranslate %}</li>
             {% if one_hint_at_a_time %}

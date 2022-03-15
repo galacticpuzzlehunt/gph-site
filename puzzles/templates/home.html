@@ -62,7 +62,7 @@ h3 {
 {% if wrapup_page_visible %}
 {% url 'wrapup' as wrapup_url %}
 {% blocktranslate %}Please fill out our <a href="{{ feedback_url }}">feedback form</a> and check out our <a href="{{ wrapup_url }}">wrap-up</a>!{% endblocktranslate %}
-{% else %} 
+{% else %}
 {% blocktranslate %}Please fill out our <a href="{{ feedback_url }}">feedback form</a> to let us know what you thought about the hunt.{% endblocktranslate %}
 {% endif %}
 {% endwith %}
@@ -72,8 +72,7 @@ h3 {
 <div class="row">
     <div class="four columns">
         <h3>{% translate "What" %}</h3>
-        <p>{% translate "A mysterious list of puzzles has appeared on the internet!  If you can solve them, you could win prizes and bragging rights!<sup>*" %}</sup>
-        </p>
+        <p>{% translate "A mysterious list of puzzles has appeared on the internet! If you can solve them, you could win prizes and bragging rights!" %}<sup>*</sup></p>
         <p><small><sup>*</sup>{% translate "there are no prizes" %}</small></p>
     </div>
     <div class="four columns">

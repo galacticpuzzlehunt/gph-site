@@ -276,14 +276,14 @@ class IndividualWebsocketConsumer(WebsocketConsumer):
 # A WebsocketConsumer subclass that can broadcast messages to a set of users.
 class BroadcastWebsocketConsumer(WebsocketConsumer):
     def connect(self):
-        if not self.is_ok(): return
-        self.group = self.get_group()
-        async_to_sync(self.channel_layer.group_add)(self.group, self.channel_name)
+        if self.is_ok():
+            self.group = self.get_group()
+            async_to_sync(self.channel_layer.group_add)(self.group, self.channel_name)
         self.accept()
 
     def disconnect(self, close_code):
-        if not self.is_ok(): return
-        async_to_sync(self.channel_layer.group_discard)(self.group, self.channel_name)
+        if self.is_ok():
+            async_to_sync(self.channel_layer.group_discard)(self.group, self.channel_name)
 
     def channel_receive_broadcast(self, event):
         try:

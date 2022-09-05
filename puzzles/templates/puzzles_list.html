@@ -1,58 +1,57 @@
 {% load i18n %}
-<div class="puzzles-list">
+<tbody class="puzzles-section">
     {% for data in round.puzzles %}
-    <div class="puzzles-entry{% if data.puzzle.is_meta %} puzzles-meta{% endif %}">
-        <a class="puzzles-link" href="{% url 'puzzle' data.puzzle.slug %}">
-            <b {% if data.puzzle.name|length > 30 %}style="font-size: 82%"{% endif %}>{{ data.puzzle.name }}</b>
-        </a>
-        {% if data.puzzle.is_meta %}
-        <div class="puzzles-new">{% translate "meta" %}</div>
-        {% elif data.new %}
-        <div class="puzzles-new">{% translate "new!" %}</div>
-        {% endif %}
-        {% if 'answer' in data %}
-        <div class="puzzles-answer solved-title-answer">
-            <b>{{ data.answer }}</b>
-        </div>
-        {% endif %}
-        {% if data.full_stats %}
-        <div class="{% if team %}puzzles-solution{% else %}puzzles-answer{% endif %}">
-            <a href="{% url 'solution' data.puzzle.slug %}">{% translate "Solution" %}</a>
-        </div>
-        {% elif 'hints' in data %}
-        <div class="puzzles-solution">
-            <a href="{% url 'hints' data.puzzle.slug %}">{% translate "Hints:" %} {{ data.hints }}</a>
-        </div>
-        {% endif %}
-        {% if 'solve_stats' in data %}
-        <div class="puzzles-inner">
-            {% if data.full_stats %}
-            <a href="{% url 'stats' data.puzzle.slug %}">
-            {% endif %}
-            {% blocktranslate count correct=data.solve_stats.correct %}<b>{{ correct }}</b> solve{% plural %}<b>{{ correct }}</b> solves{% endblocktranslate %}
-            | {% blocktranslate count guesses=data.solve_stats.guesses %}<b>{{ guesses }}</b> guess{% plural %}<b>{{ guesses }}</b> guesses{% endblocktranslate %}
-            {% if data.full_stats %}
-            | {% blocktranslate count teams=data.solve_stats.teams %}<b>{{ teams }}</b> team{% plural %}<b>{{ teams }}</b> teams{% endblocktranslate %}
+    <tr>
+        <td>
+            {% if not data.puzzle.is_meta %}{{ data.puzzle.order }}{% endif %}
+        </td>
+        <td>
+            <a href="{% url 'puzzle' data.puzzle.slug %}">
+                {% if data.puzzle.is_meta %}
+                <div class="puzzles-new">{% translate "meta" %}</div>
+                {% elif data.new %}
+                <div class="puzzles-new">{% translate "new!" %}</div>
+                {% endif %}
+                {{ data.puzzle.name }}
             </a>
+            {% if 'solve_stats' in data %}
+            <div class="puzzles-inner">
+                {% if data.full_stats %}
+                <a href="{% url 'stats' data.puzzle.slug %}">
+                {% endif %}
+                {% blocktranslate count correct=data.solve_stats.correct %}<b>{{ correct }}</b>&nbsp;solve{% plural %}<b>{{ correct }}</b>&nbsp;solves{% endblocktranslate %}
+                | {% blocktranslate count guesses=data.solve_stats.guesses %}<b>{{ guesses }}</b>&nbsp;guess{% plural %}<b>{{ guesses }}</b>&nbsp;guesses{% endblocktranslate %}
+                {% if data.full_stats %}
+                | {% blocktranslate count teams=data.solve_stats.teams %}<b>{{ teams }}</b>&nbsp;team{% plural %}<b>{{ teams }}</b>&nbsp;teams{% endblocktranslate %}
+                </a>
+                {% endif %}
+            </div>
             {% endif %}
-        </div>
+        </td>
+        <td>
+            {% if data.full_stats %}
+            <a class="puzzles-new" href="{% url 'solution' data.puzzle.slug %}">{% translate "Solution" %}</a>
+            {% elif 'hints' in data %}
+            <a class="puzzles-new" href="{% url 'hints' data.puzzle.slug %}">{% translate "Hints" %}</a>
+            {% endif %}
+        </td>
+        {% if team %}
+        <td class="puzzles-answer">
+            <div>
+                {% if 'answer' in data %}{{ data.answer }}{% else %}&nbsp;{% endif %}
+            </div>
+            {% if 'survey_stats' in data %}
+            <div class="puzzles-inner">
+                <a href="{% url 'survey' data.puzzle.slug %}">
+                {% for stat in data.survey_stats %}
+                <b>{{ stat.average|floatformat:2 }}</b>/{{ stat.max_rating }}&nbsp;{{ stat.adjective }}
+                {% if not forloop.last %}|{% endif %}
+                {% endfor %}
+                </a>
+            </div>
+            {% endif %}
+        </td>
         {% endif %}
-        {% if 'survey_stats' in data %}
-        <div class="puzzles-inner">
-            {% if is_superuser %}
-            <a href="{% url 'survey' data.puzzle.slug %}">
-            {% endif %}
-            {% for stat in data.survey_stats %}
-            <b>{{ stat.average|floatformat:2 }}</b> / {{ stat.max_rating }} {{ stat.adjective }}
-            {% if not forloop.last %}|{% endif %}
-            {% endfor %}
-            {% if is_superuser %}
-            </a>
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
+    </tr>
     {% endfor %}
-    <div class="puzzles-spacer"></div>
-    <div class="puzzles-spacer"></div>
-</div>
+</tbody>

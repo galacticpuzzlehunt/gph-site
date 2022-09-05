@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block page-title %}
-<title>{% blocktranslate with puzzle_name=puzzle.name %}Call in: {{ puzzle_name }}{% endblocktranslate %}</title>
+<title>{% blocktranslate with puzzle_name=puzzle.name %}Check: {{ puzzle_name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
@@ -11,38 +11,36 @@
 
 {% block content %}
 
-<h1>{% blocktranslate with puzzle_name=puzzle.name %}Check your answer for {{ puzzle_name }}{% endblocktranslate %}</h1>
+<h1>
+    {% blocktranslate with puzzle_name=puzzle.name %}Check: {{ puzzle_name }}{% endblocktranslate %}
+    {% if is_correct %}
+    <div class="solved-title-marker">{% translate "Solved!" %} <span class="solved-title-answer">{{ puzzle.answer }}</span></div>
+    {% elif is_wrong %}
+    <div class="solved-title-marker">{% translate "Incorrect!" %}</div>
+    {% endif %}
+</h1>
 
 <main>
-    {% if is_correct %}
-    <div class="solved-panel">
-        <h4>{% translate "Solved!" %}</h4>
-        <p>{% blocktranslate with answer=puzzle.answer %}The answer was <b>{{ answer }}</b>.{% endblocktranslate %}</p>
-    </div>
-    {% endif %}
-
-    {% if is_wrong %}
-    <div class="unsolved-panel">
-        <h4>{% translate "Incorrect!" %}</h4>
-    </div>
-    {% endif %}
-
-    <form class="call-in-answer-panel">
+    <form>
+        {{ form.non_field_errors }}
         {% for field in form %}
-        <div class="row">
-            <div class="four columns">
+        <div class="form-row">
+            <div class="form-desc">
                 {{ field.label_tag }}
             </div>
-            <div class="four columns">
-                {{ field }}
-                {{ field.errors }}
-            </div>
-            <div class="four columns">
-                <button class="btn" type="submit">{% translate "Submit" %}</button>
-            </div>
+            {{ field }}
+            {{ field.errors }}
+            <a class="delete-row" href="#">&#x2794;</a>
         </div>
         {% endfor %}
     </form>
 </main>
+
+<script>
+$('.delete-row').click(function(e) {
+    e.preventDefault();
+    this.closest('form').requestSubmit();
+});
+</script>
 
 {% endblock %}

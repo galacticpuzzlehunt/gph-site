@@ -3,7 +3,7 @@
 {% load puzzle_tags %}
 
 {% block top-left-actions %}
-{% if request.context.is_superuser %}
+{% if is_superuser %}
 <a href="{% url 'admin:puzzles_erratum_add' %}" class="btn">{% translate "New erratum" %}</a>
 {% endif %}
 {% endblock %}
@@ -20,7 +20,7 @@
         {% format_time erratum.timestamp "DATE_AT_TIME" as erratum_time %}
         {% blocktranslate %}On {{ erratum_time }}, {% endblocktranslate %}
         {{ erratum.formatted_updates_text|safe }}
-        {% if request.context.is_superuser and erratum.puzzle %}
+        {% if is_superuser and erratum.puzzle %}
         <details>
             <summary>{% translate "Emails:" %}</summary>
             <textarea>{{ erratum.get_emails|join:', ' }}</textarea>

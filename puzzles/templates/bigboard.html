@@ -71,7 +71,7 @@ td.P { {# post-hunt solve #}
 td:first-child {
     position: sticky;
     left: 0;
-    background-color: white;
+    background-color: var(--sticky-bg-color);
     z-index: 1;
     max-width: 160px;
     overflow: hidden;
@@ -82,7 +82,7 @@ td:first-child {
 th {
     position: sticky;
     top: 0;
-    background-color: white;
+    background-color: var(--sticky-bg-color);
     z-index: 2;
     text-align: center;
 }
@@ -132,7 +132,7 @@ small {
     transition: opacity 0.15s;
     pointer-events: none;
     border-radius: 0 0 8px 8px;
-    background-color: white;
+    background-color: var(--sticky-bg-color);
 }
 
 .puzzle-title-header-link:hover::before {
@@ -157,8 +157,8 @@ small {
 <tr>
     <th>{% translate "Team" %}
     <th>{% translate "#" %}
-    <th>{% translate "Solves" %}
-    <th>{% translate "Metas" %}
+    <th>{% include 'icon-solve.svg' %}
+    <th>{% include 'icon-meta.svg' %}
     <th>{% include 'icon-hint.svg' %}
     <th>{% translate "Last solve" %}
     {% for puzzle in puzzles %}
@@ -189,6 +189,7 @@ small {
     <td class="U">{{ puzzle.total_unlocks }}
     {% endfor %}
 </tr>
+{% if hints_enabled %}
 <tr>
     <td>{% translate "Hints" %}
     <td>
@@ -197,14 +198,17 @@ small {
     <td class="H">{{ puzzle.hints }}
     {% endfor %}
 </tr>
-{% if free_answers_enabled %}<tr>
+{% endif %}
+{% if free_answers_enabled %}
+<tr>
     <td>{% include 'icon-answer.svg' %}
     <td>
     <td colspan="4">
     {% for puzzle in puzzles %}
     <td class="F">{{ puzzle.free_solves }}
     {% endfor %}
-</tr>{% endif %}
+</tr>
+{% endif %}
 <tr>
     <td>{% translate "%Solve/Guess" %}
     <td>
@@ -247,7 +251,9 @@ small {
         {{ board_entry.meta_solves }}
         {% endif %}
     <td>
+        {% if board_entry.used_hints or board_entry.team.num_hints_total %}
         {{ board_entry.used_hints }} / {{ board_entry.team.num_hints_total }}
+        {% endif %}
     <td>
         {% format_time board_entry.last_solve_time %}
     {% for entry in board_entry.entries %}

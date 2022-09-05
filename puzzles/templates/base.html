@@ -50,7 +50,7 @@
                 </a>
                 {% endif %}
                 {% if hunt_has_started or hunt_has_almost_started %}
-                <a{% if '/puzzle' in request.path or '/solve' in request.path or '/post-hunt-solve' in request.path or '/hints' in request.path or '/stats' in request.path or '/solution' in request.path %} class="selected-tab"{% endif %} href="{% url 'puzzles' %}">
+                <a{% if '/puzzle' in request.path or puzzle %} class="selected-tab"{% endif %} href="{% url 'puzzles' %}">
                     {% translate "Puzzles" %}
                 </a>
                 {% endif %}
@@ -103,6 +103,12 @@
                 <span class="current-stat-label">{{ num_free_answers_remaining }}</span>
             </span>
             {% endif %}
+            {% if team and hunt_has_started %}
+            <span class="current-stat" title="Solves: {{ team.solves|length }}">
+                {% include 'icon-solve.svg' %}
+                <span class="current-stat-label">{{ team.solves|length }}</span>
+            </span>
+            {% endif %}
             {% if is_superuser %}
             <label for="shortcuts" title="{% translate 'Admin toolbox' %}">
                 {% if not hunt_is_prereleased %}&#x26A0;&#xFE0F;{% endif %}
@@ -123,7 +129,7 @@
         </div>
     </nav>
     {% if is_superuser %}
-    <main class="shortcuts">
+    <div class="shortcuts">
         <form method="post" action="{% url 'shortcuts' %}" target="dummy">
             {% csrf_token %}
             {% if not hunt_is_prereleased %}
@@ -133,21 +139,37 @@
             {% endif %}
             {% for shortcut in shortcuts %}
             {% if 'action' in shortcut %}
-            <button class="btn" type="submit" name="action" value="{{ shortcut.action }}">{{ shortcut.name }}</button>
+            <button class="btn{% if shortcut.danger %} danger{% endif %}" type="submit" name="action" value="{{ shortcut.action }}">{{ shortcut.name }}</button>
             {% else %}
             <div>{{ shortcut.name }}</div>
             {% endif %}
             {% endfor %}
-            <div>{% translate "Download logs" %}</div>
-            <a class="btn" href="{% url 'guess-csv' %}">{% translate "Guess" %}</button></a>
-            <a class="btn" href="{% url 'hint-csv' %}">{% translate "Hint" %}</button></a>
-            <a class="btn" href="{% url 'puzzle-log' %}">{% translate "Puzzle" %}</button></a>
             {% if puzzle %}
+            <div>{% translate "This puzzle&rsquo;s answer:" %}</div>
+            <div class="spoiler">{{ puzzle.answer }}</div>
+            <div>{{ puzzle.round.name }} #{{ puzzle.order }}</div>
+            <a href="/admin/puzzles/puzzle/{{ puzzle.id }}/change/" class="btn">{% translate "Django admin" %}</a>
+            <a href="{% url 'survey' puzzle.slug %}" class="btn">{% translate "Surveys" %}</a>
             <input name="puzzle" value="{{ puzzle.slug }}" type="hidden">
             {% endif %}
+            {% if view_team %}
+            <div>{% translate "This team" %}</div>
+            <div style="font-size: 70%">
+            testsolver: {{view_team.is_prerelease_testsolver}} | time from start: {{view_team.time_since_start}}
+            </div>
+            <a href="/admin/puzzles/team/{{ view_team.id }}/change/" class="btn">{% translate "Django admin" %}</a>
+            <a href="{% url 'impersonate-start' view_team.user_id %}" class="btn danger">{% translate "Impersonate" %}</a>
+            <div></div>
+            <a href="/admin/puzzles/answersubmission/?team__id__exact={{ view_team.id }}" class="btn">{% translate "All guesses" %}</a>
+            <a href="{% url 'hint-list' %}?team={{ view_team.id }}" class="btn">{% translate "All hints" %}</a>
+            {% endif %}
+            <div>{% translate "Download logs" %}</div>
+            <a class="btn" href="{% url 'guess-csv' %}">{% translate "Guess" %}</a>
+            <a class="btn" href="{% url 'hint-csv' %}">{% translate "Hint" %}</a>
+            <a class="btn" href="{% url 'puzzle-log' %}">{% translate "Puzzle" %}</a>
             <iframe src="about:blank" name="dummy" style="display: none"></iframe>
         </form>
-    </main>
+    </div>
     {% endif %}
     <script>
     {% if team %}

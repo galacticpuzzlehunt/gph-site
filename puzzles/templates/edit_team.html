@@ -11,18 +11,16 @@
     {{ team_members_formset.non_form_errors }}
     <div class="form-section">
     {% for team_member_form in team_members_formset %}
-        <div class="team-members-formset row">
+        <div class="team-members-formset form-row">
             {% for field in team_member_form %}
             {% if field.name == 'id' %}
             <div style="display: none">{{ field }}</div>
             {% else %}
-            <div class="two columns">
+            <div class="form-desc">
                 {{ field.label_tag }}
             </div>
-            <div class="three columns">
-                {{ field }}
-                {{ field.errors }}
-            </div>
+            {{ field }}
+            {{ field.errors }}
             {% endif %}
             {% endfor %}
         </div>
@@ -38,7 +36,7 @@
 $('.team-members-formset').formset({
    prefix: '{{ team_members_formset.prefix }}',
    addText: '{% translate "Add another team member" %}',
-   deleteText: '{% translate "Remove" %}',
+   deleteText: '\u2716',
    addCssClass: 'formset-add-link',
 });
 $('.formset-add-link').click(function() {

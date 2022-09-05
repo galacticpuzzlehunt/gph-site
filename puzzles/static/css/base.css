@@ -1,5 +1,38 @@
+html {
+    --page-bg-rgb: 255, 255, 255;
+    --accent-rgb: 0, 85, 170;
+
+    --white-color: white;
+    --neutral-color: #bbb;
+    --accent-color: rgb(var(--accent-rgb));
+    --accent-bg-color: rgba(var(--accent-rgb), 0.1);
+    --accent-hover-color: #2af;
+
+    --page-bg-color: rgb(var(--page-bg-rgb));
+    --sticky-bg-color: rgba(var(--page-bg-rgb), 0.9);
+    --heading-text-color: var(--accent-color);
+
+    --border-color: var(--accent-color);
+    --print-border-color: #111;
+
+    --link-text-color: var(--accent-color);
+    --link-hover-color: var(--accent-hover-color);
+
+    --btn-text-color: var(--white-color);
+    --btn-bg-color: var(--accent-color);
+    --btn-hover-color: var(--accent-hover-color);
+
+    --tray-text-color: var(--accent-color);
+    --tray-bg-color: var(--neutral-color);
+
+    --text-font: sans-serif;
+    --btn-font: sans-serif;
+    --input-font: monospace;
+    --answer-font: monospace;
+}
+
 body {
-    font-family: sans-serif;
+    font-family: var(--text-font);
     font-variant-ligatures: none;
     line-height: 2.6rem;
     font-size: 1.75rem;
@@ -14,12 +47,6 @@ body {
 }
 
 @media screen {
-    html {
-        background-image: linear-gradient(#111, #111);
-        background-size: 100% 40px;
-        background-repeat: no-repeat;
-    }
-
     body {
         margin: 0 auto 60px;
         width: 80%;
@@ -38,31 +65,27 @@ li {
 }
 
 ul > li {
-    list-style-type: disc;
+    list-style-type: "\2013  ";
 }
 
 textarea {
     width: 100%;
     min-height: 24ch;
-    font-family: monospace, monospace;
+    font-family: var(--input-font);
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
+    font-weight: bold;
 }
 
-h1 {
-    margin-top: 1.5rem;
-    text-align: center;
-    font-weight: 600;
-}
-
-h2 {
-    margin: 4rem 0;
+h1, h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 4rem;
+    font-size: 4rem;
+    line-height: 1.2;
 }
 
 main {
-    padding: 20px 30px;
     position: relative;
 }
 
@@ -96,60 +119,46 @@ tr:last-child td {
 }
 
 a, .btn {
-    color: #05a;
+    color: var(--link-text-color);
 }
 
-.btn {
+.btn, .shortcuts .btn {
     display: inline-block;
-    padding: 0 20px;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: normal;
     border-radius: 0;
     border: none;
-    font-family: inherit;
-    text-transform: none;
+    font-family: var(--btn-font);
+    text-transform: uppercase;
     letter-spacing: 0;
 
-    height: 30px;
-    line-height: 30px;
-    font-size: 1.5rem;
+    padding: 0 16px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 2rem;
 }
 
 form .btn {
-    height: 38px;
-    line-height: 38px;
-    font-size: 1.75rem;
+    padding: 0 24px;
+    height: 48px;
+    line-height: 48px;
+    font-size: 3rem;
 }
 
 input[type=text], input[type=password], input[type=email] {
     width: 100%;
     border-radius: 0;
+    margin: 0.5rem 0;
+    font-family: var(--input-font);
 }
 
 figcaption {
     text-align: center;
 }
 
-@media (min-width: 961px) {
-    label {
-        text-align: right;
-        height: 2em;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-    }
-    /* normally the label is right-aligned because it's in a column inside a
-     * row and left of the corresponding input, but sometimes it's just by
-     * itself in a row above the input (hints page) */
-    .row > label {
-        text-align: left;
-        justify-content: flex-start;
-    }
-}
-
 @media print {
     main {
-        border-top: 1px solid #111;
+        border-top: 1px solid var(--print-border-color);
     }
 
     .btn {
@@ -158,6 +167,10 @@ figcaption {
 }
 
 @media screen {
+    html {
+        background-color: var(--page-bg-color);
+    }
+
     main {
         display: table;
         min-width: 100%;
@@ -165,7 +178,18 @@ figcaption {
     }
 
     h1, h2, h3, h4 {
-        color: #05a;
+        color: var(--heading-text-color);
+    }
+
+    h1, h2 {
+        background-color: var(--accent-bg-color);
+        border-left: 3rem solid var(--border-color);
+        padding: 2rem;
+    }
+
+    h3, h4 {
+        border-bottom: 2px solid var(--border-color);
+        font-weight: normal;
     }
 
     a {
@@ -174,19 +198,41 @@ figcaption {
 
     a:hover,
     a:focus {
-        color: #2af;
+        color: var(--link-hover-color);
+    }
+
+    .puzzle-main {
+        background-color: var(--white-color);
+        padding: 20px 30px;
+    }
+
+    .puzzle-main h1, .puzzle-main h2, .puzzle-main h3, .puzzle-main h4 {
+        color: initial;
+        background: none;
+        border-left: none;
+        padding: 0;
     }
 
     .btn {
         transition: background-color 0.3s;
-        color: #f9f8f5;
-        background-color: #05a;
+        color: var(--btn-text-color);
+        background-color: var(--btn-bg-color);
     }
 
     .btn:hover,
     .btn:focus {
-        color: #f9f8f5;
-        background-color: #2af;
+        color: var(--btn-text-color);
+        background-color: var(--btn-hover-color);
+    }
+
+    .btn.danger {
+        filter: hue-rotate(180deg);
+    }
+
+    .btn:disabled, .btn:disabled:hover, .btn.btn-disabled {
+        background-color: var(--btn-bg-color);
+        filter: grayscale(1);
+        cursor: not-allowed;
     }
 
     nav {
@@ -207,17 +253,11 @@ figcaption {
         position: relative;
         padding: 6px 0 10px;
         text-decoration: none;
-        color: #f9f8f5;
         align-items: center;
     }
 
-    .top-tabs a:hover,
-    .top-tabs a:focus {
-        color: #2af;
-    }
-
     .top-tabs .selected-tab {
-        font-weight: 700;
+        font-weight: bold;
     }
 
     .top-left-actions {
@@ -226,12 +266,12 @@ figcaption {
 
     .top-right-actions {
         float: right;
-        min-height: 36px;
+        min-height: 32px;
         margin-bottom: 1.5rem;
     }
 
     .top-left-actions, .top-right-actions {
-        line-height: 36px;
+        line-height: 32px;
         word-spacing: 8px;
     }
 
@@ -248,16 +288,15 @@ figcaption {
 
     .current-stat-label {
         font-size: 2.4rem;
-        vertical-align: middle;
+        vertical-align: bottom;
     }
 
     .shortcuts {
-        border: 4px double #111;
+        border: 2px solid var(--tray-bg-color);
         background-color: white;
         position: absolute;
-        padding: 1rem;
+        padding: 1rem 1rem 0;
         right: 60px;
-        min-width: auto;
         z-index: 800;
         display: none;
     }
@@ -271,6 +310,10 @@ figcaption {
         font-size: 1.5rem;
         line-height: 1.75rem;
         margin: 0 0 1rem;
+    }
+
+    .shortcuts .btn {
+        margin-bottom: 1rem;
     }
 
     #shortcuts {
@@ -299,7 +342,6 @@ figcaption {
 
 @media screen and (max-width: 960px) {
     html {
-        background-image: none;
         font-size: calc((960px - 100vw) / 80 + 10px);
     }
 
@@ -330,8 +372,8 @@ figcaption {
         top: -100vh;
         bottom: 0;
         padding-top: 90vh;
-        background-color: #111;
-        color: #f9f8f5;
+        background-color: var(--tray-bg-color);
+        color: var(--tray-text-color);
     }
 
     .tray:after {
@@ -345,11 +387,11 @@ figcaption {
         padding-top: 10px;
         height: 64px;
         cursor: grab;
-        color: #f9f8f5;
+        color: var(--tray-text-color);
         text-align: center;
         font-size: 32px;
         line-height: 40px;
-        background-image: linear-gradient(#111, #111);
+        background-image: linear-gradient(var(--tray-bg-color), var(--tray-bg-color));
         background-size: 100% 48px;
         background-repeat: no-repeat;
         background-origin: content-box;
@@ -428,37 +470,113 @@ figcaption {
 }
 
 .hunt-icon {
-    vertical-align: middle;
+    vertical-align: bottom;
 }
 
-.gph-list-table {
+.btn .hunt-icon {
+    vertical-align: -5px;
+}
+
+.list-table {
     min-width: 100%;
     max-width: 100%;
     table-layout: fixed;
 }
 
-.gph-list-table td, .gph-list-table th {
+.list-table td, .list-table th {
     padding: 4px 8px;
 }
 
-.gph-list-table td {
+.list-table td:first-child, .list-table th:first-child {
+    padding-left: 0;
+}
+
+.list-table td {
     word-break: break-word;
     overflow-wrap: anywhere;
+    border-color: var(--border-color);
 }
 
 @media screen {
-    .gph-list-table th {
+    .list-table th {
         border: none;
         position: sticky;
         top: 0;
-        background-color: white;
-        box-shadow: inset 0 -1px 0 0 #111;
+        background-color: var(--sticky-bg-color);
+        box-shadow: inset 0 -2px 0 0 var(--border-color);
     }
 }
 
 @media screen and (max-width: 960px) {
-    .gph-list-table th {
+    .list-table th {
         top: 4rem;
+    }
+}
+
+.form-section {
+    margin: 4rem 0;
+}
+
+.form-row, .note {
+    background-color: var(--accent-bg-color);
+    border-left: 2px solid var(--border-color);
+    padding: 1rem 2rem;
+    margin: 1rem 0 1rem;
+    position: relative;
+}
+
+.form-desc label {
+    display: inline;
+}
+
+.form-row .delete-row {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    font-size: 2.4rem;
+    text-decoration: none;
+}
+
+.dynamic-form:only-of-type .delete-row {
+    display: none;
+}
+
+.info-row {
+    margin-bottom: 2.4rem;
+}
+
+.info-desc p:last-child {
+    margin-bottom: 0;
+}
+
+@media screen {
+    .info-row > div {
+        border: 2px solid var(--border-color);
+    }
+
+    .info-row h4 {
+        margin: 0;
+        background-color: var(--border-color);
+        color: var(--btn-text-color);
+        padding-left: 2rem;
+        border: none;
+    }
+
+    .info-desc {
+        font-size: 2rem;
+        padding: 1rem 2rem;
+    }
+}
+
+@media print, (min-width: 961px) {
+    .info-row {
+        display: flex;
+        gap: 4%;
+    }
+
+    .info-row > div {
+        flex-grow: 1;
+        flex-basis: 0;
     }
 }
 
@@ -479,14 +597,14 @@ figcaption {
 
 @media print {
     .story-chunk {
-        border-bottom: 1px solid #111;
+        border-bottom: 1px solid var(--print-border-color);
     }
 }
 
 @media screen {
     .story-chunk {
         max-width: 600px;
-        margin: 0 auto 30px;
+        margin: 0 auto 3rem;
     }
 
     .story-chunk a {
@@ -501,21 +619,12 @@ figcaption {
     font-style: italic;
 }
 
-.form-section {
-    margin-top: 20px;
-    margin-bottom: 40px;
-}
-
-.team-members-formset .delete-row {
-    float: right;
-}
-
 .errorlist {
-    padding: 10px;
+    padding: 1rem;
     border: 3px solid currentColor;
     list-style-type: none;
     color: #b21;
-    background-color: #eee;
+    background-color: var(--white-color);
 }
 
 .errorlist li {
@@ -525,30 +634,6 @@ figcaption {
     padding-left: 0;
 }
 
-.team-info-panel, .call-in-answer-panel, .solved-panel, .puzzle-stats-panel {
-    margin-bottom: 24px;
-}
-
-.call-in-answer-panel:last-child {
-    margin-bottom: 0;
-}
-
-.call-in-answer-panel .row {
-    margin: 1em 0;
-}
-
-.call-in-answer-panel .errorlist {
-    margin-bottom: 0;
-}
-
-.solved-panel {
-    color: #4a2;
-}
-
-.unsolved-panel {
-    color: #c32;
-}
-
 .solved-title-marker {
     font-size: 50%;
     color: initial;
@@ -556,23 +641,28 @@ figcaption {
 
 .solved-title-answer {
     color: #4a2;
+    font-family: var(--answer-font);
 }
 
 .stat-entry {
-    font-size: 2rem;
+    font-weight: bold;
 }
 
 .stat-value {
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .current-team {
     font-weight: bold;
 }
 
+.meta-stats {
+    font-style: italic;
+}
+
 .puzzle-erratum {
     color: #c32;
-    margin-bottom: 10px;
+    margin-bottom: 1rem;
 }
 
 .hint-table {
@@ -619,61 +709,90 @@ figcaption {
 }
 
 .puzzles-list {
-    display: flex;
-    flex-wrap: wrap;
+    font-size: 2.4rem;
+    width: 100%;
 }
 
 .puzzles-list a {
     text-decoration: none;
 }
 
-.puzzles-entry, .puzzles-spacer {
-    flex-grow: 1;
-    margin: 0 20px;
-    width: 280px;
-    box-sizing: border-box;
+.puzzles-list h1 {
+    text-align: left;
+    margin: 0;
 }
 
-.puzzles-entry {
-    margin: 20px;
-    border: 2px solid #111;
-    position: relative;
-    padding: 20px;
-    text-align: center;
+.puzzles-list th {
+    border: none;
 }
 
-.puzzles-link, .puzzles-new, .puzzles-answer, .puzzles-solution {
-    position: absolute;
-    line-height: 24px;
-    background-color: white;
-    padding: 4px 8px;
+.puzzles-list tbody:not(:first-child) th {
+    padding-top: 2em;
 }
 
-.puzzles-link { top: -16px; left: -12px; font-size: 2rem; }
-.puzzles-new { top: -16px; right: -12px; color: #ae4160; }
-.puzzles-answer { bottom: -16px; right: -12px; }
-.puzzles-solution { bottom: -16px; left: -12px; }
+.puzzles-list td {
+    border: none;
+    padding-left: 0;
+    padding-right: 0.5ch;
+    vertical-align: top;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
 
-.puzzles-meta {
-    border-style: dotted;
+.puzzles-list td:first-child {
+    width: 3rem;
+    text-align: right;
+    font-weight: bold;
+}
+
+.puzzles-list td:nth-child(3) {
+    width: 0;
+    white-space: nowrap;
+}
+
+.puzzles-list td:last-child {
+    padding-right: 0;
+}
+
+.puzzles-answer {
+    width: 20ch;
+    max-width: 30vw;
+}
+
+.puzzles-answer > :first-child {
+    border-bottom: 2px solid var(--border-color);
+    font-family: var(--answer-font);
+    font-weight: bold;
+}
+
+.puzzles-new {
+    display: inline-block;
+    font-size: 1.5rem;
+    padding: 0 0.5rem;
+    vertical-align: top;
+    font-family: var(--btn-font);
+    text-transform: uppercase;
+}
+
+@media screen {
+    .puzzles-new {
+        color: var(--btn-text-color);
+        background-color: var(--btn-bg-color);
+        transition: background-color 0.3s;
+    }
+
+    .puzzles-new:hover, a:hover .puzzles-new {
+        color: var(--btn-text-color);
+        background-color: var(--btn-hover-color);
+    }
 }
 
 .puzzles-inner {
-    font-size: 1.4rem;
+    font-size: 1.8rem;
 }
 
 .puzzles-inner b {
-    font-size: 1.6rem;
-}
-
-.note {
-    border: 1px solid #ae4160;
-    padding: 0.5em;
-    margin-bottom: 2em;
-}
-
-.note strong {
-    color: #ae4160;
+    font-size: 2.0rem;
 }
 
 @media screen {
@@ -685,6 +804,7 @@ figcaption {
 
     .spoiler:not(:hover) {
         background-color: currentColor;
+        color: inherit;
     }
 }
 
@@ -719,20 +839,20 @@ figcaption {
 
 .chart {
     width: 100%;
-    height: 82px;
     transform: scaleY(-1);
-    margin-bottom: 24px;
+    margin-bottom: 2.4rem;
     position: relative;
+    display: block;
     z-index: -1;
 }
 
 .chart-area {
-    fill: #44454d;
+    fill: var(--neutral-color);
     opacity: 0.5;
 }
 
 .chart-line {
-    stroke: #ae4160;
+    stroke: var(--accent-color);
     stroke-width: 0.25%;
     fill: none;
 }

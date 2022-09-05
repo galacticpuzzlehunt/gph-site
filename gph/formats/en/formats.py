@@ -1,4 +1,4 @@
-DATE_TIME = 'M j, g:i'
+DATE_TIME = 'M j, H:i'
 DATE_AT_TIME = 'F j, Y \\a\\t g:i A T'
 TIME = 'g:i A T'
 WEEKDATE = 'l, F j, Y'

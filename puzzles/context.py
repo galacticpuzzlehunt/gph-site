@@ -84,6 +84,9 @@ class BaseContext:
     def start_time(self):
         return HUNT_START_TIME - self.team.start_offset if self.team else HUNT_START_TIME
 
+    def time_since_start(self):
+        return self.now - self.start_time
+
     def end_time(self):
         return HUNT_END_TIME
 

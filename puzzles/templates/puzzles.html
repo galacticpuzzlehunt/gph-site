@@ -1,25 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load static %}
 {% block content %}
-
-<style>
-h2 {
-    position: relative;
-}
-
-h2 a {
-    text-decoration: none;
-}
-
-.meta-answer {
-    position: absolute;
-    top: 0;
-    right: 0;
-    font-size: 2.4rem;
-    line-height: 4.5rem;
-}
-</style>
 
 {% if hunt_is_prereleased %}
 <h3 style="text-align: center">
@@ -27,17 +8,15 @@ h2 a {
 </h3>
 {% endif %}
 
+<table class="puzzles-list">
 {% for round in rounds.values %}
-{% if round.round.slug == intro_round_slug %}
-{% include 'puzzles_list.html' with round=round %}
-{% else %}
-<h2>
-    <a href="{% url 'round' round.round.slug %}">{{ round.round.name }}</a>
-    {% if 'meta_answer' in round %}
-    <div class="meta-answer solved-title-answer">{{ round.meta_answer }}</div>
-    {% endif %}
-</h2>
-{% endif %}
+    <tbody>
+        <th colspan="4">
+            <h1><a href="{% url 'round' round.round.slug %}">{{ round.round.name }}</a></h1>
+        </th>
+    </tbody>
+    {% include 'puzzles_list.html' with round=round %}
 {% endfor %}
+</table>
 
 {% endblock %}

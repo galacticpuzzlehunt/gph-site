@@ -21,18 +21,16 @@
 
     <div class="form-section">
     {% for field in form %}
-    <div class="row">
-        <div class="two columns">
-            {{ field.label_tag }}
-        </div>
-        <div class="four columns">
+        <div class="form-row">
+            <div class="form-desc">
+                {{ field.label_tag }}
+            </div>
             {{ field }}
             {{ field.errors }}
+            <div class="form-desc">
+                {{ field.help_text|safe }}
+            </div>
         </div>
-        <div class="six columns">
-            {{ field.help_text|safe }}
-        </div>
-    </div>
     {% endfor %}
     </div>
 
@@ -45,15 +43,13 @@
     {{ team_members_formset.management_form }}
     {{ team_members_formset.non_form_errors }}
     {% for team_member_form in team_members_formset %}
-        <div class="team-members-formset row">
+        <div class="team-members-formset form-row">
             {% for field in team_member_form %}
-            <div class="two columns">
+            <div class="form-desc">
                 {{ field.label_tag }}
             </div>
-            <div class="three columns">
-                {{ field }}
-                {{ field.errors }}
-            </div>
+            {{ field }}
+            {{ field.errors }}
             {% endfor %}
         </div>
     {% endfor %}
@@ -92,7 +88,7 @@
 $('.team-members-formset').formset({
     prefix: '{{ team_members_formset.prefix }}',
     addText: '{% translate "Add another team member" %}',
-    deleteText: '{% translate "Remove" %}',
+    deleteText: '\u2716',
     addCssClass: 'formset-add-link',
 });
 $('.formset-add-link').click(function() {

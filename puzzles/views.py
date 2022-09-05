@@ -4,7 +4,9 @@ import itertools
 import json
 import logging
 import os
+import re
 import requests
+import traceback
 from collections import defaultdict, OrderedDict, Counter
 from functools import wraps
 from urllib.parse import unquote
@@ -24,6 +26,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.html import escape
 from django.utils.http import urlsafe_base64_encode
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_GET, require_POST
@@ -67,7 +70,7 @@ from puzzles.hunt_config import (
     META_META_SLUG,
 )
 
-from puzzles.messaging import send_mail_wrapper, dispatch_victory_alert
+from puzzles.messaging import send_mail_wrapper, dispatch_victory_alert, show_victory_notification
 from puzzles.shortcuts import dispatch_shortcut
 
 
@@ -80,7 +83,8 @@ def validate_puzzle(require_team=False):
     def decorator(f):
         @wraps(f)
         def inner(request, slug):
-            puzzle = Puzzle.objects.filter(slug=slug).first()
+            puzzle = Puzzle.objects.select_related().filter(slug=slug).first()
+            request.context.puzzle = puzzle
             if not puzzle or puzzle not in request.context.unlocks:
                 messages.error(request, _('Invalid puzzle name.'))
                 return redirect('puzzles')
@@ -96,7 +100,6 @@ def validate_puzzle(require_team=False):
                     'access this page.')
                 )
                 return redirect('puzzle', slug)
-            request.context.puzzle = puzzle
             return f(request)
         return inner
     return decorator
@@ -126,7 +129,7 @@ def require_admin(request):
 
 # So it's absolutely clear, the two following decorators are
 # asymmetric: the hunt can "end" before it "closes", and in the time
-# between, both of these decorators will allow non-superusers.  See
+# between, both of these decorators will allow non-superusers. See
 # the "Timing" section of the README.
 @access_restrictor
 def require_after_hunt_end_or_admin(request):
@@ -278,12 +281,16 @@ def password_reset(request):
 
     return render(request, 'password_reset.html', {'form': form})
 
-@require_GET
 def team(request, team_name):
     '''List stats for a single team.'''
     user_team = request.context.team
 
     is_own_team = user_team is not None and user_team.team_name == team_name
+    if request.method == 'POST':
+        if not is_own_team: raise Http404
+        user_team.allow_time_unlocks = request.POST.get('enable') == 'true'
+        user_team.save()
+        return redirect('team', team_name)
     can_view_info = is_own_team or request.context.is_superuser
     team_query = Team.objects.filter(team_name=team_name)
     if not can_view_info:
@@ -597,7 +604,7 @@ def solve(request):
         form = SubmitAnswerForm(request.POST)
         if puzzle_messages:
             for message in puzzle_messages:
-                form.add_error(None, message.response)
+                form.add_error(None, mark_safe(message.response))
         elif not normalized_answer:
             form.add_error(None, _('All puzzle answers will have '
                 'at least one letter A through Z (case does not matter).'))
@@ -622,6 +629,7 @@ def solve(request):
                     dispatch_victory_alert(
                         _('Team %s has finished the hunt!') % team +
                         _('\n**Emails:** <%s>') % request.build_absolute_uri(reverse('finishers')))
+                    show_victory_notification(request.context)
                     return redirect('victory')
             else:
                 messages.error(request, _('%s is incorrect.') % normalized_answer)
@@ -632,17 +640,37 @@ def solve(request):
             raise Http404
         survey = SurveyForm(request.POST)
         if survey.is_valid():
-            Survey.objects.update_or_create(
-                puzzle=puzzle, team=team, defaults=survey.cleaned_data)
+            if request.POST.get('id'):
+                survey_obj = Survey.objects.filter(id=request.POST.get('id')).first()
+                if not survey_obj or survey_obj.team != team or survey_obj.puzzle != puzzle:
+                    raise Http404
+            else:
+                survey_obj = Survey(team=team, puzzle=puzzle)
+            for k, v in survey.cleaned_data.items():
+                setattr(survey_obj, k, v)
+            survey_obj.save()
             messages.success(request, _('Thanks!'))
             return redirect('solve', puzzle.slug)
 
     if survey is None and SURVEYS_AVAILABLE:
-        survey = SurveyForm(
-            instance=Survey.objects.filter(puzzle=puzzle, team=team).first())
+        survey = SurveyForm()
     return render(request, 'solve.html', {
         'form': form or SubmitAnswerForm(),
         'survey': survey,
+        'survey_fields': Survey.fields(),
+        'past_surveys': [{
+            'fields': [{
+                'value': field.value_from_object(survey),
+                'max': field.max_rating,
+                'name': field.name,
+            } for field in Survey.fields()],
+            'comments': survey.comments,
+            'submitted_datetime': survey.submitted_datetime,
+            'id': survey.id,
+        } for survey in Survey.objects
+            .filter(puzzle=puzzle, team=team)
+            .order_by('-submitted_datetime')
+        ],
     })
 
 
@@ -679,12 +707,26 @@ def post_hunt_solve(request):
     '''Check an answer client-side for a puzzle after the hunt ends.'''
 
     puzzle = request.context.puzzle
-    answer = Puzzle.normalize_answer(request.GET.get('answer'))
-    is_correct = answer == puzzle.normalized_answer
+    answer = request.GET.get('answer')
+    if answer:
+        semicleaned_guess = PuzzleMessage.semiclean_guess(answer)
+        normalized_answer = Puzzle.normalize_answer(answer)
+        is_correct = normalized_answer == puzzle.normalized_answer
+        puzzle_messages = [
+            message for message in puzzle.puzzlemessage_set.all()
+            if semicleaned_guess == message.semicleaned_guess
+        ]
+        form = SubmitAnswerForm(request.GET)
+        if puzzle_messages:
+            for message in puzzle_messages:
+                form.add_error(None, mark_safe(message.response))
+            answer = None
+    else:
+        form = SubmitAnswerForm()
     return render(request, 'post_hunt_solve.html', {
-        'is_correct': answer is not None and is_correct,
-        'is_wrong': answer is not None and not is_correct,
-        'form': SubmitAnswerForm(),
+        'is_correct': answer and is_correct,
+        'is_wrong': answer and not is_correct,
+        'form': form,
     })
 
 
@@ -864,7 +906,7 @@ def hint(request, id):
 
     claimer = request.COOKIES.get('claimer')
     if claimer:
-        claimer = unquote(claimer)
+        claimer = re.sub(r'#\d+$', '', unquote(claimer))
     if hint.status != Hint.NO_RESPONSE:
         if hint.claimer:
             form.add_error(None, _('This hint has been answered by {}!').format(hint.claimer))
@@ -1005,10 +1047,9 @@ def stats(request):
     solvers_map = {}
     unlock_time_map = {
         unlock.team_id: unlock.unlock_datetime
-        for unlock in puzzle.puzzleunlock_set.all()
+        for unlock in puzzle.puzzleunlock_set.exclude(view_datetime=None).all()
     }
     incorrect_guesses = Counter()
-    guess_time_map = {}
     for submission in puzzle_submissions:
         team_id = submission.team_id
         total_guesses_map[team_id] += 1
@@ -1017,18 +1058,11 @@ def stats(request):
             solvers_map[team_id] = submission.team
         else:
             incorrect_guesses[submission.submitted_answer] += 1
-            guess_time_map[team_id, submission.submitted_answer] = submission.submitted_datetime
-    wrong = '(?)'
-    if incorrect_guesses:
-        (wrong, _), = incorrect_guesses.most_common(1)
     solvers = [{
         'team': solver,
         'is_current': solver == team,
         'unlock_time': unlock_time_map.get(solver.id),
         'solve_time': solve_time_map[solver.id],
-        'wrong_duration':
-            (solve_time_map[solver.id] - guess_time_map[solver.id, wrong])
-            .total_seconds() if (solver.id, wrong) in guess_time_map else None,
         'open_duration':
             (solve_time_map[solver.id] - unlock_time_map[solver.id])
             .total_seconds() if solver.id in unlock_time_map else None,
@@ -1041,7 +1075,8 @@ def stats(request):
         'solves': len(solvers_map),
         'guesses': sum(total_guesses_map.values()),
         'answers_tried': incorrect_guesses.most_common(),
-        'wrong': wrong,
+        'unlock_count': len(unlock_time_map),
+        'hint_count': puzzle.hint_set.exclude(team__is_hidden=True).count(),
     })
 
 
@@ -1070,7 +1105,7 @@ def story(request):
 
     # FIXME: This will depend a lot on your hunt. It might not make any sense
     # at all.
-    if not STORY_PAGE_VISIBLE:
+    if not STORY_PAGE_VISIBLE and not request.context.is_superuser:
         raise Http404
     story_points = OrderedDict((
         ('pre_hunt', not request.context.hunt_has_almost_started),
@@ -1085,7 +1120,7 @@ def story(request):
                 if puzzle.is_meta:
                     story_points['meta%d_done' % puzzle.round.order] = True
     story_points = [key for (key, visible) in story_points.items() if visible]
-    if not request.context.hunt_is_over:
+    if request.context.team:
         story_points.reverse()
     return render(request, 'story.html', {'story_points': story_points})
 
@@ -1113,7 +1148,7 @@ def errata(request):
 
 @require_GET
 def wrapup(request):
-    if not WRAPUP_PAGE_VISIBLE:
+    if not WRAPUP_PAGE_VISIBLE and not request.context.is_superuser:
         raise Http404
     return render(request, 'wrapup.html')
 
@@ -1124,17 +1159,14 @@ def finishers(request):
     unlocks = OrderedDict()
     solves_by_team = defaultdict(list)
     metas_by_team = defaultdict(list)
-    wrong_times = {}
 
     for submission in AnswerSubmission.objects.filter(
         puzzle__slug=META_META_SLUG,
         team__is_hidden=False,
+        is_correct=True,
         submitted_datetime__lt=HUNT_END_TIME,
     ).order_by('submitted_datetime'):
-        if submission.is_correct:
-            unlocks[submission.team_id] = None
-        else:
-            wrong_times[submission.team_id] = submission.submitted_datetime
+        unlocks[submission.team_id] = None
     for unlock in PuzzleUnlock.objects.select_related().filter(
         team__id__in=unlocks,
         puzzle__slug=META_META_SLUG,
@@ -1158,21 +1190,11 @@ def finishers(request):
             'after': (solves[i] - HUNT_START_TIME).total_seconds(),
         } for i in range(1, len(solves))]
         metas = metas_by_team[team_id]
-        times = [unlock.unlock_datetime, wrong_times.get(team_id), metas[-1]]
-        last_time = times[0]
-        milestones = []
-        for i in range(1, len(times)):
-            if times[i]:
-                milestones.append((times[i], (times[i] - last_time).total_seconds()))
-                last_time = times[i]
-            else:
-                milestones.append((times[i], None))
         data.append({
             'team': unlock.team,
-            'unlock_time': times[0],
-            'solve_time': times[-1],
-            'milestones': milestones,
-            'total_time': (times[-1] - times[0]).total_seconds(),
+            'unlock_time': unlock.unlock_datetime,
+            'solve_time': metas[-1],
+            'total_time': (metas[-1] - unlock.unlock_datetime).total_seconds(),
             'hunt_length': (HUNT_END_TIME - HUNT_START_TIME).total_seconds(),
             'solves': solves,
             'metas': [(ts - HUNT_START_TIME).total_seconds() for ts in metas],
@@ -1213,7 +1235,6 @@ def bigboard_generic(request, hide_hidden):
     used_hints_map = defaultdict(int) # (team, puzzle) -> number of hints
     used_hints_by_team_map = defaultdict(int) # team -> number of hints
     used_hints_by_puzzle_map = defaultdict(int) # puzzle -> number of hints
-    solves_map = defaultdict(dict) # team -> {puzzle id -> puzzle}
     meta_solves_map = defaultdict(int) # team -> number of meta solves
     solve_time_map = defaultdict(dict) # team -> {puzzle id -> solve time}
     during_hunt_solve_time_map = defaultdict(dict) # team -> {puzzle id -> solve time}
@@ -1242,7 +1263,6 @@ def bigboard_generic(request, hide_hidden):
             solve_time_map[team_id][puzzle_id] = submitted_datetime
             if submitted_datetime < HUNT_END_TIME:
                 during_hunt_solve_time_map[team_id][puzzle_id] = submitted_datetime
-        solves_map[team_id][puzzle_id] = puzzle_map[puzzle_id]
         if puzzle_id not in puzzle_metas:
             meta_solves_map[team_id] += 1
 
@@ -1470,10 +1490,11 @@ def shortcuts(request):
     try:
         dispatch_shortcut(request)
     except Exception as e:
+        print('Shortcut exception:', traceback.format_exc())
         response.write('<script>top.toastr.error(%s)</script>' % (
             json.dumps('<br>'.join(escape(str(part)) for part in e.args))))
     else:
-        response.write('<script>top.location.reload()</script>')
+        response.write('<script>top.location.reload(true)</script>')
     return response
 
 
@@ -1484,3 +1505,12 @@ def robots(request):
     else:
         response.write('User-agent: *\nDisallow: /solution/\n')
     return response
+
+
+def accept_ranges_middleware(get_response):
+    # https://stackoverflow.com/questions/36783521/why-does-setting-currenttime-of-html5-video-element-reset-time-in-chrome
+    def process_request(request):
+        response = get_response(request)
+        response['Accept-Ranges'] = 'bytes'
+        return response
+    return process_request

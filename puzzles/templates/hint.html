@@ -29,7 +29,7 @@
         regardless of what status you assign to it. You should clarify whatever
         was confusing or mistargeted in the last response, but feel free to
         request that the team use a real hint instead. Setting this hint to
-        Refunded will also prevent additional follow-ups to the follow-up."{% endblocktranslate %}
+        Refunded will also prevent additional follow-ups to the follow-up.{% endblocktranslate %}
     </div>
     {% endif %}
     {% for hint in previous_same_team %}
@@ -122,17 +122,17 @@
 </table>
 
 {{ form.non_field_errors }}
-<form method="post" class="call-in-answer-panel hint-controls">
+<form method="post" class="hint-controls">
     {% csrf_token %}
     {% for field in form %}
-    <div class="row">
-        <div class="two columns">{{ field.label_tag }}</div>
-        <div class="ten columns">{{ field }} {{ field.errors }}</div>
-    </div>
+    {{ field.label_tag }}
+    {{ field }}
+    {{ field.errors }}
     {% endfor %}
     <input type="hidden" name="initial_status" value="{{ hint.status }}">
+    <br>
     {% if hint.status == 'NR' %}
-    <button class="btn" name="action" type="submit" value="unclaim" formnovalidate style="filter: hue-rotate(120deg)">{% translate "Unclaim" %}</button>
+    <button class="btn danger" name="action" type="submit" value="unclaim" formnovalidate>{% translate "Unclaim" %}</button>
     {% else %}
     <a class="btn" href="{% url 'hint-list' %}">{% translate "Back to list" %}</a>
     {% endif %}

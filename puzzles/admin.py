@@ -79,7 +79,7 @@ class ErratumAdmin(admin.ModelAdmin):
     search_fields = ('puzzle', 'update_text', 'puzzle_text')
 
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ('team', 'puzzle')
+    list_display = ('team', 'puzzle', 'submitted_datetime')
     list_filter = ('puzzle', 'puzzle__round', 'team')
     search_fields = ('comments',)
 

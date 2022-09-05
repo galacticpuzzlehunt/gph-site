@@ -11,37 +11,40 @@
 {% if modify_info_available %}
 <a href="{% url 'edit-team' %}" class="btn">{% translate "Edit team members" %}</a>
 <a href="{% url 'password_change' %}" class="btn">{% translate "Change password" %}</a>
-{% elif request.context.is_superuser %}
-<a href="/admin/puzzles/team/{{ view_team.id }}/change/" class="btn">{% translate "Django admin" %}</a>
-<a href="/admin/puzzles/answersubmission/?team__id__exact={{ view_team.id }}" class="btn">{% translate "All guesses" %}</a>
-<a href="{% url 'hint-list' %}?team={{ view_team.id }}" class="btn">{% translate "All hints" %}</a>
-<a href="{% url 'impersonate-start' view_team.user_id %}" class="btn" style="filter: hue-rotate(120deg)">{% translate "Impersonate" %}</a>
+{% if not hunt_is_over %}
+<a href="javascript:toggleTimeUnlocks()" class="btn">
+    {% if team.allow_time_unlocks %}
+    {% translate "Disable time unlocks" %}
+    {% else %}
+    {% translate "Enable time unlocks" %}
+    {% endif %}
+</a>
+<form method="post" id="time_unlocks" style="display: none">
+    {% csrf_token %}
+    <input type="hidden" name="enable" value="{{ team.allow_time_unlocks|yesno:'false,true' }}">
+</form>
+<script>
+function toggleTimeUnlocks() {
+    const form = document.getElementById('time_unlocks');
+    {% if team.allow_time_unlocks %}
+    const msg = gettext(`We unlock puzzles over several days after the hunt starts so all teams have a chance to work on them. You may disable this behavior in order to work on the hunt at your own pace.
+
+Note that this means you may see fewer puzzles than if you were logged out. Also, this option has no effect after the hunt ends.`);
+    if (confirm(msg)) form.submit();
+    {% else %}
+    form.submit();
+    {% endif %}
+}
+</script>
+{% endif %}
 {% endif %}
 {% endblock %}
 
 {% block content %}
 
 <style>
-.meta {
-    font-style: italic;
-}
-
-.team-members {
-    margin-top: 24px;
-}
-
-@media (min-width: 550px) {
-    .team-members {
-        margin-top: 0;
-    }
-}
-
-.team-info-panel h4 {
-    margin-bottom: 0;
-}
-
-.free {
-    color: #aaa;
+.free td:not(:first-child) {
+    opacity: 0.5;
 }
 
 .free td:last-child:before {
@@ -56,10 +59,10 @@
 <h1>{{ view_team.team_name }}</h1>
 
 <main>
-    <div class="team-info-panel">
-        <div class="row">
-            <div class="six columns">
-                <h4>{% translate "Stats" %}</h4>
+    <div class="info-row">
+        <div>
+            <h4>{% translate "Stats" %}</h4>
+            <div class="info-desc">
                 <div class="stat-entry">{% translate "Rank:" %} <span class="stat-value">{{ rank }}</span></div>
                 <div class="stat-entry">{% translate "Puzzles solved:" %} <span class="stat-value">{{ solves }}</span></div>
                 {% if view_info_available %}
@@ -67,25 +70,23 @@
                 <div class="stat-entry">{% translate "Hints available:" %} <span class="stat-value">{{ view_team.num_hints_remaining }}</span></div>
                 {% endif %}
                 {% if view_team.num_free_answers_remaining > 0 %}
-                <div class="stat-entry">{% translate "Free answers available: " %}<span class="stat-value">{{ view_team.num_free_answers_remaining }}</span></div>
+                <div class="stat-entry">{% translate "Free answers available:" %} <span class="stat-value">{{ view_team.num_free_answers_remaining }}</span></div>
                 {% endif %}
                 {% endif %}
             </div>
-            <div class="six columns">
-                <div class="team-members">
-                    <h4>{% translate "Team Members:" %}</h4>
-                    <div class="stat-entry">
-                        {% for team_member in view_team.teammember_set.all %}
-                        {{ team_member.name }}{% if forloop.revcounter != 1 %}, {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
+        </div>
+        <div>
+            <h4>{% translate "Members" %}</h4>
+            <div class="info-desc">
+                {% for team_member in view_team.teammember_set.all %}
+                {{ team_member.name }}{% if forloop.revcounter != 1 %}, {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>
     {% if submissions|length %}
     {% if view_info_available or hunt_is_over %}
-    <svg class="chart" viewbox="0 0 {{ chart.hunt_length }} {{ all_puzzles|length }}" preserveAspectRatio="none">
+    <svg class="chart" style="height: calc(2px * {{ all_puzzles|length }})" viewbox="0 0 {{ chart.hunt_length }} {{ all_puzzles|length }}" preserveAspectRatio="none">
         <path d="M {{ chart.hunt_length }} 0 L 0 0
         {% for solve in chart.solves %}
         L {{ solve.before }} {{ forloop.counter }}
@@ -96,7 +97,7 @@
         <path d="M {{ meta }} 0 L {{ meta }} {{ all_puzzles|length }}" class="chart-line"></path>
         {% endfor %}
     </svg>
-    <table class="sortable gph-list-table">
+    <table class="sortable list-table">
         <col style="width: 40%">
         <col style="width: 10%">
         <col style="width: 20%">
@@ -111,7 +112,9 @@
         </tr>
         {% for s in submissions %}
         <tr{% if s.submission.used_free_answer %} class="free"{% endif %}>
-            <td sorttable_customkey="{{ s.submission.puzzle.name }}"{% if s.submission.puzzle.is_meta %} class="meta"{% endif %}><a href="{% url 'puzzle' s.submission.puzzle.slug %}">{{ s.submission.puzzle.name }}</a></td>
+            <td sorttable_customkey="{{ s.submission.puzzle.name }}"{% if s.submission.puzzle.is_meta %} class="meta-stats"{% endif %}>
+                <a href="{% url 'puzzle' s.submission.puzzle.slug %}">{{ s.submission.puzzle.name }}</a>
+            </td>
             <td>{{ s.guesses }}</td>
             <td sorttable_customkey="{{ s.unlock_time|unix_time }}">{% format_time s.unlock_time %}</td>
             <td sorttable_customkey="{{ s.open_duration }}">{% format_duration s.open_duration %}</td>

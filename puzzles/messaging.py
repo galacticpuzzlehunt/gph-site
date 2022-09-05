@@ -1,14 +1,14 @@
+import asyncio
+import collections
 import json
 import logging
 import requests
 import traceback
 
-from disco.api.client import APIClient
-from disco.types.message import MessageEmbed
-
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
+import discord
 
 from django.conf import settings
 from django.contrib import messages
@@ -24,6 +24,7 @@ from puzzles.hunt_config import (
     HUNT_ORGANIZERS,
     CONTACT_EMAIL,
     MESSAGING_SENDER_EMAIL,
+    META_META_SLUG,
 )
 
 logger = logging.getLogger('puzzles.messaging')
@@ -118,13 +119,6 @@ def send_mail_wrapper(subject, template, context, recipients):
             subject, ', '.join(recipients), traceback.format_exc()))
 
 
-# Set to this to delete an embed from a message. (None doesn't work; that's
-# interpreted as "don't change the embed". MessageEmbed() does not work; you
-# get a small, ugly embed with nothing in it.)
-class EmptyEmbed:
-    def to_dict(self):
-        return {}
-
 class DiscordInterface:
     TOKEN = None # FIXME a long token from Discord
 
@@ -142,18 +136,28 @@ class DiscordInterface:
         self.client = None
         self.avatars = None
         if self.TOKEN and not settings.IS_TEST:
-            self.client = APIClient(self.TOKEN)
+            self.client = discord.Client()
+            self.client.loop = asyncio.new_event_loop()
+            self.client.loop.run_until_complete(self.client.login(self.TOKEN))
+            # Look man, I dunno. I have no clue how Python async works and this
+            # is all a house of cards that probably works totally differently
+            # depending on your environment. If you can find a way to reliably
+            # call these async things from here, please send us a PR.
 
-    def get_avatars(self):
+    def get_avatar(self, claimer):
         if self.avatars is None:
             self.avatars = {}
             if self.client is not None:
-                members = self.client.guilds_members_list(self.GUILD).values()
+                members = [
+                    discord.Member(data=data, guild=None, state=self.client._connection)
+                    for data in self.client.loop.run_until_complete(
+                    self.client.http.get_members(self.GUILD, limit=1000, after=None))
+                ]
                 for member in members:
-                    self.avatars[member.user.username] = member.user.avatar_url
+                    self.avatars[member.name] = member.display_avatar.url
                 for member in members:
-                    self.avatars[member.name] = member.user.avatar_url
-        return self.avatars
+                    self.avatars[member.display_name] = member.display_avatar.url
+        return self.avatars.get(claimer)
 
     # If you get an error code 50001 when trying to create a message, even
     # though you're sure your bot has all the permissions, it might be because
@@ -163,53 +167,50 @@ class DiscordInterface:
     # I spent like four hours trying to find weird asynchronous ways to do this
     # right before each time I send a message, but it seems maybe you actually
     # just need to do this once and your bot can create messages forever?
-    # disco.py's Client (not APIClient) wraps an APIClient and a GatewayClient,
-    # the latter of which does this. So I believe you can fix this by running a
+    # pycord's Client does this. So I believe you can fix this by running a
     # script like the following *once* on your local machine (it will, as
     # advertised, run forever; just kill it after a few seconds)?
 
-    # from gevent import monkey
-    # monkey.patch_all()
-    # from disco.client import Client, ClientConfig
-    # Client(ClientConfig({'token': TOKEN})).run_forever()
+    # import discord
+    # discord.Client().run(TOKEN)
 
     def update_hint(self, hint):
         HintsConsumer.send_to_all(json.dumps({'id': hint.id,
             'content': render_to_string('hint_list_entry.html', {
                 'hint': hint, 'now': timezone.localtime()})}))
-        embed = MessageEmbed()
-        embed.author.url = hint.full_url()
+        embed = collections.defaultdict(lambda: collections.defaultdict(dict))
+        embed['author']['url'] = hint.full_url()
         if hint.claimed_datetime:
-            embed.color = 0xdddddd
-            embed.timestamp = hint.claimed_datetime.isoformat()
-            embed.author.name = _('Claimed by {}').format(hint.claimer)
-            if hint.claimer in self.get_avatars():
-                embed.author.icon_url = self.get_avatars()[hint.claimer]
+            embed['color'] = 0xdddddd
+            embed['timestamp'] = hint.claimed_datetime.isoformat()
+            embed['author']['name'] = _('Claimed by {}').format(hint.claimer)
+            avatar = self.get_avatar(hint.claimer)
+            if avatar: embed['author']['icon_url'] = avatar
             debug = _('claimed by {}').format(hint.claimer)
         else:
-            embed.color = 0xff00ff
-            embed.author.name = _('U N C L A I M E D')
+            embed['color'] = 0xff00ff
+            embed['author']['name'] = _('U N C L A I M E D')
             claim_url = hint.full_url(claim=True)
-            embed.title = _('Claim: ') + claim_url
-            embed.url = claim_url
+            embed['title'] = _('Claim: ') + claim_url
+            embed['url'] = claim_url
             debug = 'unclaimed'
 
         if self.client is None:
             message = hint.long_discord_message()
             logger.info(_('Hint, {}: {}\n{}').format(debug, hint, message))
-            logger.info(_('Embed: {}').format(embed.to_dict()))
+            logger.info(_('Embed: {}').format(embed))
         elif hint.discord_id:
             try:
-                self.client.channels_messages_modify(
-                    self.HINT_CHANNEL, hint.discord_id, embed=embed)
+                self.client.loop.run_until_complete(self.client.http.edit_message(
+                    self.HINT_CHANNEL, hint.discord_id, embeds=[embed]))
             except Exception:
                 dispatch_general_alert(_('Discord API failure: modify\n{}').format(
                     traceback.format_exc()))
         else:
             message = hint.long_discord_message()
             try:
-                discord_id = self.client.channels_messages_create(
-                    self.HINT_CHANNEL, message, embed=embed).id
+                discord_id = self.client.loop.run_until_complete(self.client.http.send_message(
+                    self.HINT_CHANNEL, message, embeds=[embed]))['id']
             except Exception:
                 dispatch_general_alert(_('Discord API failure: create\n{}').format(
                     traceback.format_exc()))
@@ -222,34 +223,25 @@ class DiscordInterface:
         if self.client is None:
             logger.info(_('Hint done: {}').format(hint))
         elif hint.discord_id:
-            # try:
-            #     self.client.channels_messages_delete(
-            #         self.HINT_CHANNEL, hint.discord_id)
-            # except Exception:
-            #     dispatch_general_alert(_('Discord API failure: delete\n{}').format(
-            #         traceback.format_exc()))
-            # hint.discord_id = ''
-            # hint.save(update_fields=('discord_id',))
-
             # what DPPH did instead of deleting messages:
             # (nb. I tried to make these colors color-blind friendly)
 
-            embed = MessageEmbed()
+            embed = collections.defaultdict(lambda: collections.defaultdict(dict))
             if hint.status == hint.ANSWERED:
-                embed.color = 0xaaffaa
+                embed['color'] = 0xaaffaa
             elif hint.status == hint.REFUNDED:
-                embed.color = 0xcc6600
+                embed['color'] = 0xcc6600
             # nothing for obsolete
 
-            embed.author.name = _('{} by {}').format(hint.get_status_display(), hint.claimer)
-            embed.author.url = hint.full_url()
-            embed.description = hint.response[:250]
-            if hint.claimer in self.get_avatars():
-                embed.author.icon_url = self.get_avatars()[hint.claimer]
+            embed['author']['name'] = _('{} by {}').format(hint.get_status_display(), hint.claimer)
+            embed['author']['url'] = hint.full_url()
+            embed['description'] = hint.response[:250]
+            avatar = self.get_avatar(hint.claimer)
+            if avatar: embed['author']['icon_url'] = avatar
             debug = _('claimed by {}').format(hint.claimer)
             try:
-                self.client.channels_messages_modify(
-                    self.HINT_CHANNEL, hint.discord_id, content=hint.short_discord_message(), embed=embed)
+                self.client.loop.run_until_complete(self.client.http.edit_message(
+                    self.HINT_CHANNEL, hint.discord_id, content=hint.short_discord_message(), embeds=[embed]))
             except Exception:
                 dispatch_general_alert(_('Discord API failure: modify\n{}').format(
                     traceback.format_exc()))
@@ -279,6 +271,9 @@ class BroadcastWebsocketConsumer(WebsocketConsumer):
         if self.is_ok():
             self.group = self.get_group()
             async_to_sync(self.channel_layer.group_add)(self.group, self.channel_name)
+        # If not is_ok, still accept the connection to stop the client from
+        # repeatedly retrying. But consider modifying the client to not open a
+        # socket at all in this case since it's probably pointless to do so.
         self.accept()
 
     def disconnect(self, close_code):
@@ -342,7 +337,7 @@ def show_unlock_notification(context, unlock):
     TeamNotificationsConsumer.send_to_team(unlock.team, data)
 
 def show_solve_notification(submission):
-    if not submission.puzzle.is_meta:
+    if not submission.puzzle.is_meta or submission.puzzle.slug == META_META_SLUG:
         return
     data = json.dumps({
         'title': str(submission.puzzle),
@@ -352,6 +347,14 @@ def show_solve_notification(submission):
     # No need to worry here since whoever triggered this is already getting a
     # [ANSWER is correct!] notification.
     TeamNotificationsConsumer.send_to_team(submission.team, data)
+
+def show_victory_notification(context):
+    data = json.dumps({
+        'title': 'Congratulations!',
+        'text': _('You’ve finished the %s!') % HUNT_TITLE,
+        'link': reverse('victory'),
+    })
+    TeamNotificationsConsumer.send_to_team(context.team, data)
 
 def show_hint_notification(hint):
     data = json.dumps({

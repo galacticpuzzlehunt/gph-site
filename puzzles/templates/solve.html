@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load puzzle_tags %}
 
 {% block page-title %}
-<title>{% blocktranslate with puzzle_name=puzzle.name %}Call in: {{ puzzle_name }}{% endblocktranslate %}</title>
+<title>{% blocktranslate with puzzle_name=puzzle.name %}Solve: {{ puzzle_name }}{% endblocktranslate %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
@@ -11,32 +12,28 @@
 
 {% block content %}
 
-<h1>{% blocktranslate with puzzle_name=puzzle.name %}Call in an answer for {{ puzzle_name }}{% endblocktranslate %}</h1>
+<h1>
+    {% blocktranslate with puzzle_name=puzzle.name %}Solve: {{ puzzle_name }}{% endblocktranslate %}
+    {% if puzzle_answer %}
+    <div class="solved-title-marker">{% translate "Solved!" %} <span class="solved-title-answer">{{ puzzle_answer }}</span></div>
+    {% endif %}
+</h1>
 
 <main>
 {% if puzzle_answer != None %}
-    <div class="solved-panel">
-        <h4>{% translate "Solved!" %}</h4>
-        <p>{% translate "The answer was"%} <b>{{ puzzle_answer }}</b>.</p>
-    </div>
-
     {% if survey %}
     <h4>{% translate "Optional survey" %}</h4>
-    <div class="note">{% blocktranslate %}This survey will submit on behalf of 
-your whole team, so make sure you don&rsquo;t have two responders 
-overwriting each other&rsquo;s comments.  
-You can come back to this page at any time to edit your response.{% endblocktranslate %}
-</div>
+    <div class="note">{% translate "You can come back to this page at any time to edit your response." %}</div>
 
-    <form method="post" class="call-in-answer-panel">
+    <form method="post" id="survey_form">
         {% csrf_token %}
-
+        <input name="id" value="" type="hidden">
         {{ survey.non_field_errors }}
 
-        <div class="row">
+        <div class="info-row">
         {% for field in survey %}
             {% if 'adjective' in field.field.widget.attrs %}
-            <div class="six columns rating">
+            <div class="rating">
                 {% blocktranslate with max_value=field.field.max_value adjective=field.field.widget.attrs.adjective %}On a scale from 1 to {{ max_value }}, how {{ adjective }} was this puzzle?{% endblocktranslate %}
                 <p>
                 {% spaceless %}
@@ -54,30 +51,27 @@ You can come back to this page at any time to edit your response.{% endblocktran
 
         {% for field in survey %}
         {% if 'adjective' not in field.field.widget.attrs %}
-        <div class="row">
-            <div class="three columns">
-                {{ field.label_tag }}
-            </div>
-            <div class="six columns">
-                {{ field }}
-                {{ field.errors }}
-            </div>
-            <div class="three columns">
-                <button class="btn" type="submit">{% translate "Submit" %}</button>
-            </div>
-        </div>
+        {{ field }}
+        {{ field.errors }}
         {% endif %}
         {% endfor %}
 
+        <button class="btn" type="submit">{% translate "Submit" %}</button>
+        {% if past_surveys %}
+        <a class="btn danger" style="float: right" href="javascript:clearSurvey()">{% translate "Reset" %}</a>
+        {% endif %}
+
         <style>
-        .rating {
+        .rating.rating {
             text-align: center;
+            border: none;
         }
 
         .rating p {
             white-space: nowrap;
             pointer-events: none;
             user-select: none;
+            margin: 0;
         }
 
         .rating input {
@@ -109,32 +103,69 @@ You can come back to this page at any time to edit your response.{% endblocktran
         }
         </style>
     </form>
+
+    {% if past_surveys %}
+    <table class="list-table">
+        <tr>
+            {% for field in survey_fields %}
+            <th>{{ field.adjective|title }}</th>
+            {% endfor %}
+            <th>{% translate "Comments" %}</th>
+            <th>{% translate "Submitted" %}</th>
+            <th></th>
+        </tr>
+        {% for past_survey in past_surveys %}
+        <tr>
+            {% for field in past_survey.fields %}
+            <td>{{ field.value }} <small>/ {{ field.max }}</small></td>
+            {% endfor %}
+            <td><pre class="submitted-text">{{ past_survey.comments }}</pre></td>
+            <td>{% format_time past_survey.submitted_datetime %}</td>
+            <td><a href="javascript:editSurvey({{ past_survey.id }})">{% translate "Edit" %}</a></td>
+        {% endfor %}
+    </table>
+    {{ past_surveys|json_script:"past_surveys" }}
+    <script>
+        function clearSurvey() {
+            $('#survey_form [name=id]').val('');
+            $('#survey_form [type=radio]').prop('checked', false);
+            $('#survey_form [name=comments]').val('');
+        }
+        function editSurvey(id) {
+            for (const pastSurvey of JSON.parse($('#past_surveys').text())) {
+                if (pastSurvey.id != id) continue;
+                $('#survey_form [name=id]').val(pastSurvey.id);
+                for (const field of pastSurvey.fields)
+                    $('#survey_form [name=' + field.name + '][value=' + field.value + ']').prop('checked', true);
+                $('#survey_form [name=comments]').val(pastSurvey.comments);
+            }
+        }
+    </script>
+    {% endif %}
     {% endif %}
 {% else %}
     {% if guesses_remaining == 0 %}
     <p>{% translate "You have no more guesses remaining for this puzzle!" %}</p>
     {% else %}
-    <form method="post" class="call-in-answer-panel">
+    <form method="post">
         {% csrf_token %}
 
         {{ form.non_field_errors }}
 
         {% for field in form %}
-        <div class="row">
-            <div class="four columns">
+        <div class="form-row">
+            <div class="form-desc">
                 {{ field.label_tag }}
             </div>
-            <div class="four columns">
-                {{ field }}
-                {{ field.errors }}
+            {{ field }}
+            {{ field.errors }}
+            <div class="form-desc">
+                {% blocktranslate count guesses=guesses_remaining %}You have {{ guesses }} guess remaining for this puzzle.{% plural %}You have {{ guesses }} guesses remaining for this puzzle.{% endblocktranslate %}
             </div>
-            <div class="four columns">
-                <button class="btn" type="submit">{% translate "Submit" %}</button>
-            </div>
+            <a class="delete-row" href="#">&#x2794;</a>
         </div>
         {% endfor %}
     </form>
-    <p>{% blocktranslate count guesses=guesses_remaining %}You have {{ guesses }} guess remaining for this puzzle.{% plural %}You have {{ guesses }} guesses remaining for this puzzle.{% endblocktranslate %}</p>
     {% endif %}
 
     {% if not puzzle.is_meta and num_free_answers_remaining > 0 %}
@@ -154,5 +185,12 @@ You can come back to this page at any time to edit your response.{% endblocktran
     </ul>
 {% endif %}
 </main>
+
+<script>
+$('.delete-row').click(function(e) {
+    e.preventDefault();
+    this.closest('form').requestSubmit();
+});
+</script>
 
 {% endblock %}

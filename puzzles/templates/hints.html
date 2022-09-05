@@ -32,12 +32,12 @@
     vertical-align: text-top;
 }
 .hint-info {
-    color: #999;
+    opacity: 0.5;
     white-space: initial;
 }
 </style>
 
-<h1>{% blocktranslate with puzzle_name=puzzle.name %}Hints for {{ puzzle_name }}{% endblocktranslate %}</h1>
+<h1>{% blocktranslate with puzzle_name=puzzle.name %}Hints: {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
     {% if not hunt_is_over %}
@@ -88,12 +88,13 @@
         {% blocktranslate %}You&rsquo;ve already solved this puzzle, but you can ask for a hint anyway if you&rsquo;d like (for example, if you&rsquo;re not sure about a step or you backsolved it). The restrictions above still apply.{% endblocktranslate %}
     </div>
     {% endif %}
-    <form method="post" class="call-in-answer-panel{% if error %} hint-hidden{% endif %}">
+    <form method="post"{% if error %} class="hint-hidden"{% endif %}>
         {% csrf_token %}
         {{ form.non_field_errors }}
         {% for field in form %}
-        <div class="row">{{ field.label_tag }}</div>
-        <div class="row">{{ field }} {{ field.errors }}</div>
+        {{ field.label_tag }}
+        {{ field }}
+        {{ field.errors }}
         {% endfor %}
 
         {% if can_followup %}
@@ -120,11 +121,10 @@
         </script>
         {% endif %}
 
-        <div class="row">
-            <button class="btn" type="submit">
-                {% translate "Submit" %} (&minus; <span id="hint-cost">1</span> {% include 'icon-hint.svg' %})
-            </button>
-        </div>
+        <br>
+        <button class="btn" type="submit">
+            {% translate "Submit" %} (&minus;<span id="hint-cost">1</span> {% spaceless %}{% include 'icon-hint.svg' %}{% endspaceless %})
+        </button>
     </form>
     {% endif %}
 
@@ -155,8 +155,7 @@
                 </p>
                 <p class="hint-info">
                     {% if hint.status == 'OBS' %}
-                    {% translate "Looks like you solved this puzzle before we could send you
-                    a response! Your use of the hint was refunded." %}
+                    {% translate "Looks like you solved this puzzle before we could send you a response! Your use of the hint was refunded." %}
                     {% elif hint.is_followup %}
                     {% translate "This was a follow-up hint." %}
                     {% elif hint.status == 'REF' %}

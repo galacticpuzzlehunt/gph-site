@@ -170,7 +170,7 @@
                     }
                 });
             }
-            // FIXME: Perhaps using $.data would be a better idea?
+            // TODO: Perhaps using $.data would be a better idea?
             options.formTemplate = template;
 
             if ($$.is('TR')) {

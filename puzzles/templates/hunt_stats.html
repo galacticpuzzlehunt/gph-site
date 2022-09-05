@@ -7,43 +7,29 @@
 
 {% block content %}
 
-<style>
-.meta {
-    font-style: italic;
-}
-</style>
-
 <h1>{% translate "Hunt Stats" %}</h1>
 
 <main>
-    <div class="row puzzle-stats-panel">
-        <div class="row">
-            <div class="six columns">
-                <div class="stat-entry">{% translate "Total guesses:" %} <span class="stat-value">{{ total_guesses }}</span></div>
-            </div>
-            <div class="six columns">
-                <div class="stat-entry">{% translate "Total solves:" %} <span class="stat-value">{{ total_solves }}</span></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="six columns">
-                <div class="stat-entry">{% translate "Total participants:" %} <span class="stat-value">{{ total_participants }}</span></div>
-            </div>
-            <div class="six columns">
+    <div class="info-row">
+        <div>
+            <h4>&nbsp;</h4>
+            <div class="info-desc">
                 <div class="stat-entry">{% translate "Total teams:" %} <span class="stat-value">{{ total_teams }}</span></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="six columns">
+                <div class="stat-entry">{% translate "Total participants:" %} <span class="stat-value">{{ total_participants }}</span></div>
                 <div class="stat-entry">{% translate "Hints asked:" %} <span class="stat-value">{{ total_hints }}</span></div>
             </div>
-            <div class="six columns">
+        </div>
+        <div>
+            <h4>&nbsp;</h4>
+            <div class="info-desc">
+                <div class="stat-entry">{% translate "Total guesses:" %} <span class="stat-value">{{ total_guesses }}</span></div>
+                <div class="stat-entry">{% translate "Total solves:" %} <span class="stat-value">{{ total_solves }}</span></div>
                 <div class="stat-entry">{% translate "Metas solved:" %} <span class="stat-value">{{ total_metas }}</span></div>
             </div>
         </div>
     </div>
 
-    <table class="sortable gph-list-table">
+    <table class="sortable list-table">
         <tr>
             <th>{% translate "Puzzle" %}</th>
             <th title="{% translate 'Total number of correct answers' %}">{% translate "Solves" %}</th>
@@ -58,9 +44,11 @@
         </tr>
         {% for row in data %}
         <tr>
-            <td sorttable_customkey="{{ forloop.counter }}" {% if row.puzzle.is_meta %}class="meta"{% endif %}><a href="{% url 'stats' row.puzzle.slug %}">{{ row.puzzle.name }}</a></td>
+            <td sorttable_customkey="{{ forloop.counter }}"{% if row.puzzle.is_meta %} class="meta-stats"{% endif %}>
+                <a href="{% url 'stats' row.puzzle.slug %}">{{ row.puzzle.name }}</a>
+            </td>
             {% for number in row.numbers %}
-            <td {% if forloop.counter > 3 %}style="background-color: rgba(255, 255, 255, calc({{ number }} / {{ row.numbers|first }} / 2));"{% endif %}>{{ number }}</td>
+            <td>{{ number }}</td>
             {% endfor %}
         </tr>
         {% endfor %}

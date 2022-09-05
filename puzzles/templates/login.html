@@ -10,25 +10,23 @@
 
     <div class="form-section">
         {% for field in form %}
-        <div class="row">
-            <div class="two columns">
+        <div class="form-row">
+            <div class="form-desc">
                 {{ field.label_tag }}
             </div>
-            <div class="four columns">
-                {{ field }}
-                {{ field.errors }}
+            {{ field }}
+            {{ field.errors }}
+            <div class="form-desc">
+                {% if not hunt_is_closed %}
+                {% url 'register' as register_url %}
+                {% url 'password_reset' as password_url %}
+                {% if field.name == 'username' %}
+                {% blocktranslate %}If you haven&rsquo;t created a team yet, <a href="{{ register_url }}" tabindex="1">register a new team here</a>.{% endblocktranslate %}
+                {% else %}
+                {% blocktranslate %}Forgot your password? <a href="{{ password_url }}" tabindex="1">Click here to reset password</a>.{% endblocktranslate %}
+                {% endif %}
+                {% endif %}
             </div>
-            {% if not hunt_is_closed %}
-            {% url 'register' as register_url %}
-            {% url 'password_reset' as password_url %}
-            <div class="six columns">
-            {% if field.name == 'username' %}
-                <p>{% blocktranslate %}If you haven&rsquo;t created a team yet, <a href="{{ register_url }}">register a new team here</a>.{% endblocktranslate %}</p>
-            {% else %}
-                <p>{% blocktranslate %}Forgot your password? <a href="{{ password_url }}">Click here to reset password</a>.{% endblocktranslate %}</p>
-            {% endif %}
-            </div>
-            {% endif %}
         </div>
         {% endfor %}
     </div>

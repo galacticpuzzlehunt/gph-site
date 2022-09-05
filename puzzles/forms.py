@@ -134,6 +134,7 @@ class SubmitAnswerForm(forms.Form):
     answer = forms.CharField(
         label=_('Enter your guess:'),
         max_length=500,
+        widget=forms.TextInput(attrs={'autofocus': True}),
     )
 
 
@@ -190,7 +191,7 @@ class AnswerHintForm(forms.ModelForm):
 class SurveyForm(forms.ModelForm):
     class Meta:
         model = Survey
-        exclude = ('team', 'puzzle')
+        exclude = ('team', 'puzzle', 'submitted_datetime')
 
 
 # This form is a customization of forms.PasswordResetForm

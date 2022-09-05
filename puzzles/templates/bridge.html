@@ -4,15 +4,6 @@
 <h1>{% translate "The Bridge" %}</h1>
 
 <main>
-    <style>
-        textarea {
-            background-color: #f8f8f8;
-            min-height: 200px;
-            overflow-y: scroll;
-            font-family: monospace;
-            min-width: 100%;
-        }
-    </style>
     <h4>{% translate "Email recipients list" %}</h4>
     <p>{% blocktranslate count recipients=recipient_count %}There is currently <strong>{{ recipients }}</strong> recipient.{% plural %}There are currently <strong>{{ recipients }}</strong> recipients.{% endblocktranslate %}</p>
     <textarea>{{ recipients_list }}</textarea>

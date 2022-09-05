@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'puzzles.messaging.log_request_middleware',
     'puzzles.context.context_middleware',
     'puzzles.puzzlehandlers.reverse_proxy_middleware',
+    'puzzles.views.accept_ranges_middleware',
 ]
 
 CACHES = {
@@ -184,10 +185,10 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'django': {
-            'format': '%(asctime)s [%(levelname)s] %(module)s\n%(message)s'
+            'format': '%(asctime)s (PID %(process)d) [%(levelname)s] %(module)s\n%(message)s'
         },
         'puzzles': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s %(message)s'
+            'format': '%(asctime)s (PID %(process)d) [%(levelname)s] %(name)s %(message)s'
         },
     },
     # FIXME you may want to change the filenames to something like

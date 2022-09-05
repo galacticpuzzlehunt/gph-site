@@ -53,7 +53,7 @@ MAX_MEMBERS_PER_TEAM = 10
 # If this is disabled, teams will not get any hints.
 HINTS_ENABLED = True
 # Teams accumulate this many hints each day.
-HINTS_PER_DAY = (1, 1, 2, 2, 2, 2, 2, 4, 2)
+HINTS_PER_DAY = (2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
 # Teams get the first number in HINTS_PER_DAY at this time, and subsequent
 # numbers every day after until the end of HINTS_PER_DAY.
 HINT_TIME = HUNT_START_TIME + datetime.timedelta(days=1)
@@ -65,7 +65,7 @@ HINT_TIME = HUNT_START_TIME + datetime.timedelta(days=1)
 # many hints they would get, since we advertised that there would be intro
 # hints or extra hints released at this or that time. Feel free to change the
 # logic in models.py to suit your needs.)
-TEAM_AGE_BEFORE_HINTS = datetime.timedelta(days=2)
+TEAM_AGE_BEFORE_HINTS = datetime.timedelta(days=1)
 # If set, a team's first N hints are usable only on puzzles in the intro round.
 # (They don't go away or convert into regular hints after some time; if a team
 # doesn't use them, they can still use regular hints they receive afterward.)

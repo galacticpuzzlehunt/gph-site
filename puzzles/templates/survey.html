@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load puzzle_tags %}
 
 {% block page-title %}
 <title>{% blocktranslate with puzzle_name=puzzle.name %}Surveys: {{ puzzle_name }}{% endblocktranslate %}</title>
@@ -17,15 +18,16 @@ th {
 }
 </style>
 
-<h1>{% blocktranslate with puzzle_name=puzzle.name %}Survey responses for {{ puzzle_name }}{% endblocktranslate %}</h1>
+<h1>{% blocktranslate with puzzle_name=puzzle.name %}Surveys: {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
-    <table class="sortable gph-list-table">
+    <table class="sortable list-table">
         <tr>
             {% for field in fields %}
             <th>{{ field.field.adjective|title }} ({{ field.average|floatformat:2 }} <small>/ {{ field.max }}</small>)</th>
             {% endfor %}
             <th>{% translate "Comments" %}</th>
+            <th>{% translate "Submitted" %}</th>
             <th>{% translate "Team" %}</th>
         </tr>
         {% for survey in surveys %}
@@ -34,6 +36,7 @@ th {
             <td>{{ rating.0 }} <small>/ {{ rating.1 }}</small></td>
             {% endfor %}
             <td><pre class="submitted-text">{{ survey.survey.comments }}</pre></td>
+            <td sorttable_customkey="{{ survey.survey.submitted_datetime|unix_time }}">{% format_time survey.survey.submitted_datetime %}</td>
             <td><a href="{% url 'team' survey.survey.team.team_name %}">{{ survey.survey.team.team_name }}</a></td>
         </tr>
         {% endfor %}

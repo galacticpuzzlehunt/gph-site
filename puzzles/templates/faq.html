@@ -26,10 +26,11 @@
             <li>{% translate "Get fresh eyes on the puzzle, or conversely, take a break and look at something else." %}</li>
             <li>{% translate "Consider what information you haven&rsquo;t used yet." %}</li>
             <li>{% translate "It can be useful to put everything you have into your favorite search engine." %}</li>
-            <li><a target="_blank" href="https://www.mit.edu/~puzzle/resources/haveyoutried.pdf">{% translate "Have you tried&hellip;" %}</a></li>
+            <li>{% blocktranslate %}Look at <a href="https://devjoe.appspot.com/huntindex/index/keywords.html">similar examples</a> of the puzzle type you&rsquo;re working on.{% endblocktranslate %}</li>
+            <li><a target="_blank" href="https://beta.vero.site/try">{% translate "Have you tried&hellip;" %}</a></li>
         </ul>
         {% if hints_enabled %}
-        <p>{% translate "Remember that after hints are released, you can also use them to get a nudge in the right direction." %}</p>
+        <p>{% translate "Remember that after hints are released, you can also use them to get a nudge in the right direction. Please use them if you&rsquo;re stuck!" %}</p>
         {% endif %}
     </div>
 

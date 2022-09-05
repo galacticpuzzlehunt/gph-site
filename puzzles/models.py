@@ -146,6 +146,7 @@ class Puzzle(models.Model):
 
     @staticmethod
     def normalize_answer(s):
+        if s is None: return s
         nfkd_form = unicodedata.normalize('NFKD', s)
         return ''.join([c.upper() for c in nfkd_form if c.isalpha()])
 
@@ -177,6 +178,11 @@ class Team(models.Model):
         default=datetime.timedelta, verbose_name=_('Start offset'),
         help_text=_('''How much earlier this team should start, for early-testing
         teams; be careful with this!'''),
+    )
+    allow_time_unlocks = models.BooleanField(
+        default=True, verbose_name=_('Allow time unlocks'),
+        help_text=_('''Whether this team receives time-unlocked puzzles. Note that
+        if disabled, they may be able to access more puzzles by logging out'''),
     )
 
     total_hints_awarded = models.IntegerField(
@@ -265,7 +271,7 @@ class Team(models.Model):
         )
 
     @staticmethod
-    def leaderboard_teams(current_team, division=None, hide_hidden=True):
+    def leaderboard_teams(current_team, hide_hidden=True):
         '''
         Returns a (lazy, not-yet-evaluated) QuerySet of teams, in the order
         they should appear on the leaderboard, with the following annotations:
@@ -446,9 +452,13 @@ class Team(models.Model):
     def compute_unlocks(context):
         metas_solved = []
         puzzles_unlocked = collections.OrderedDict()
+        unlocks = []
         for puzzle in context.all_puzzles:
             unlocked_at = None
-            if 0 <= puzzle.unlock_hours:
+            if 0 <= puzzle.unlock_hours and (
+                puzzle.unlock_hours == 0 or
+                not context.team or
+                context.team.allow_time_unlocks):
                 unlock_time = context.start_time + datetime.timedelta(hours=puzzle.unlock_hours)
                 if unlock_time <= context.now:
                     unlocked_at = unlock_time
@@ -467,25 +477,23 @@ class Team(models.Model):
                 if puzzle.id in context.team.db_unlocks:
                     unlocked_at = context.team.db_unlocks[puzzle.id].unlock_datetime
                 elif unlocked_at:
-                    Team.unlock_puzzle(context, puzzle, unlocked_at)
+                    unlocks.append(Team.unlock_puzzle(context, puzzle, unlocked_at))
             if unlocked_at:
                 puzzles_unlocked[puzzle] = unlocked_at
+        if unlocks:
+            PuzzleUnlock.objects.bulk_create(unlocks, ignore_conflicts=True)
         return puzzles_unlocked
 
     @staticmethod
     def unlock_puzzle(context, puzzle, unlocked_at):
-        if context.hunt_is_prereleased or context.hunt_is_over:
-            return
-        if puzzle.id in context.team.db_unlocks:
-            return
         unlock = PuzzleUnlock(
             team=context.team,
             puzzle=puzzle,
             unlock_datetime=unlocked_at)
-        unlock.save()
         context.team.db_unlocks[puzzle.id] = unlock
         if unlocked_at == context.now:
             show_unlock_notification(context, unlock)
+        return unlock
 
 
 @receiver(post_save, sender=Team)
@@ -594,16 +602,19 @@ def notify_on_answer_submission(sender, instance, created, **kwargs):
                 _(':question: {} Team {} used a free answer on {}!{}').format(
                     instance.puzzle.emoji, instance.team, instance.puzzle, hint_line))
         else:
+            submitted_teams = AnswerSubmission.objects.filter(
+                puzzle=instance.puzzle,
+                submitted_answer=instance.submitted_answer,
+                used_free_answer=False,
+                team__is_hidden=False,
+            ).values_list('team_id', flat=True).distinct().count()
             sigil = ':x:'
             if instance.is_correct:
                 sigil = {
                     1: ':first_place:', 2: ':second_place:', 3: ':third_place:'
-                }.get(AnswerSubmission.objects.filter(
-                    puzzle=instance.puzzle,
-                    is_correct=True,
-                    used_free_answer=False,
-                    team__is_hidden=False,
-                ).count(), ':white_check_mark:')
+                }.get(submitted_teams, ':white_check_mark:')
+            elif submitted_teams > 1:
+                sigil = ':skull_crossbones:'
             dispatch_submission_alert(
                 _('{} {} Team {} submitted `{}` for {}: {}{}').format(
                     sigil, instance.puzzle.emoji, instance.team,
@@ -669,6 +680,7 @@ class PuzzleMessage(models.Model):
 
     @staticmethod
     def semiclean_guess(s):
+        if s is None: return s
         nfkd_form = unicodedata.normalize('NFKD', s)
         return ''.join([c.upper() for c in nfkd_form if c.isalnum()])
 
@@ -679,10 +691,14 @@ class Erratum(models.Model):
     puzzle = models.ForeignKey(Puzzle, null=True, blank=True, on_delete=models.CASCADE, verbose_name=_('puzzle'))
     updates_text = models.TextField(blank=True, verbose_name=_('Updates text'), help_text=_('''
         Text to show on the Updates (errata) page. If blank, it will not appear there.
-        Use $PUZZLE to refer to the puzzle. HTML is ok.
+        Use $PUZZLE to refer to the puzzle. The text will be prefixed with "On
+        (date)," when displayed, so you should capitalize it the way it would
+        appear mid-sentence. HTML is ok.
     '''))
     puzzle_text = models.TextField(blank=True, verbose_name=_('Puzzle text'), help_text=_('''
-        Text to show on the puzzle page. If blank, it will not appear there. HTML is ok.
+        Text to show on the puzzle page. If blank, it will not appear there.
+        The text will be prefixed with "On (date)," when displayed, so you
+        should capitalize it the way it would appear mid-sentence. HTML is ok.
     '''))
     timestamp = models.DateTimeField(default=timezone.now, verbose_name=_('Timestamp'))
     published = models.BooleanField(default=False, verbose_name=_('Published'))
@@ -709,7 +725,7 @@ class Erratum(models.Model):
         return errata
 
     def get_emails(self):
-        teams = PuzzleUnlock.objects.filter(puzzle=self.puzzle).values_list('team_id', flat=True)
+        teams = PuzzleUnlock.objects.filter(puzzle=self.puzzle).exclude(view_datetime=None).values_list('team_id', flat=True)
         return TeamMember.objects.filter(team_id__in=teams).exclude(email='').values_list('email', flat=True)
 
     class Meta:
@@ -748,6 +764,7 @@ class Survey(models.Model):
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name=_('team'))
     puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE, verbose_name=_('puzzle'))
+    submitted_datetime = models.DateTimeField(auto_now=True, verbose_name=_('Submitted datetime'))
 
     # NOTE: Due to some pretty dynamic queries, the names of rating fields
     # should be pretty unique! They definitely shouldn't overlap with the names
@@ -760,7 +777,6 @@ class Survey(models.Model):
         return '%s: %s' % (self.puzzle, self.team)
 
     class Meta:
-        unique_together = ('team', 'puzzle')
         verbose_name = _('survey')
         verbose_name_plural = _('surveys')
 
@@ -862,7 +878,7 @@ class Hint(models.Model):
         )
 
     def long_discord_message(self):
-        return self.short_discord_message(1500) + (
+        return self.short_discord_message(1000) + (
             _('**Team:** {} ({})\n'
             '**Puzzle:** {} ({})\n')
         ).format(

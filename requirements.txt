@@ -1,7 +1,7 @@
 asgiref==3.4.1
 channels==3.0.3
 channels-redis==3.3.0
-Django==3.2.15
+Django==3.2.16
 django-impersonate==1.7.3
 django-mathfilters==1.0.0
 django-ratelimit==3.0.1

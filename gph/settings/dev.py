@@ -45,25 +45,25 @@ LOGGING = {
         'django': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': './logs/django.log',
+            'filename': os.path.join(LOGS_DIR, 'django.log'),
             'formatter': 'django-file',
         },
         'general': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': './logs/general.log',
+            'filename': os.path.join(LOGS_DIR, 'general.log'),
             'formatter': 'puzzles-file',
         },
         'puzzle': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': './logs/puzzle.log',
+            'filename': os.path.join(LOGS_DIR, 'puzzle.log'),
             'formatter': 'puzzles-file',
         },
         'request': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': './logs/request.log',
+            'filename': os.path.join(LOGS_DIR, 'request.log'),
             'formatter': 'puzzles-file',
         },
         'django-console': {

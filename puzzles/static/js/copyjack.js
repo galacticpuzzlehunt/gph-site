@@ -45,8 +45,6 @@
  *  - When copying tables, only borders on `th` and `td` elements will have any
  *    effect. Make sure borders are set on those instead of relying on styles for
  *    the `table` or `tr` elements.
- *  - Copied borders can only be black or gray. If not one of these colors,
- *    borders get copied as gray.
  *  - If there is a border on every side, then due to browser weirdness, each
  *    side of the cell must have the same border (at least when copying into
  *    Google Sheets). This makes certain layouts such as having a thicker
@@ -489,9 +487,13 @@ function copyJack(rootElement, config) {
           const style = cellStyle.getPropertyValue('border-top-style');
           const color = cellStyle.getPropertyValue('border-top-color');
 
+          // Note as of Feb 13 2023:
+          // Colored borders work in Google Sheets. Previously, it only handled
+          // black and gray borders.
+          // Google Sheets only likes 1px and 3px borders, so we coerce border width.
+          // Tested in Chrome, Firefox, and Safari.
           const coercedWidth = parseInt(width, 10) < 2 ? '1px' : '3px';
-          const coercedColor = color === "rgb(0, 0, 0)" ? "black" : "gray";
-          const injectedStyle = `border-bottom: ${coercedWidth} ${style} ${coercedColor};`;
+          const injectedStyle = `border-bottom: ${coercedWidth} ${style} ${color};`;
           lastRowCells[j].dataset.copyOnlyStyles = (lastRowCells[j].dataset.copyOnlyStyles || '') + injectedStyle;
         }
       }
@@ -596,14 +598,13 @@ function copyJackInlineBorders(element) {
     // In barred grids, force the top border to 0px. Separately, a top row will
     // be injected at copy time.
     if (inBarredGrid && dir === 'top') return "";
-    // Google Sheets only handles black or gray borders (untested). Treat black
-    // as black, and everything else as gray.
-    // Also, getComputedStyle returns resolved values, so the color has a
-    // standard format.
-    // And Sheets only likes 1px and 3px borders, so coerce it.
+    // Note as of Feb 13 2023:
+    // Colored borders work in Google Sheets. Previously, it only handled
+    // black and gray borders.
+    // Google Sheets only likes 1px and 3px borders, so we coerce border width.
+    // Tested in Chrome, Firefox, and Safari.
     const coercedWidth = parseInt(width, 10) < 2 ? '1px' : '3px';
-    const coercedColor = color === "rgb(0, 0, 0)" ? "black" : "gray";
-    return `border-${dir}: ${coercedWidth} ${style} ${coercedColor};`;
+    return `border-${dir}: ${coercedWidth} ${style} ${color};`;
   });
   // Mark as copyOnlyStyles to avoid changing the visual display of the grid.
   const borderStylesText = borderStyles.join(" ").trim();

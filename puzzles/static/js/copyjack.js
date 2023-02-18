@@ -341,7 +341,8 @@ function copyJack(rootElement, config) {
     }
     const listStyleType = window.getComputedStyle(list).getPropertyValue('list-style-type');
     let lastIndex = 0;
-    for (const item of list.querySelectorAll('li')) {
+    // Look at direct children only. Children in sub-lists will be handled on later iterations of the outer for loop.
+    for (const item of Array.from(list.children).filter((child) => child instanceof HTMLLIElement)) {
       const index = item.value ? parseInt(item.value, 10) : lastIndex + 1;
       const displayedIndex = resolveListIndex(index, listStyleType);
       lastIndex = index;
@@ -734,9 +735,11 @@ function makeHrefAbsolute(href) {
 function resolveListIndex(index, listStyleType) {
   switch (listStyleType) {
     case 'upper-alpha':
+    case 'upper-latin':
       return String.fromCharCode(64 + Math.max(Math.min(index, 26), 1)) + '. ';
 
     case 'lower-alpha':
+    case 'lower-latin':
       return String.fromCharCode(96 + Math.max(Math.min(index, 26), 1)) + '. ';
 
     case 'decimal':

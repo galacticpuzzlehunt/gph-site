@@ -33,9 +33,7 @@
     {{ ga_code|safe }}
 </head>
 <body>
-    {% if is_superuser %}
-    <input id="shortcuts" type="checkbox">
-    {% endif %}
+    <a class="skip-to-main">Press enter to skip to main content.</a>
     <nav>
         <span class="tray">
             <div class="top-tabs">
@@ -111,10 +109,70 @@
             </span>
             {% endif %}
             {% if is_superuser %}
-            <label for="shortcuts" title="{% translate 'Admin toolbox' %}">
+            <button id="toggle-shortcuts" aria-expanded="false" aria-controls="shortcuts" title="{% translate 'Admin toolbox' %}">
                 {% if not hunt_is_prereleased %}&#x26A0;&#xFE0F;{% endif %}
                 {% translate "Shortcuts" %}
-            </label>
+                &#x25BC;
+            </button>
+            <div class="shortcuts" id="shortcuts">
+                <form method="post" action="{% url 'shortcuts' %}" target="dummy">
+                    {% csrf_token %}
+                    {% if not hunt_is_prereleased %}
+                    <p>
+                        {% translate "Even though you&rsquo;re an admin, you&rsquo;re not currently marked as a testsolver, so you won&rsquo;t be able to view puzzles." %}
+                    </p>
+                    {% endif %}
+                    {% for shortcut in shortcuts %}
+                    {% if 'action' in shortcut %}
+                    <button class="btn{% if shortcut.danger %} danger{% endif %}" type="submit" name="action" value="{{ shortcut.action }}">{{ shortcut.name }}</button>
+                    {% else %}
+                    <div>{{ shortcut.name }}</div>
+                    {% endif %}
+                    {% endfor %}
+                    {% if puzzle %}
+                    <div>{% translate "This puzzle&rsquo;s answer:" %}</div>
+                    <div class="spoiler">{{ puzzle.answer }}</div>
+                    <div>{{ puzzle.round.name }} #{{ puzzle.order }}</div>
+                    <a href="/admin/puzzles/puzzle/{{ puzzle.id }}/change/" class="btn">{% translate "Django admin" %}</a>
+                    <a href="{% url 'survey' puzzle.slug %}" class="btn">{% translate "Surveys" %}</a>
+                    <input name="puzzle" value="{{ puzzle.slug }}" type="hidden">
+                    {% endif %}
+                    {% if view_team %}
+                    <div>{% translate "This team" %}</div>
+                    <div style="font-size: 70%">
+                    testsolver: {{view_team.is_prerelease_testsolver}} | time from start: {{view_team.time_since_start}}
+                    </div>
+                    <a href="/admin/puzzles/team/{{ view_team.id }}/change/" class="btn">{% translate "Django admin" %}</a>
+                    <a href="{% url 'impersonate-start' view_team.user_id %}" class="btn danger">{% translate "Impersonate" %}</a>
+                    <div></div>
+                    <a href="/admin/puzzles/answersubmission/?team__id__exact={{ view_team.id }}" class="btn">{% translate "All guesses" %}</a>
+                    <a href="{% url 'hint-list' %}?team={{ view_team.id }}" class="btn">{% translate "All hints" %}</a>
+                    {% endif %}
+                    <div>{% translate "Download logs" %}</div>
+                    <a class="btn" href="{% url 'guess-csv' %}">{% translate "Guess" %}</a>
+                    <a class="btn" href="{% url 'hint-csv' %}">{% translate "Hint" %}</a>
+                    <a class="btn" href="{% url 'puzzle-log' %}">{% translate "Puzzle" %}</a>
+                    <iframe src="about:blank" name="dummy" style="display: none"></iframe>
+                </form>
+            </div>
+            <script>
+                const downArrow = "\u25BC";
+                const upArrow = "\u25B2";
+                const toggleButton = document.getElementById("toggle-shortcuts");
+                const buttonTextPrefix = toggleButton.innerText.substring(0, toggleButton.innerText.length-1);
+                const shortcutsPopup = document.getElementById("shortcuts");
+                toggleButton.addEventListener("click", () => {
+                    if (toggleButton.innerText.endsWith(downArrow)) {
+                        toggleButton.innerText = buttonTextPrefix + upArrow;
+                        toggleButton.ariaExpanded = true;
+                        shortcutsPopup.style.display = "block";
+                    } else {
+                        toggleButton.innerText = buttonTextPrefix + downArrow;
+                        toggleButton.ariaExpanded = false;
+                        shortcutsPopup.style.display = "none";
+                    }
+                })
+            </script>
             {% if unclaimed_hints %}
             <a class="current-stat" title="{% translate 'Hints that need answering:' %} {{ unclaimed_hints }}" href="{% url 'hint-list' %}" style="color: red">
                 {% include 'icon-hint.svg' %}
@@ -129,49 +187,6 @@
         {% endif %}
         </div>
     </nav>
-    {% if is_superuser %}
-    <div class="shortcuts">
-        <form method="post" action="{% url 'shortcuts' %}" target="dummy">
-            {% csrf_token %}
-            {% if not hunt_is_prereleased %}
-            <p>
-                {% translate "Even though you&rsquo;re an admin, you&rsquo;re not currently marked as a testsolver, so you won&rsquo;t be able to view puzzles." %}
-            </p>
-            {% endif %}
-            {% for shortcut in shortcuts %}
-            {% if 'action' in shortcut %}
-            <button class="btn{% if shortcut.danger %} danger{% endif %}" type="submit" name="action" value="{{ shortcut.action }}">{{ shortcut.name }}</button>
-            {% else %}
-            <div>{{ shortcut.name }}</div>
-            {% endif %}
-            {% endfor %}
-            {% if puzzle %}
-            <div>{% translate "This puzzle&rsquo;s answer:" %}</div>
-            <div class="spoiler">{{ puzzle.answer }}</div>
-            <div>{{ puzzle.round.name }} #{{ puzzle.order }}</div>
-            <a href="/admin/puzzles/puzzle/{{ puzzle.id }}/change/" class="btn">{% translate "Django admin" %}</a>
-            <a href="{% url 'survey' puzzle.slug %}" class="btn">{% translate "Surveys" %}</a>
-            <input name="puzzle" value="{{ puzzle.slug }}" type="hidden">
-            {% endif %}
-            {% if view_team %}
-            <div>{% translate "This team" %}</div>
-            <div style="font-size: 70%">
-            testsolver: {{view_team.is_prerelease_testsolver}} | time from start: {{view_team.time_since_start}}
-            </div>
-            <a href="/admin/puzzles/team/{{ view_team.id }}/change/" class="btn">{% translate "Django admin" %}</a>
-            <a href="{% url 'impersonate-start' view_team.user_id %}" class="btn danger">{% translate "Impersonate" %}</a>
-            <div></div>
-            <a href="/admin/puzzles/answersubmission/?team__id__exact={{ view_team.id }}" class="btn">{% translate "All guesses" %}</a>
-            <a href="{% url 'hint-list' %}?team={{ view_team.id }}" class="btn">{% translate "All hints" %}</a>
-            {% endif %}
-            <div>{% translate "Download logs" %}</div>
-            <a class="btn" href="{% url 'guess-csv' %}">{% translate "Guess" %}</a>
-            <a class="btn" href="{% url 'hint-csv' %}">{% translate "Hint" %}</a>
-            <a class="btn" href="{% url 'puzzle-log' %}">{% translate "Puzzle" %}</a>
-            <iframe src="about:blank" name="dummy" style="display: none"></iframe>
-        </form>
-    </div>
-    {% endif %}
     <script>
     {% if team %}
         openSocket('/ws/team', showNotify);
@@ -193,6 +208,18 @@
     <div class="content">
         {% block content %}{% endblock %}
     </div>
+    <script>
+        const skipToMainLink = document.querySelector("a.skip-to-main");
+        const mainContentElement = document.getElementsByTagName("main")?.item(0) || document.querySelector("div.content");
+        if (skipToMainLink && mainContentElement) {
+            const mainContentAnchor = document.createElement("a");
+            const anchorId = "main-content-anchor"
+            mainContentAnchor.className = anchorId;
+            mainContentAnchor.id = anchorId;
+            skipToMainLink.href = `#${anchorId}`;
+            mainContentElement.parentNode.insertBefore(mainContentAnchor, mainContentElement);
+        }
+    </script>
     <footer>
         {% translate 'Powered by <a href="https://github.com/galacticpuzzlehunt/gph-site">gph-site</a>' %}
     </footer

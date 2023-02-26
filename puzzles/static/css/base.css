@@ -860,6 +860,7 @@ a.main-content-anchor {
     padding: 0 0.8em;
     position: fixed !important;
     right: 1.5em;
+    z-index: 100; /* Needed so hover & click work even when button floats outside of its parent. */
 }
 
 @media print {

@@ -50,10 +50,10 @@
  *    Google Sheets). This makes certain layouts such as having a thicker
  *    outside border challenging.
  *
- * This automatically runs on page load, and finds a button with ID `clipboard-button`.
+ * This automatically runs on page load, and finds a button with class `clipboard-button`.
  * If present, the button becomes a copy puzzle button. The button should contain no
  * content, and be hidden by default so it does not appear if javascript is disabled.
- *   `<button id="clipboard-button"></button>`
+ *   `<button class="clipboard-button"></button>`
  *
  * It uses class names to find puzzle content and control copying.
  *  - `.puzzle` contains the root container for all puzzle content. Everything
@@ -66,7 +66,7 @@
  * copying globally, or to a DOM node to control copying for that element.
  * As an example, you could use the following to disable adding inline styles
  * globally or for a single element.
- *   `<button id="clipboard-button" data-skip-inline-styles="true"></button>`
+ *   `<button class="clipboard-button" data-skip-inline-styles="true"></button>`
  *   `<div src="..." alt="..." data-skip-inline-styles="true">`
  *
  * Available settings are:
@@ -82,7 +82,7 @@
  *
  * The global CSS should have the following styles to support copy-jacking.
  * ```
- * #clipboard-button:not(.shown) {
+ * .clipboard-button:not(.shown) {
  *   display: none;
  * }
  *

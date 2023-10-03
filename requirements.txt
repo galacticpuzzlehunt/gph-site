@@ -6,7 +6,7 @@ django-impersonate==1.7.3
 django-mathfilters==1.0.0
 django-ratelimit==3.0.1
 django-redis==5.0.0
-gevent==21.12.0
+gevent==23.9.0
 greenlet==1.1.2
 gunicorn==20.1.0
 Markdown==3.3.4

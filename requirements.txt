@@ -6,11 +6,11 @@ django-impersonate==1.7.3
 django-mathfilters==1.0.0
 django-ratelimit==3.0.1
 django-redis==5.0.0
-gevent==21.12.0
-greenlet==1.1.2
+gevent==23.9.1
+greenlet==3.0.0
 gunicorn==20.1.0
 Markdown==3.3.4
-py-cord==2.0.0rc1
+py-cord==2.4.1
 requests==2.31.0
 Twisted==22.10.0
-uvicorn[standard]==0.14.0
+uvicorn[standard]==0.23.2

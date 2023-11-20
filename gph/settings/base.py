@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 '''
 
 import os
+import datetime
+from django.utils import timezone
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -26,6 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'FIXME_SECRET_KEY_HERE')
 
 RECAPTCHA_SITEKEY = None
 RECAPTCHA_SECRETKEY = None
+RECAPTCHA_SCORE_THRESHOLD = 0
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -42,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
+    'corsheaders',
     'impersonate',
     'mathfilters',
     'channels',
@@ -49,6 +53,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -248,3 +253,28 @@ GA_CODE = ''
 
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
+
+# Hunt config. These are defined here to make them easy to override
+# under different environments.
+
+HUNT_START_TIME = timezone.make_aware(datetime.datetime(
+    year=9001,
+    month=1,
+    day=1,
+    hour=0,
+    minute=0,
+), timezone=datetime.timezone(datetime.timedelta(hours=11)))
+HUNT_END_TIME = timezone.make_aware(datetime.datetime(
+    year=9002,
+    month=1,
+    day=1,
+    hour=0,
+    minute=0,
+), timezone=datetime.timezone(datetime.timedelta(hours=11)))
+HUNT_CLOSE_TIME = timezone.make_aware(datetime.datetime(
+    year=9003,
+    month=1,
+    day=1,
+    hour=0,
+    minute=0,
+), timezone=datetime.timezone(datetime.timedelta(hours=11)))

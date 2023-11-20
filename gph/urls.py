@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 '''
 
-from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import quote, unquote
 
 from django.conf import settings
 from django.urls import path, re_path, include, register_converter
@@ -30,10 +30,10 @@ class QuotedStringConverter:
     regex = '[^/]+'
 
     def to_python(self, value):
-        return unquote_plus(value)
+        return unquote(value)
 
     def to_url(self, value):
-        return quote_plus(value, safe='')
+        return quote(value, safe='')
 
 register_converter(QuotedStringConverter, 'quotedstr')
 
@@ -43,8 +43,7 @@ urlpatterns = [
 
     path('', views.index, name='index'),
 
-    path('rules', views.rules, name='rules'),
-    path('faq', views.faq, name='faq'),
+    path('about', views.about, name='about'),
     path('archive', views.archive, name='archive'),
     path('register', views.register, name='register'),
 
@@ -78,6 +77,7 @@ urlpatterns = [
     path('solve/<slug:slug>', views.solve, name='solve'),
     path('free-answer/<slug:slug>', views.free_answer, name='free-answer'),
     path('post-hunt-solve/<slug:slug>', views.post_hunt_solve, name='post-hunt-solve'),
+    path('survey', views.survey_list, name='survey-list'),
     path('survey/<slug:slug>', views.survey, name='survey'),
     path('hints', views.hint_list, name='hint-list'),
     path('hints/<slug:slug>', views.hints, name='hints'),
@@ -95,7 +95,7 @@ urlpatterns = [
     path('victory', views.victory, name='victory'),
     path('errata', views.errata, name='errata'),
     path('wrapup', views.wrapup, name='wrapup'),
-    path('wrapup/finishers', views.finishers, name='finishers'),
+    path('finishers', views.finishers, name='finishers'),
 
     path('bridge', views.bridge, name='bridge'),
     path('bigboard', views.bigboard, name='bigboard'),

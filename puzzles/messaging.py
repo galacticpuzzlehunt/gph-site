@@ -60,7 +60,7 @@ def dispatch_discord_alert(webhook, content, username):
         logger.info(_('(Test) Discord alert:\n') + content)
         return
     logger.info(_('(Real) Discord alert:\n') + content)
-    requests.post(webhook, data={'username': username, 'content': content})
+    requests.post(webhook, json={'username': username, 'content': content, 'allowed_mentions': {'parse': []}})
 
 def dispatch_general_alert(content):
     dispatch_discord_alert(ALERT_WEBHOOK_URL, content, ALERT_DISCORD_USERNAME)
@@ -148,15 +148,13 @@ class DiscordInterface:
         if self.avatars is None:
             self.avatars = {}
             if self.client is not None:
-                members = [
-                    discord.Member(data=data, guild=None, state=self.client._connection)
-                    for data in self.client.loop.run_until_complete(
-                    self.client.http.get_members(self.GUILD, limit=1000, after=None))
-                ]
-                for member in members:
-                    self.avatars[member.name] = member.display_avatar.url
-                for member in members:
-                    self.avatars[member.display_name] = member.display_avatar.url
+                guild = discord.Guild(data=self.client.loop.run_until_complete(
+                    self.client.http.get_guild(self.GUILD)), state=self.client._connection)
+                for data in self.client.loop.run_until_complete(
+                    self.client.http.get_members(self.GUILD, limit=1000, after=None)):
+                    avatar = discord.Member(data=data, guild=guild, state=self.client._connection).display_avatar.url
+                    for name in (data.get('nick'), data['user'].get('username'), data['user'].get('global_name')):
+                        if name: self.avatars[name] = avatar
         return self.avatars.get(claimer)
 
     # If you get an error code 50001 when trying to create a message, even

@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block page-title %}
+<title>{% translate "Hunt Stats" %}</title>
+{% endblock %}
+
 {% block top-left-actions %}
-<a href="{% url 'wrapup' %}" class="btn">{% translate "Back to wrap-up" %}</a>
+<a href="{% url 'finishers' %}" class="btn">{% translate "Finishers" %}</a>
+<a href="{% url 'biggraph' %}" class="btn">{% translate "Big Graph" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -12,20 +17,14 @@
 <main>
     <div class="info-row">
         <div>
-            <h4>&nbsp;</h4>
-            <div class="info-desc">
-                <div class="stat-entry">{% translate "Total teams:" %} <span class="stat-value">{{ total_teams }}</span></div>
-                <div class="stat-entry">{% translate "Total participants:" %} <span class="stat-value">{{ total_participants }}</span></div>
-                <div class="stat-entry">{% translate "Hints asked:" %} <span class="stat-value">{{ total_hints }}</span></div>
-            </div>
+            <div class="stat-entry">{% translate "Total teams:" %} <span class="stat-value">{{ total_teams }}</span></div>
+            <div class="stat-entry">{% translate "Total participants:" %} <span class="stat-value">{{ total_participants }}</span></div>
+            <div class="stat-entry">{% translate "Hints asked:" %} <span class="stat-value">{{ total_hints }}</span></div>
         </div>
         <div>
-            <h4>&nbsp;</h4>
-            <div class="info-desc">
-                <div class="stat-entry">{% translate "Total guesses:" %} <span class="stat-value">{{ total_guesses }}</span></div>
-                <div class="stat-entry">{% translate "Total solves:" %} <span class="stat-value">{{ total_solves }}</span></div>
-                <div class="stat-entry">{% translate "Metas solved:" %} <span class="stat-value">{{ total_metas }}</span></div>
-            </div>
+            <div class="stat-entry">{% translate "Total guesses:" %} <span class="stat-value">{{ total_guesses }}</span></div>
+            <div class="stat-entry">{% translate "Total solves:" %} <span class="stat-value">{{ total_solves }}</span></div>
+            <div class="stat-entry">{% translate "Metas solved:" %} <span class="stat-value">{{ total_metas }}</span></div>
         </div>
     </div>
 

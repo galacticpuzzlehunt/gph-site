@@ -38,7 +38,7 @@
     <h4>{% translate "Team members" %}</h4>
 
     <p>{% translate "You will also be able to add and remove team members at any later time on your team&rsquo;s profile page." %}<br>
-        {% translate "You'll need to provide an email address for at least one of your team members." %}</p>
+        {% translate "You’ll need to provide an email address for at least one of your team members." %}</p>
 
     {{ team_members_formset.management_form }}
     {{ team_members_formset.non_form_errors }}
@@ -61,17 +61,10 @@
         <script>
         function recaptchaSubmit() {
             var form = document.getElementById('register');
-            if (form.requestSubmit) {
-                form.requestSubmit();
-            } else if (form.reportValidity) {
-                if (form.reportValidity())
-                    form.submit();
-            } else if (form.checkValidity) {
-                if (form.checkValidity())
-                    form.submit();
-            } else {
+            if (form.reportValidity())
                 form.submit();
-            }
+            else
+                grecaptcha.reset();
         }
         </script>
         <button class="btn g-recaptcha"

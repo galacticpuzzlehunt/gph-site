@@ -4,11 +4,12 @@
 {% load humanize %}
 
 {% block page-title %}
-<title>{% translate "Biggraph" %}</title>
+<title>{% translate "Big Graph" %}</title>
 {% endblock %}
 
 {% block top-left-actions %}
-<a href="{% url 'wrapup' %}" class="btn">{% translate "Back to wrap-up" %}</a>
+<a href="{% url 'hunt-stats' %}" class="btn">{% translate "Hunt Stats" %}</a>
+<a href="{% url 'finishers' %}" class="btn">{% translate "Finishers" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -31,6 +32,7 @@
 echarts.init(document.getElementById('biggraph')).setOption({
   title: {
     left: "center",
+    textStyle: { color: "white" },
     text: "{% blocktranslate with teams=teams|length|escapejs %}Top {{ teams }} Teams{% endblocktranslate %}",
   },
   tooltip: {
@@ -44,6 +46,8 @@ echarts.init(document.getElementById('biggraph')).setOption({
     orient: "horizontal",
     align: "left",
     bottom: 35,
+    textStyle: { color: "white", overflow: "truncate", width: 70 },
+    pageTextStyle: { color: "white" },
     data: [
       {% for team in teams %}
         "{{ team.team_name|escapejs }}",

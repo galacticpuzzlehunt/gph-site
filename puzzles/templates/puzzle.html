@@ -12,7 +12,7 @@
 <a href="{% url 'round' round.slug %}" class="btn">{{ round.name }}</a>
 {% endif %}
 {% if team and not hunt_is_closed %}
-<a href="{% url 'solve' puzzle.slug %}" class="btn">{% translate "Call in an answer" %}</a>
+<a href="{% url 'solve' puzzle.slug %}" class="btn">{% translate "Submit an answer" %}</a>
 {% if not puzzle.is_meta and num_free_answers_remaining > 0 and puzzle_answer is None %}
 <a href="{% url 'free-answer' puzzle.slug %}" class="btn">{% translate "Use free answer" %}</a>
 {% endif %}

@@ -94,10 +94,9 @@
             {% if hunt_is_closed %}
             {% blocktranslate %}This was a puzzlehunt run by {{ organizer }}.{% endblocktranslate %}
             {% else %}
-            {% url 'rules' as rules_url %}
-            {% url 'faq' as faq_url %}
+            {% url 'about' as about_url %}
             {% blocktranslate %}This is a puzzlehunt run by {{ organizer }}.{% endblocktranslate %}
-            {% blocktranslate %}Registration is open! Be sure to check out our <a href="{{ rules_url }}">rules</a> and <a href="{{ faq_url }}">FAQ</a> pages for more information.{% endblocktranslate %}
+            {% blocktranslate %}Registration is open! Be sure to check out our <a href="{{ about_url }}">about</a> page for more information.{% endblocktranslate %}
             {% endif %}
             {% endwith %}
             {% comment %}
@@ -107,7 +106,7 @@
     </div>
 </div>
 
-{% if not hunt_is_closed %}
+{% if not hunt_is_closed and not request.user.is_authenticated %}
 <div class="register">
     <a href="{% url 'register' %}" class="btn">{% translate "Register your team!" %}</a>
 </div>

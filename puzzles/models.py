@@ -2,7 +2,7 @@ import collections
 import datetime
 import re
 import unicodedata
-from urllib.parse import quote_plus
+from urllib.parse import quote
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -34,7 +34,8 @@ from puzzles.hunt_config import (
     HUNT_END_TIME,
     MAX_GUESSES_PER_PUZZLE,
     HINTS_ENABLED,
-    HINTS_PER_DAY,
+    HINTS_PER_INTERVAL,
+    HINT_INTERVAL,
     HINT_TIME,
     TEAM_AGE_BEFORE_HINTS,
     INTRO_HINTS,
@@ -231,18 +232,21 @@ class Team(models.Model):
     def puzzle_answer(self, puzzle):
         return puzzle.answer if puzzle.id in self.solves else None
 
-    def guesses_remaining(self, puzzle):
-        wrong_guesses = sum(
+    def num_wrong_guesses(self, puzzle):
+        return sum(
             1 for submission in self.puzzle_submissions(puzzle)
             if not submission.is_correct
         )
-        extra_guess_grant = ExtraGuessGrant.objects.filter(
-            team=self,
-            puzzle=puzzle
-        ).first() # will be model or None
-        extra_guesses = (extra_guess_grant.extra_guesses if
-                extra_guess_grant else 0)
-        return MAX_GUESSES_PER_PUZZLE + extra_guesses - wrong_guesses
+
+    def num_extra_guesses(self, puzzle):
+        return self.extra_guesses.get(puzzle.slug, 0)
+
+    def guesses_remaining(self, puzzle):
+        return (
+            MAX_GUESSES_PER_PUZZLE +
+            self.num_extra_guesses(puzzle) -
+            self.num_wrong_guesses(puzzle)
+        )
 
     @staticmethod
     def leaderboard(current_team, hide_hidden=True):
@@ -379,8 +383,8 @@ class Team(models.Model):
             return 0
         if self.now < self.creation_time + TEAM_AGE_BEFORE_HINTS:
             return self.total_hints_awarded
-        days = max(0, (self.now - (HINT_TIME - self.start_offset)).days + 1)
-        return self.total_hints_awarded + sum(HINTS_PER_DAY[:days])
+        intervals = max(0, (self.now - (HINT_TIME - self.start_offset)) // HINT_INTERVAL + 1)
+        return self.total_hints_awarded + sum(HINTS_PER_INTERVAL[:intervals])
 
     def num_hints_used(self):
         return sum(hint.consumes_hint for hint in self.asked_hints)
@@ -414,6 +418,12 @@ class Team(models.Model):
 
     def num_free_answers_remaining(self):
         return self.num_free_answers_total - self.num_free_answers_used
+
+    def extra_guesses(self):
+        return {
+            grant.puzzle.slug: grant.extra_guesses
+            for grant in self.extraguessgrant_set.select_related('puzzle')
+        }
 
     def submissions(self):
         return tuple(
@@ -719,14 +729,15 @@ class Erratum(models.Model):
             if not context.is_superuser:
                 if not erratum.published:
                     continue
-                if erratum.puzzle and erratum.puzzle not in context.unlocks:
+                if erratum.puzzle and erratum.puzzle not in context.unlocks and not (context.team and erratum.puzzle_id in context.team.db_unlocks):
                     continue
             errata.append(erratum)
         return errata
 
     def get_emails(self):
-        teams = PuzzleUnlock.objects.filter(puzzle=self.puzzle).exclude(view_datetime=None).values_list('team_id', flat=True)
-        return TeamMember.objects.filter(team_id__in=teams).exclude(email='').values_list('email', flat=True)
+        unlocks = set(PuzzleUnlock.objects.filter(puzzle=self.puzzle).exclude(view_datetime=None).values_list('team_id', flat=True))
+        solves = set(AnswerSubmission.objects.filter(puzzle=self.puzzle, is_correct=True).values_list('team_id', flat=True))
+        return TeamMember.objects.filter(team_id__in=(unlocks - solves)).exclude(email='').values_list('email', flat=True)
 
     class Meta:
         verbose_name = _('erratum')
@@ -882,7 +893,7 @@ class Hint(models.Model):
             _('**Team:** {} ({})\n'
             '**Puzzle:** {} ({})\n')
         ).format(
-            settings.DOMAIN + 'team/%s' % quote_plus(self.team.team_name, safe=''),
+            settings.DOMAIN.rstrip('/') + reverse('team', args=(quote(self.team.team_name, safe=''),)),
             settings.DOMAIN + 'hints?team=%s' % self.team_id,
             settings.DOMAIN + 'solution/' + self.puzzle.slug,
             settings.DOMAIN + 'hints?puzzle=%s' % self.puzzle_id,

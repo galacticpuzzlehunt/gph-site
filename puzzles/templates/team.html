@@ -43,6 +43,17 @@ Note that this means you may see fewer puzzles than if you were logged out. Also
 {% block content %}
 
 <style>
+main {
+    display: flex;
+    gap: 2.5em;
+    flex-direction: column;
+}
+
+.list-table td:not(:first-child) {
+    white-space: nowrap;
+    font-variant: tabular-nums;
+}
+
 .free td:not(:first-child) {
     opacity: 0.5;
 }
@@ -59,44 +70,11 @@ Note that this means you may see fewer puzzles than if you were logged out. Also
 <h1>{{ view_team.team_name }}</h1>
 
 <main>
-    <div class="info-row">
-        <div>
-            <h4>{% translate "Stats" %}</h4>
-            <div class="info-desc">
-                <div class="stat-entry">{% translate "Rank:" %} <span class="stat-value">{{ rank }}</span></div>
-                <div class="stat-entry">{% translate "Puzzles solved:" %} <span class="stat-value">{{ solves }}</span></div>
-                {% if view_info_available %}
-                {% if view_team.num_hints_remaining > 0 %}
-                <div class="stat-entry">{% translate "Hints available:" %} <span class="stat-value">{{ view_team.num_hints_remaining }}</span></div>
-                {% endif %}
-                {% if view_team.num_free_answers_remaining > 0 %}
-                <div class="stat-entry">{% translate "Free answers available:" %} <span class="stat-value">{{ view_team.num_free_answers_remaining }}</span></div>
-                {% endif %}
-                {% endif %}
-            </div>
-        </div>
-        <div>
-            <h4>{% translate "Members" %}</h4>
-            <div class="info-desc">
-                {% for team_member in view_team.teammember_set.all %}
-                {{ team_member.name }}{% if forloop.revcounter != 1 %}, {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+    {% for team_member in view_team.teammember_set.all %}
+    {{ team_member.name }}{% if forloop.revcounter != 1 %}, {% endif %}
+    {% endfor %}
     {% if submissions|length %}
     {% if view_info_available or hunt_is_over %}
-    <svg class="chart" style="height: calc(2px * {{ all_puzzles|length }})" viewbox="0 0 {{ chart.hunt_length }} {{ all_puzzles|length }}" preserveAspectRatio="none">
-        <path d="M {{ chart.hunt_length }} 0 L 0 0
-        {% for solve in chart.solves %}
-        L {{ solve.before }} {{ forloop.counter }}
-        L {{ solve.after }} {{ forloop.counter }}
-        {% endfor %}
-        " class="chart-area"></path>
-        {% for meta in chart.metas %}
-        <path d="M {{ meta }} 0 L {{ meta }} {{ all_puzzles|length }}" class="chart-line"></path>
-        {% endfor %}
-    </svg>
     <table class="sortable list-table">
         <col style="width: 40%">
         <col style="width: 10%">

@@ -2,8 +2,13 @@
 {% load i18n %}
 {% load puzzle_tags %}
 
+{% block page-title %}
+<title>{% translate "Finishers" %}</title>
+{% endblock %}
+
 {% block top-left-actions %}
-<a href="{% url 'wrapup' %}" class="btn">{% translate "Back to wrap-up" %}</a>
+<a href="{% url 'hunt-stats' %}" class="btn">{% translate "Hunt Stats" %}</a>
+<a href="{% url 'biggraph' %}" class="btn">{% translate "Big Graph" %}</a>
 {% endblock %}
 
 {% block content %}
@@ -16,15 +21,20 @@ td {
 .sorting [colspan] {
     display: none;
 }
+
+.list-table td:not(:first-child) {
+    white-space: nowrap;
+    font-variant: tabular-nums;
+}
 </style>
 
 <h1>{% translate "Finishers" %}</h1>
 
 <main>
 <table class="sortable list-table">
-    <col style="width: 40%">
+    <col style="width: 50%">
     <col style="width: 20%">
-    <col style="width: 20%">
+    <col style="width: 10%">
     <col style="width: 20%">
     <tr onclick="document.querySelector('tbody').className = 'sorting'">
         <th>{% translate "Team" %}</th>
@@ -54,21 +64,6 @@ td {
         </td>
     </tr>
     {% endif %}
-    <tr>
-        <td colspan="6">
-            <svg class="chart" style="height: calc(2px * {{ all_puzzles|length }})" viewbox="0 0 {{ team.hunt_length }} {{ all_puzzles|length }}" preserveAspectRatio="none">
-                <path d="M {{ team.hunt_length }} 0 L 0 0
-                {% for solve in team.solves %}
-                L {{ solve.before }} {{ forloop.counter }}
-                L {{ solve.after }} {{ forloop.counter }}
-                {% endfor %}
-                " class="chart-area"></path>
-                {% for meta in team.metas %}
-                <path d="M {{ meta }} 0 L {{ meta }} {{ all_puzzles|length }}" class="chart-line"></path>
-                {% endfor %}
-            </svg>
-        </td>
-    </tr>
     {% endfor %}
 </table>
 </main>

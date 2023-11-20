@@ -72,8 +72,8 @@
     {% if one_hint_at_a_time %}
         <li>{% blocktranslate %}You may have <b>one hint</b> open at a time. You must wait until that hint is answered to ask another.{% endblocktranslate %}
     {% endif %}
-        {% url 'rules' as rules %}
-        <li>{% blocktranslate %}See the <a href="{{ rules }}#Hints">rules page</a> for details on when hints will be released.{% endblocktranslate %}
+        {% url 'about' as about %}
+        <li>{% blocktranslate %}See the <a href="{{ about }}#Hints">about page</a> for details on when hints will be released.{% endblocktranslate %}
     </ul>
     {% endif %}
 

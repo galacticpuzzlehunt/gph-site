@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 from django import forms
 from django.contrib.auth.models import User
@@ -14,6 +15,8 @@ from puzzles.models import (
 
 
 def looks_spammy(s):
+    # do not allow names that are only space or control characters
+    if all(unicodedata.category(c).startswith(('Z', 'C')) for c in s): return True
     return re.search('https?://', s, re.IGNORECASE) is not None
 
 class RegisterForm(forms.Form):
@@ -49,7 +52,7 @@ class RegisterForm(forms.Form):
         password2 = cleaned_data.get('password2')
         team_name = cleaned_data.get('team_name')
 
-        if looks_spammy(team_name):
+        if not team_name or looks_spammy(team_name):
             raise forms.ValidationError(
                 _('That public team name isn’t allowed.')
             )

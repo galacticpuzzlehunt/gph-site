@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load puzzle_tags %}
+
+{% block content %}
+
+<h1>{% translate "Surveys" %}</h1>
+
+<main>
+    <table class="sortable list-table">
+        <tr>
+            <th>Puzzle</th>
+            <th>Surveys</th>
+            {% for field in fields %}
+            <th>{{ field.adjective|title }}</th>
+            {% endfor %}
+        </tr>
+        {% for puzzle in puzzles %}
+        <tr>
+            <td><a href="{% url 'survey' puzzle.puzzle.slug %}">{{ puzzle.puzzle }}</a></td>
+            <td>{{ puzzle.puzzle.survey__count }}</td>
+            {% for rating in puzzle.ratings %}
+            <td>{{ rating.avg|floatformat:2 }} <small>/ {{ rating.max }}</small></td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</main>
+
+{% endblock %}

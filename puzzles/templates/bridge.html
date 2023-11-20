@@ -1,12 +1,127 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load static %}
 {% block content %}
+<style>
+    .wysihtml-sandbox {
+        font-family: sans-serif;
+        min-height: 24ch;
+        display: inline-block;
+    }
+</style>
+<script src="{% static "js/wysihtml/wysihtml.min.js" %}"></script>
+<script src="{% static "js/wysihtml/wysihtml.toolbar.min.js" %}"></script>
+<script src="{% static "js/wysihtml/simple.js" %}"></script>
+<script>
+    function download(text, filename) {
+        const blob = new Blob([text], { type: "text/plain"});
+        const anchor = document.createElement("a");
+        anchor.download = filename;
+        anchor.href = window.URL.createObjectURL(blob);
+        anchor.target ="_blank";
+        anchor.style.display = "none";
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+    }
+
+    function downloadTextArea(id, filename) {
+        event.preventDefault();
+        const text = document.getElementById(id).value;
+        download(text, filename);
+     }
+
+    function downloadEmailText() {
+        event.preventDefault();
+        const editor = document.querySelector('.wysihtml-sandbox').contentDocument.querySelector('.wysihtml-editor');
+        const text = editor.innerText;
+        download(text, 'body.txt');
+    }
+
+    function downloadEmailHTML() {
+        event.preventDefault();
+        const editor = document.querySelector('.wysihtml-sandbox').contentDocument.querySelector('.wysihtml-editor');
+        const text = "<html>\n" + editor.innerHTML + "\n</html>";
+        download(text, 'body.html');
+    }
+
+    function downloadEmail() {
+        event.preventDefault();
+        downloadEmailText();
+        downloadEmailHTML();
+    }
+
+    function appendFooter() {
+        event.preventDefault();
+        const editor = document.querySelector('.wysihtml-sandbox').contentDocument.querySelector('.wysihtml-editor');
+        const footer = "<br>FIXME"
+        editor.innerHTML += footer;
+    }
+
+</script>
 <h1>{% translate "The Bridge" %}</h1>
 
 <main>
     <h4>{% translate "Email recipients list" %}</h4>
     <p>{% blocktranslate count recipients=recipient_count %}There is currently <strong>{{ recipients }}</strong> recipient.{% plural %}There are currently <strong>{{ recipients }}</strong> recipients.{% endblocktranslate %}</p>
-    <textarea>{{ recipients_list }}</textarea>
+    <p>
+        <textarea id="recipients" readonly>{{ recipients_list }}</textarea>
+        <a href="#" class="btn" onclick="downloadTextArea('recipients', 'bridge.txt')">Download recipients file (bridge.txt)</a>
+    </p>
+    <h4>Draft an email</h4>
+    <p>
+        <div id="toolbar">
+            <a class="btn" data-wysihtml-command="bold">bold</a>
+            <a class="btn" data-wysihtml-command="italic">italic</a>
+            <a class="btn" data-wysihtml-command="createLink">insert link</a>
+            <div data-wysihtml-dialog="createLink" style="display: none;">
+              <label>
+                Link:
+                <input data-wysihtml-dialog-field="href" value="https://" class="text">
+              </label>
+              <a class="btn" data-wysihtml-dialog-action="save">OK</a> <a class="btn" data-wysihtml-dialog-action="cancel">Cancel</a>
+            </div>
+            <a class="btn" data-wysihtml-command="removeLink">remove link</a>
+        </div>
+        
+        <textarea id="email-draft" placeholder="Write your email here..."></textarea>
+
+        <a href="#" class="btn" onclick="appendFooter()">✈✈✈ Add footer ✈✈✈</a>
+        <a href="#" class="btn" onclick="downloadEmail()">Download email (plaintext & html)</a>
+
+    </p>
+    <h4>Sending an email to all registered hunters:</h4>
+    <h5>Prerequisites (one-time setup)</h5>
+    <ol>
+        <li>Linux/Mac/WSL required. Make a local folder for email sending.</li>
+        <li>Download <a href="#" onclick="downloadTextArea('make-email', 'make-email.py')">make-email.py</a>. Replace <code>&lt;PRIVATE_API_KEY&gt;</code> with the key from <a href="https://app.mailgun.com/app/account/security/api_keys" target="_blank" rel="noopener noreferrer">mailgun</a>, including the <code>key-</code> prefix. Replace <code>&lt;YOUR_EMAIL_ADDRESS&gt;</code> with your email address to test receiving the email.</li>
+        <li>Everything other than the recipients list updating works offline. Save a copy of this page locally in case the hunt site goes down.</li>
+    </ol>
+    <h5>Repeat these steps for each email:</h5>
+    <ol>
+        <li>Download the recipients list to <code>bridge.txt</code>. Replace this if there are new recipients.</li>
+        <li>Draft an email. Download the email draft to <code>body.txt</code> (plaintext) and <code>body.html</code>. You may need to allow multiple downloads from your browser. Make sure links are included in the plaintext email.</li>
+        <li>Run <code>python ./make-email.py -s "EMAIL SUBJECT"</code>. This should create files <code>mg-auto-test</code> and <code>mg-auto-bridge-N</code>, starting from N=0, for roughly every 1000 recipients in bridge.txt.</li>
+        <li>Run <code>bash ./mg-auto-test</code> to send the email to your email address ONLY. Check the email, making sure the subject and body are correct. Make sure ALL LINKS work and go to the production site, not staging. <b>DO NOT SKIP THIS STEP!</b></li>
+        <li>If everything looks good and you’re ready to send the email, run <code>bash ./mg-auto-bridge-N</code> for each N. You should receive an additional N emails if it was sent successfully.</li>
+
+    </ol>
+
+    <textarea id="make-email" readonly style="display: none;">{% include 'make-email.py' %}</textarea>
 </main>
+
+<script>
+    // fix offline double iframe
+    const sandbox = document.querySelectorAll('.wysihtml-sandbox')
+    if (sandbox.length > 0) {
+        sandbox[0].remove();
+        document.querySelector('#email-draft').style.display = 'inline-block';
+    }
+
+    var editor = new wysihtml.Editor('email-draft', {
+        toolbar: 'toolbar',
+        parserRules:  wysihtmlParserRules
+    });
+</script>
 
 {% endblock %}

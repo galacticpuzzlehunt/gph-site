@@ -195,9 +195,10 @@ button.button-primary,
 input[type="submit"].button-primary,
 input[type="reset"].button-primary,
 input[type="button"].button-primary {
+  color-scheme: only light;
   color: #FFF;
-  background-color: #33C3F0;
-  border-color: #33C3F0; }
+  background-color: #A697D8;
+  border-color: #A697D8; }
 .button.button-primary:hover,
 button.button-primary:hover,
 input[type="submit"].button-primary:hover,
@@ -256,7 +257,8 @@ input[type="url"]:focus,
 input[type="password"]:focus,
 textarea:focus,
 select:focus {
-  border: 1px solid #33C3F0;
+  color-scheme: only light;
+  border: 3px solid #A697D8;
   outline: 0; }
 label,
 legend {
@@ -301,8 +303,8 @@ code {
   margin: 0 .2rem;
   font-size: 90%;
   white-space: nowrap;
-  background: #F1F1F1;
-  border: 1px solid #E1E1E1;
+  background: #0f0f0f;
+  border: 1px solid #555;
   border-radius: 4px; }
 pre > code {
   display: block;

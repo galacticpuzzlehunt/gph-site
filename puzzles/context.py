@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from puzzles import hunt_config
-from puzzles.hunt_config import HUNT_START_TIME, HUNT_END_TIME, HUNT_CLOSE_TIME
+from puzzles.hunt_config import HUNT_START_TIME, HUNT_END_TIME, HUNT_CLOSE_TIME, META_META_SLUG
 from puzzles import models
 from puzzles.shortcuts import get_shortcuts
 
@@ -186,3 +186,6 @@ class Context:
     # an archive, you don't have to bother with this.
     def archive_link(self):
         return reverse('archive') if settings.DEBUG else 'https://FIXME/archive'
+
+    def has_finished_hunt(self):
+        return any(puzzle.slug == META_META_SLUG for puzzle in self.team.solves.values()) if self.team else False

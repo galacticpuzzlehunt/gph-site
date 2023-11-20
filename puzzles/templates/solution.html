@@ -29,7 +29,7 @@ h4 {
 
 <h1>
     {% blocktranslate with puzzle_name=puzzle.name %}Solution: {{ puzzle_name }}{% endblocktranslate %}
-    <div class="solved-title-marker">{% translate "Answer:" %} <span class="solved-title-answer spoiler">{{ puzzle.answer }}</span></div>
+    {% if puzzle.answer %}<div class="solved-title-marker">{% translate "Answer:" %} <span class="solved-title-answer spoiler">{{ puzzle.answer }}</span></div>{% endif %}
 </h1>
 
 <main class="puzzle-main">

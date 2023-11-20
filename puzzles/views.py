@@ -9,7 +9,7 @@ import requests
 import traceback
 from collections import defaultdict, OrderedDict, Counter
 from functools import wraps
-from urllib.parse import unquote
+from urllib.parse import quote, unquote
 
 from django.conf import settings
 from django.contrib import messages
@@ -127,6 +127,15 @@ def access_restrictor(check_request):
 def require_admin(request):
     raise Http404
 
+# Like require_admin, but allow admins who are currently impersonating. Used
+# for hint answering. In theory we could expand it to other pages, but it would
+# require caution and might not be worth it (we'd like people to not be
+# impersonating when they don't have to be).
+@access_restrictor
+def require_admin_or_impersonating(request):
+    if not (request.impersonator and request.impersonator.is_superuser):
+        raise Http404
+
 # So it's absolutely clear, the two following decorators are
 # asymmetric: the hunt can "end" before it "closes", and in the time
 # between, both of these decorators will allow non-superusers. See
@@ -138,11 +147,16 @@ def require_after_hunt_end_or_admin(request):
         return redirect('index')
 
 @access_restrictor
+def require_after_hunt_end_or_finished(request):
+    if not request.context.hunt_is_over and not request.context.has_finished_hunt:
+        messages.error(request, _('Sorry, not available until the hunt ends.'))
+        return redirect('index')
+
+@access_restrictor
 def require_before_hunt_closed_or_admin(request):
     if request.context.hunt_is_closed:
         messages.error(request, _('Sorry, the hunt is over.'))
         return redirect('index')
-
 
 # These are basically static pages:
 
@@ -150,21 +164,13 @@ def require_before_hunt_closed_or_admin(request):
 def index(request):
     return render(request, 'home.html')
 
-
 @require_GET
-def rules(request):
-    return render(request, 'rules.html')
-
-
-@require_GET
-def faq(request):
-    return render(request, 'faq.html')
-
+def about(request):
+    return render(request, 'about.html')
 
 @require_GET
 def archive(request):
     return render(request, 'archive.html')
-
 
 recaptcha_logger = logging.getLogger('puzzles.recaptcha')
 
@@ -182,6 +188,7 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         formset = team_members_formset(request.POST)
+        recaptcha_score = 0
 
         # The below only logs the response and doesn't do anything with it.
         # If you have spam problems, you can reject when the score is low.
@@ -193,10 +200,18 @@ def register(request):
                     'secret': settings.RECAPTCHA_SECRETKEY,
                     'response': token,
                 }).json()
+                if 'score' in response:
+                    recaptcha_score = response['score']
+                else:
+                    recaptcha_score = 1.0 if response['success'] else 0.0
                 recaptcha_logger.info(_('team [%s] token [%s]\n%s') % (
                     request.POST['team_id'], token, response))
             except Exception:
                 pass
+
+        if recaptcha_score < settings.RECAPTCHA_SCORE_THRESHOLD:
+            messages.error(request, _('Recaptcha failed.'))
+            return redirect('register')
 
         if form.is_valid() and formset.is_valid():
             data = form.cleaned_data
@@ -239,7 +254,6 @@ def register(request):
         'team_members_formset': formset,
     })
 
-
 @require_before_hunt_closed_or_admin
 def password_change(request):
     if request.method == 'POST':
@@ -255,7 +269,6 @@ def password_change(request):
         form = PasswordChangeForm(user=request.user)
 
     return render(request, 'password_change.html', {'form': form})
-
 
 @require_before_hunt_closed_or_admin
 def password_reset(request):
@@ -440,7 +453,6 @@ def edit_team(request):
 
     return render(request, 'edit_team.html', {'team_members_formset': formset})
 
-
 @require_GET
 def puzzles(request):
     '''List all unlocked puzzles.
@@ -455,7 +467,6 @@ def puzzles(request):
         return render(request, 'countdown.html', {'start': request.context.start_time})
     else:
         raise Http404
-
 
 @require_GET
 def round(request, slug):
@@ -473,7 +484,6 @@ def round(request, slug):
                 return redirect('puzzles')
     messages.error(request, _('Invalid round name.'))
     return redirect('puzzles')
-
 
 def render_puzzles(request):
     team = request.context.team
@@ -543,7 +553,6 @@ def render_puzzles(request):
         rounds[puzzle.round.slug]['puzzles'].append(data)
     return rounds
 
-
 @require_GET
 @validate_puzzle()
 def puzzle(request):
@@ -569,7 +578,6 @@ def puzzle(request):
         # is blank.
         data['template_name'] = template_name
         return render(request, 'puzzle.html', data)
-
 
 @validate_puzzle(require_team=True)
 @require_before_hunt_closed_or_admin
@@ -636,7 +644,7 @@ def solve(request):
             return redirect('solve', puzzle.slug)
 
     elif request.method == 'POST':
-        if not request.context.puzzle_answer or not SURVEYS_AVAILABLE:
+        if puzzle.id not in team.solves or not SURVEYS_AVAILABLE:
             raise Http404
         survey = SurveyForm(request.POST)
         if survey.is_valid():
@@ -673,7 +681,6 @@ def solve(request):
         ],
     })
 
-
 @validate_puzzle(require_team=True)
 @require_before_hunt_closed_or_admin
 def free_answer(request):
@@ -699,7 +706,6 @@ def free_answer(request):
             messages.success(request, _('Free answer used!'))
         return redirect('solve', puzzle.slug)
     return render(request, 'free_answer.html')
-
 
 @validate_puzzle()
 @require_after_hunt_end_or_admin
@@ -729,6 +735,23 @@ def post_hunt_solve(request):
         'form': form,
     })
 
+@require_GET
+@require_admin
+def survey_list(request):
+    '''For admins. See survey results.'''
+
+    fields = Survey.fields()
+    puzzles = []
+    for puzzle in Puzzle.objects.annotate(Count('survey'), *[
+        Avg('survey__' + field.name) for field in fields
+    ]):
+        if puzzle.survey__count == 0: continue
+        ratings = [{
+            'avg': getattr(puzzle, 'survey__%s__avg' % field.name),
+            'max': field.max_rating,
+        } for field in fields]
+        puzzles.append({'puzzle': puzzle, 'ratings': ratings})
+    return render(request, 'survey_list.html', {'fields': fields, 'puzzles': puzzles})
 
 @require_GET
 @validate_puzzle()
@@ -754,9 +777,8 @@ def survey(request):
         field['average'] = field['total'] / field['count'] if field['count'] else 0
     return render(request, 'survey.html', {'fields': fields, 'surveys': surveys})
 
-
 @require_GET
-@require_admin
+@require_admin_or_impersonating
 def hint_list(request):
     '''For admins. By default, list popular and outstanding hint requests.
     With query options, list hints satisfying some query.'''
@@ -806,7 +828,6 @@ def hint_list(request):
             'unanswered': unanswered,
             'stats': itertools.zip_longest(popular, claimers),
         })
-
 
 @validate_puzzle(require_team=True)
 @require_before_hunt_closed_or_admin
@@ -872,8 +893,7 @@ def hints(request):
         'can_followup': can_followup,
     })
 
-
-@require_admin
+@require_admin_or_impersonating
 def hint(request, id):
     '''For admins. Handle a particular hint.'''
 
@@ -953,9 +973,8 @@ def hint(request, id):
         'form': form,
     })
 
-
 @require_GET
-@require_after_hunt_end_or_admin
+@require_after_hunt_end_or_finished
 def hunt_stats(request):
     '''After hunt ends, view stats for the entire hunt.'''
 
@@ -1023,7 +1042,6 @@ def hunt_stats(request):
         'data': data,
     })
 
-
 @require_GET
 @validate_puzzle()
 @require_after_hunt_end_or_admin
@@ -1076,9 +1094,8 @@ def stats(request):
         'guesses': sum(total_guesses_map.values()),
         'answers_tried': incorrect_guesses.most_common(),
         'unlock_count': len(unlock_time_map),
-        'hint_count': puzzle.hint_set.exclude(team__is_hidden=True).count(),
+        'hint_count': puzzle.hint_set.filter(q).count(),
     })
-
 
 @require_GET
 @validate_puzzle()
@@ -1092,12 +1109,10 @@ def solution(request):
     except TemplateDoesNotExist:
         return render(request, 'solution.html', {'template_name': template_name})
 
-
 @require_GET
 @require_after_hunt_end_or_admin
 def solution_static(request, path):
     return serve(request, path, document_root=settings.SOLUTION_STATIC_ROOT)
-
 
 @require_GET
 def story(request):
@@ -1124,27 +1139,23 @@ def story(request):
         story_points.reverse()
     return render(request, 'story.html', {'story_points': story_points})
 
-
 @require_GET
 def victory(request):
     '''View your team's victory page, if you've finished the hunt.'''
 
-    team = request.context.team
-    if not request.context.hunt_is_over and not request.context.is_superuser:
-        if not team or not request.context.hunt_has_started:
-            raise Http404
-        finished = any(puzzle.slug == META_META_SLUG for puzzle in team.solves.values())
-        if not finished:
-            raise Http404
+    if not (
+        request.context.hunt_is_over or
+        request.context.is_superuser or
+        request.context.has_finished_hunt
+    ):
+        raise Http404
     return render(request, 'victory.html')
-
 
 @require_GET
 def errata(request):
     if not request.context.errata_page_visible:
         raise Http404
     return render(request, 'errata.html')
-
 
 @require_GET
 def wrapup(request):
@@ -1154,11 +1165,10 @@ def wrapup(request):
 
 
 @require_GET
-@require_after_hunt_end_or_admin
+@require_after_hunt_end_or_finished
 def finishers(request):
     unlocks = OrderedDict()
-    solves_by_team = defaultdict(list)
-    metas_by_team = defaultdict(list)
+    solves = {}
 
     for submission in AnswerSubmission.objects.filter(
         puzzle__slug=META_META_SLUG,
@@ -1167,37 +1177,20 @@ def finishers(request):
         submitted_datetime__lt=HUNT_END_TIME,
     ).order_by('submitted_datetime'):
         unlocks[submission.team_id] = None
+        solves[submission.team_id] = submission
     for unlock in PuzzleUnlock.objects.select_related().filter(
         team__id__in=unlocks,
         puzzle__slug=META_META_SLUG,
-    ):
+    ).prefetch_related('team__teammember_set'):
         unlocks[unlock.team_id] = unlock
-    for solve in AnswerSubmission.objects.select_related().filter(
-        team__id__in=unlocks,
-        used_free_answer=False,
-        is_correct=True,
-        submitted_datetime__lt=HUNT_END_TIME,
-    ).order_by('submitted_datetime'):
-        solves_by_team[solve.team_id].append(solve.submitted_datetime)
-        if solve.puzzle.is_meta:
-            metas_by_team[solve.team_id].append(solve.submitted_datetime)
 
     data = []
     for team_id, unlock in unlocks.items():
-        solves = [HUNT_START_TIME] + solves_by_team[team_id] + [HUNT_END_TIME]
-        solves = [{
-            'before': (solves[i - 1] - HUNT_START_TIME).total_seconds(),
-            'after': (solves[i] - HUNT_START_TIME).total_seconds(),
-        } for i in range(1, len(solves))]
-        metas = metas_by_team[team_id]
         data.append({
             'team': unlock.team,
             'unlock_time': unlock.unlock_datetime,
-            'solve_time': metas[-1],
-            'total_time': (metas[-1] - unlock.unlock_datetime).total_seconds(),
-            'hunt_length': (HUNT_END_TIME - HUNT_START_TIME).total_seconds(),
-            'solves': solves,
-            'metas': [(ts - HUNT_START_TIME).total_seconds() for ts in metas],
+            'solve_time': solves[team_id].submitted_datetime,
+            'total_time': (solves[team_id].submitted_datetime - unlock.unlock_datetime).total_seconds(),
         })
     if request.context.is_superuser:
         data.reverse()
@@ -1375,7 +1368,7 @@ def bigboard_unhidden(request):
     return bigboard_generic(request, hide_hidden=False)
 
 @require_GET
-@require_after_hunt_end_or_admin
+@require_after_hunt_end_or_finished
 def biggraph(request):
     puzzles = request.context.all_puzzles
     puzzle_map = {}
@@ -1450,7 +1443,6 @@ def guess_csv(request):
             'F' if ans.used_free_answer else ('Y' if ans.is_correct else 'N')])
     return response
 
-
 @require_GET
 @require_admin
 def hint_csv(request):
@@ -1474,13 +1466,11 @@ def hint_csv(request):
             hint.response])
     return response
 
-
 @require_GET
 @require_admin
 def puzzle_log(request):
     return serve(request, os.path.join(settings.BASE_DIR,
         settings.LOGGING['handlers']['puzzle']['filename']), document_root='/')
-
 
 @require_POST
 @require_admin
@@ -1497,7 +1487,6 @@ def shortcuts(request):
         response.write('<script>top.location.reload(true)</script>')
     return response
 
-
 def robots(request):
     response = HttpResponse(content_type='text/plain')
     if settings.DEBUG:
@@ -1505,7 +1494,6 @@ def robots(request):
     else:
         response.write('User-agent: *\nDisallow: /solution/\n')
     return response
-
 
 def accept_ranges_middleware(get_response):
     # https://stackoverflow.com/questions/36783521/why-does-setting-currenttime-of-html5-video-element-reset-time-in-chrome

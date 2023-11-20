@@ -10,6 +10,7 @@ $(function() {
     }
     e.stopPropagation();
   });
+  $(document).mousedown(function(e) { toggle(false); });
   var swipe = null;
   var nav = $('nav').swipe({
     fallbackToMouseEvents: false,
@@ -50,7 +51,7 @@ $(function() {
           }
           break;
         case 'cancel':
-          if ($.contains($('.top-right-actions')[0], e.target)) {
+          if ($.contains($('.top-more-actions')[0], e.target)) {
             toggle(true);
           } else {
             toggle(swipe[1]);

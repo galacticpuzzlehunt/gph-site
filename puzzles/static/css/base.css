@@ -1,12 +1,24 @@
 html {
-    --page-bg-rgb: 255, 255, 255;
-    --accent-rgb: 0, 85, 170;
+    --page-bg-rgb: 5, 5, 5;
+    --accent-bg-rgb: 40, 26, 33;
+    --accent-rgb: 237, 242, 243;
+    --dark-accent-rgb: 13, 4, 26;
+    --body-rgb: 221, 221, 215;
+    --dark-flair-rgb: 67, 38, 117;
+    --flair-rgb: 159, 122, 234;
+    --light-flair-rgb: 192, 168, 240;
 
-    --white-color: white;
-    --neutral-color: #bbb;
+    --white-color: #f9f8f5;
+    --neutral-color: #bbbcc3;
+    --dark-text-color: rgba(var(--dark-accent-rgb), 0.9);
+    --subtle-text-color: rgba(var(--dark-accent-rgb), 0.5);
+    --body-text-color: rgba(var(--body-rgb), 0.9);
+    --glow-color: rgba(var(--accent-rgb), 0.4);
+
     --accent-color: rgb(var(--accent-rgb));
     --accent-bg-color: rgba(var(--accent-rgb), 0.1);
-    --accent-hover-color: #2af;
+    --accent-hover-color: rgba(var(--flair-rgb), 0.7);
+    --light-flair-color: rgba(var(--light-flair-rgb), 0.8);
 
     --page-bg-color: rgb(var(--page-bg-rgb));
     --sticky-bg-color: rgba(var(--page-bg-rgb), 0.9);
@@ -16,14 +28,17 @@ html {
     --print-border-color: #111;
 
     --link-text-color: var(--accent-color);
-    --link-hover-color: var(--accent-hover-color);
+    --link-hover-color: #b794f4;
 
-    --btn-text-color: var(--white-color);
-    --btn-bg-color: var(--accent-color);
-    --btn-hover-color: var(--accent-hover-color);
+    --btn-text-color: var(--accent-color);
+    --btn-bg-color: rgba(var(--dark-flair-rgb), 0.8);
+    --btn-bg-2-color: rgba(var(--accent-bg-rgb), 0.8);
+    --btn-hover-color: rgba(var(--flair-rgb), 0.7);
 
     --tray-text-color: var(--accent-color);
-    --tray-bg-color: var(--neutral-color);
+    --tray-bg-color: rgba(var(--accent-bg-rgb), 0.65);
+    --info-bg-color: rgba(var(--page-bg-rgb), 0.8);
+    --dropdown-bg-color: rgba(var(--accent-bg-rgb), 0.9);
 
     --text-font: sans-serif;
     --btn-font: sans-serif;
@@ -38,6 +53,11 @@ body {
     font-size: 1.75rem;
     overflow-wrap: break-word;
     position: relative;
+    color: var(--body-text-color);
+}
+
+strong {
+    text-shadow: 0 0 10px var(--glow-color);
 }
 
 @media print {
@@ -65,7 +85,7 @@ li {
 }
 
 ul > li {
-    list-style-type: "\2013  ";
+    list-style-type: disc;
 }
 
 textarea {
@@ -75,7 +95,12 @@ textarea {
 }
 
 h1, h2, h3, h4, h5, h6 {
+    font-family: var(--accent-font);
     font-weight: bold;
+    text-shadow: 0 0 10px var(--glow-color);
+
+    letter-spacing: 0.02em;
+    word-spacing: 0.1em;
 }
 
 h1, h2 {
@@ -109,9 +134,11 @@ table.very-small td, table.very-small th {
 }
 
 code {
-    font-size: 80%;
     max-width: 1000px;
     overflow: scroll;
+    border: none;
+    padding: 0.1em 0.25em;
+    background-color: var(--primary-800);
 }
 
 tr:last-child td {
@@ -126,9 +153,8 @@ a, .btn {
     display: inline-block;
     text-decoration: none;
     font-weight: normal;
-    border-radius: 0;
     border: none;
-    font-family: var(--btn-font);
+    font-family: var(--accent-font);
     text-transform: uppercase;
     letter-spacing: 0;
 
@@ -136,6 +162,7 @@ a, .btn {
     height: 32px;
     line-height: 32px;
     font-size: 2rem;
+    border-radius: 0;
 }
 
 form .btn {
@@ -187,7 +214,7 @@ a.main-content-anchor {
     display: block;
     visibility: hidden;
     position: relative;
-    top: 4rem; /* .top-right-actions margin-bottom + h1 margin-top */
+    top: 4rem; /* .top-team-actions margin-bottom + h1 margin-top */
 }
 
 @media print {
@@ -216,9 +243,7 @@ a.main-content-anchor {
     }
 
     h1, h2 {
-        background-color: var(--accent-bg-color);
-        border-left: 3rem solid var(--border-color);
-        padding: 2rem;
+        text-transform: uppercase;
     }
 
     h3, h4 {
@@ -233,24 +258,28 @@ a.main-content-anchor {
     a:hover,
     a:focus {
         color: var(--link-hover-color);
+        text-shadow: 0 0 10px #b794f4aa;
     }
 
     .puzzle-main {
-        background-color: var(--white-color);
+        background-color: var(--primary-900);
         padding: 20px 30px;
     }
 
     .puzzle-main h1, .puzzle-main h2, .puzzle-main h3, .puzzle-main h4 {
-        color: initial;
         background: none;
         border-left: none;
         padding: 0;
     }
 
     .btn {
+        position: relative;
         transition: background-color 0.3s;
+
         color: var(--btn-text-color);
-        background-color: var(--btn-bg-color);
+        background-image: linear-gradient(1deg, var(--btn-bg-color), var(--btn-bg-2-color));
+
+
     }
 
     .btn:hover,
@@ -271,46 +300,71 @@ a.main-content-anchor {
 
     nav {
         overflow: hidden;
+        height: 50px;
     }
 
     .top-tabs {
+        position: fixed;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+
         display: flex;
         white-space: nowrap;
-        justify-content: space-evenly;
+        justify-content: space-between;
         font-size: 2rem;
-        margin: 5px 0 1.5rem;
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 4px;
         line-height: 1;
+        background-color: var(--info-bg-color);
+        font-family: var(--accent-font);
+        text-transform: uppercase;
+        backdrop-filter: blur(0.5em);
     }
 
     .top-tabs a {
         display: inline-flex;
         position: relative;
-        padding: 6px 0 10px;
+        padding: 6px 20px;
         text-decoration: none;
         align-items: center;
     }
 
     .top-tabs .selected-tab {
         font-weight: bold;
+        text-shadow: 0 0 10px var(--glow-color);
     }
 
-    .top-left-actions {
-        float: left;
-    }
-
-    .top-right-actions {
-        float: right;
-        min-height: 32px;
-        margin-bottom: 1.5rem;
-    }
-
-    .top-left-actions, .top-right-actions {
+    .top-more-actions {
         line-height: 32px;
-        word-spacing: 8px;
+        margin: 5rem 0 0 0;
     }
 
-    .top-left-actions > *, .top-right-actions > * {
+    .top-team-actions {
+        margin-left: 5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .top-team-actions .team-name {
+        max-width: 15em;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        display: block;
+    }
+
+    .top-more-actions, .top-team-actions {
+        word-spacing: 12px;
+    }
+
+    .top-more-actions > *, .top-team-actions > * {
         word-spacing: initial;
+    }
+
+    .site-nav {
+        display: flex;
+        margin-right: 5rem;
     }
 
     .current-stat {
@@ -326,13 +380,15 @@ a.main-content-anchor {
     }
 
     .shortcuts {
-        border: 2px solid var(--tray-bg-color);
-        background-color: white;
+        background-color: var(--dropdown-bg-color);
         position: absolute;
         padding: 1rem 1rem 0;
-        right: 60px;
+        left: 100px;
+        top: 48px;
         z-index: 800;
         display: none;
+        color: var(--text-color);
+        white-space: normal;
     }
 
     .shortcuts form {
@@ -356,7 +412,7 @@ a.main-content-anchor {
         margin: 0px;
         height: auto;
         border: none;
-        color: #222;
+        color: var(--body-text-color);
         text-transform: none;
         font-size: 17.5px;
         font-weight: 600;
@@ -401,10 +457,11 @@ a.main-content-anchor {
         left: 0;
         right: 0;
         top: -100vh;
-        bottom: 0;
+        bottom: -48px;
         padding-top: 90vh;
-        background-color: var(--tray-bg-color);
+        background-color: var(--info-bg-color);
         color: var(--tray-text-color);
+        backdrop-filter: blur(0.5em);
     }
 
     .tray:after {
@@ -422,42 +479,51 @@ a.main-content-anchor {
         text-align: center;
         font-size: 32px;
         line-height: 40px;
-        background-image: linear-gradient(var(--tray-bg-color), var(--tray-bg-color));
-        background-size: 100% 48px;
-        background-repeat: no-repeat;
-        background-origin: content-box;
     }
 
-    .tray div {
+    .top-team-actions, .top-team-actions #nav-team-name, .site-nav {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
         flex-basis: 0;
         z-index: 0;
+        align-items: start;
+        gap: 0.5em;
     }
 
     .top-tabs {
-        align-items: flex-start;
-        justify-content: flex-start;
+        position: relative;
         margin: 0;
         font-size: calc((960px - 100vw) / 16 + 20px);
+        background-color: initial;
+        gap: 0.5em;
+        backdrop-filter: none;
+        padding-top: 32px;
     }
 
-    .top-left-actions {
-        align-items: flex-end;
+    .top-tabs a, .top-tabs .site-nav .dropdown-trigger button {
+        padding: 0;
+        line-height: 1.5;
     }
 
-    .top-left-actions a {
+    .top-tabs .site-nav .dropdown-content a {
+        padding: 0.5em 1em;
+    }
+
+    .top-more-actions a {
         line-height: 2;
         height: auto;
         font-size: calc((960px - 100vw) * 3 / 80 + 18px);
         margin-bottom: calc((960px - 100vw) * 3 / 40 + 12px);
     }
 
-    .top-right-actions {
-        float: none;
-        text-align: center;
-        padding-top: 64px;
+    .top-team-actions {
+        margin-left: 0;
+    }
+
+    .site-nav {
+        margin-right: 0;
+        align-items: end;
     }
 
     .flavor {
@@ -466,7 +532,7 @@ a.main-content-anchor {
     }
 
     a.main-content-anchor {
-        top: calc(4rem - 64px); /* .top-right-actions margin-bottom + h1 margin-top - .tray:after height */
+        top: calc(4rem - 64px); /* .top-team-actions margin-bottom + h1 margin-top - .tray:after height */
     }
 }
 
@@ -497,7 +563,7 @@ a.main-content-anchor {
         font-size: 30px;
     }
 
-    .top-left-actions a {
+    .top-more-actions a {
         font-size: 24px;
         margin-bottom: 24px;
     }
@@ -540,9 +606,10 @@ a.main-content-anchor {
     .list-table th {
         border: none;
         position: sticky;
-        top: 0;
+        top: 36px;
         background-color: var(--sticky-bg-color);
         box-shadow: inset 0 -2px 0 0 var(--border-color);
+        z-index: 1;
     }
 }
 
@@ -581,42 +648,15 @@ a.main-content-anchor {
 }
 
 .info-row {
-    margin-bottom: 2.4rem;
+    display: flex;
+    gap: 4%;
 }
 
-.info-desc p:last-child {
-    margin-bottom: 0;
-}
-
-@media screen {
-    .info-row > div {
-        border: 2px solid var(--border-color);
-    }
-
-    .info-row h4 {
-        margin: 0;
-        background-color: var(--border-color);
-        color: var(--btn-text-color);
-        padding-left: 2rem;
-        border: none;
-    }
-
-    .info-desc {
-        font-size: 2rem;
-        padding: 1rem 2rem;
-    }
-}
-
-@media print, (min-width: 961px) {
-    .info-row {
-        display: flex;
-        gap: 4%;
-    }
-
-    .info-row > div {
-        flex-grow: 1;
-        flex-basis: 0;
-    }
+.info-row > div {
+    font-size: 2rem;
+    margin-bottom: 4rem;
+    flex-grow: 1;
+    flex-basis: 0;
 }
 
 .no-break {
@@ -660,10 +700,11 @@ a.main-content-anchor {
 
 .errorlist {
     padding: 1rem;
-    border: 3px solid currentColor;
     list-style-type: none;
-    color: #b21;
-    background-color: var(--white-color);
+    color: var(--btn-text-color);
+    text-shadow: 0 0 10px var(--glow-color);
+    background-image: linear-gradient(-1deg, rgba(141, 45, 35, 0.8), rgb(194, 42, 25));
+
 }
 
 .errorlist li {
@@ -675,7 +716,7 @@ a.main-content-anchor {
 
 .solved-title-marker {
     font-size: 50%;
-    color: initial;
+    color: var(--body-text-color);
 }
 
 .solved-title-answer {
@@ -692,7 +733,7 @@ a.main-content-anchor {
 }
 
 .current-team {
-    font-weight: bold;
+    background-color: var(--btn-bg-color);
 }
 
 .meta-stats {
@@ -808,8 +849,9 @@ a.main-content-anchor {
     display: inline-block;
     font-size: 1.5rem;
     padding: 0 0.5rem;
+    margin-right: 0.2rem;
     vertical-align: top;
-    font-family: var(--btn-font);
+    font-family: var(--accent-font);
     text-transform: uppercase;
 }
 
@@ -843,7 +885,7 @@ a.main-content-anchor {
 
     .spoiler:not(:hover) {
         background-color: currentColor;
-        color: inherit;
+        color: rgb(var(--accent-rgb));
     }
 }
 
@@ -852,14 +894,14 @@ a.main-content-anchor {
 }
 
 .clipboard-button {
-    border-radius: 1em;
+    border-radius: 50%;
     bottom: 1.5em;
-    cursor: pointer;
-    font-size: 1em;
-    height: 2em;
-    padding: 0 0.8em;
+    box-shadow: .1em .1em .5em var(--info-bg-color);
+    font-size: 2em;
+    height: 2.25em;
     position: fixed !important;
     right: 1.5em;
+    width: 2.25em;
     z-index: 100; /* Needed so hover & click work even when button floats outside of its parent. */
 }
 
@@ -901,6 +943,15 @@ a.main-content-anchor {
     .chart {
         display: none;
     }
+}
+
+kbd {
+    display: inline-block;
+    padding: 0 0.25em;
+    border: 1px solid var(--primary-200);
+    border-radius: 0.25em;
+    margin: 0.15em 0.2em;
+    background-color: var(--primary-800);
 }
 
 footer {

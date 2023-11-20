@@ -12,23 +12,24 @@
 
 {% block content %}
 
+<style>
+.list-table td:not(:first-child) {
+    white-space: nowrap;
+    font-variant: tabular-nums;
+}
+</style>
+
 <h1>{% blocktranslate with puzzle_name=puzzle.name %}Stats: {{ puzzle_name }}{% endblocktranslate %}</h1>
 
 <main>
     <div class="info-row">
         <div>
-            <h4>&nbsp;</h4>
-            <div class="info-desc">
-                <div class="stat-entry">{% translate "Total solves:" %} <span class="stat-value">{{ solves }}</span></div>
-                <div class="stat-entry">{% translate "Total guesses:" %} <span class="stat-value">{{ guesses }}</span></div>
-            </div>
+            <div class="stat-entry">{% translate "Total solves:" %} <span class="stat-value">{{ solves }}</span></div>
+            <div class="stat-entry">{% translate "Total guesses:" %} <span class="stat-value">{{ guesses }}</span></div>
         </div>
         <div>
-            <h4>&nbsp;</h4>
-            <div class="info-desc">
-                <div class="stat-entry">{% translate "Hints asked:" %} <span class="stat-value">{{ hint_count }}</span></div>
-                <div class="stat-entry">{% translate "Teams unlocked:" %} <span class="stat-value">{{ unlock_count }}</span></div>
-            </div>
+            <div class="stat-entry">{% translate "Hints asked:" %} <span class="stat-value">{{ hint_count }}</span></div>
+            <div class="stat-entry">{% translate "Teams unlocked:" %} <span class="stat-value">{{ unlock_count }}</span></div>
         </div>
     </div>
 
@@ -53,26 +54,6 @@
                 <td sorttable_customkey="{{ solver.unlock_time|unix_time }}">{% format_time solver.unlock_time %}</td>
                 <td sorttable_customkey="{{ solver.open_duration }}">{% format_duration solver.open_duration %}</td>
                 <td sorttable_customkey="{{ solver.solve_time|unix_time }}">{% format_time solver.solve_time %}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <table class="sortable list-table">
-        <col style="width: 80%">
-        <col style="width: 20%">
-        <tbody>
-            <tr>
-                <th>{% translate "Answer" %}</th>
-                <th>{% translate "Submission count" %}</th>
-            </tr>
-            <tr>
-                <td style="font-family: var(--answer-font); font-weight: bold;">{{ puzzle.answer }}</td>
-                <td style="font-weight: bold;">{{ solves }}</td>
-            </tr>
-            {% for pair in answers_tried %}
-            <tr>
-                <td style="font-family: var(--answer-font); word-break: break-all;">{{ pair.0 }}</td>
-                <td>{{ pair.1 }}</td>
             </tr>
             {% endfor %}
         </tbody>

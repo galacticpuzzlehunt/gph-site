@@ -16,7 +16,10 @@
         {% translate "Your name is" %} <b id="claimer">{% translate "anonymous" %}</b>.
     </a>
     <script src="{% static "js/hint.js" %}"></script>
-    <a href="/admin/puzzles/hint/{{ hint.id }}/change/" class="btn">{% translate "View in admin" %}</a>
+    <span>
+        <a href="{% url 'impersonate-start' hint.team.user_id %}" class="btn danger">{% translate "Impersonate" %}</a>
+        <a href="/admin/puzzles/hint/{{ hint.id }}/change/" class="btn">{% translate "View in admin" %}</a>
+    </span>
 </div>
 
 <table class="hint-table">

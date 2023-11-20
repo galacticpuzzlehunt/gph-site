@@ -90,6 +90,7 @@ class Command(BaseCommand):
                             submitted_answer=wrong_answers[i],
                             is_correct=False,
                             used_free_answer=False,
+                            submitted_datetime=cur_time,
                         ).save()
 
                 if random.random() < success_prob:

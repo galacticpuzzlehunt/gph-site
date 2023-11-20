@@ -117,15 +117,15 @@ function bootstrapClipoardButton(clipboardButton) {
   if (!puzzleElement) return;
 
   // Fill default button contents.
-  clipboardButton.textContent = gettext("Copy to clipboard");
+  clipboardButton.textContent = "📋️";
   clipboardButton.addEventListener("click", () => {
     // Show copy status within button. Do this before copying, so the copy handler
     // can change the status if needed.
-    clipboardButton.textContent = gettext("Copied to clipboard!");
+    clipboardButton.textContent = "✔️";
 
     copyContents(puzzleElement, clipboardButton.dataset);
     setTimeout(() => {
-      clipboardButton.textContent = gettext("Copy to clipboard");
+      clipboardButton.textContent = "📋️";
     }, 3000);
   });
 

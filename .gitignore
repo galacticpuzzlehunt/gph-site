@@ -23,6 +23,9 @@
 # MacOS generated files
 .DS_Store
 
+# IntelliJ
+.idea/
+
 dump.rdb
 
 *.swp

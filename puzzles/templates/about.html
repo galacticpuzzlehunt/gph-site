@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load puzzle_tags %}
+
+{% block content %}
+
+<h1>{% translate "About" %}</h1>
+
+<main>
+    <div class="no-break">
+        <h4 id="Format">{% translate "What are the rules?" %}</h4>
+        <ul>
+            {% format_time start_time "WEEKDATE_AT_TIME" as hunt_start %}
+            {% format_time end_time "WEEKDATE_AT_TIME" as hunt_end %}
+            <li>{% blocktranslate %}The puzzlehunt starts on <strong>{{ hunt_start }}</strong> and ends on <strong>{{ hunt_end }}</strong>, at which point puzzle solutions will be available. {% endblocktranslate %}
+            {% comment %}
+            {% format_time close_time "WEEKDATE_AT_TIME" as hunt_close %}
+            {% blocktranslate %}However, we will leave the website running until <strong>{{ hunt_close }}</strong> so teams can still submit answers and go through the hunt at their own pace.{% endblocktranslate %}
+            {% endcomment %}
+            </li>
+            <li>{% blocktranslate with max_members=max_members_per_team contact=contact_email %}Teams have a maximum size of {{ max_members }}.{% endblocktranslate %}</li>
+            <li>{% blocktranslate %}We reserve the right to disqualify any team for unsportsmanlike conduct.{% endblocktranslate %}</li>
+            <li>{% blocktranslate with contact=contact_email %}If you have any questions about the hunt, or if you want to contact us for any reason, email <a href="mailto:{{ contact }}">{{ contact }}</a>. We will get back to you as soon as we can.{% endblocktranslate %}</li>
+        </ul>
+    </div>
+    <div class="no-break">
+        <h4>{% translate "What is a puzzlehunt?" %}</h4>
+        <p>{% blocktranslate %}In a puzzlehunt, each puzzle has an underlying pattern or insight, which you need to figure out (somewhat like the <a href="https://en.wikipedia.org/wiki/Crossword#Themes">theme</a> of a crossword puzzle). Puzzles can come in many different forms; the only real commonality is that you usually receive no direct instructions, so it&rsquo;s up to you to figure out how to make sense of the information you&rsquo;re given. You can read a longer introduction to puzzlehunts <a href="https://blog.vero.site/post/puzzlehunts" target="_blank">here</a>.{% endblocktranslate %}</p>
+        <p>{% blocktranslate %}If you are new to puzzles and are interested in seeing some examples, or if you&rsquo;re looking for some practice, we recommend looking at puzzles from other online hunts such as <a target="_blank" href="https://galacticpuzzlehunt.com/">Galactic Puzzle Hunt</a>, <a target="_blank" href ="https://teammatehunt.com/">Teammate Hunt</a>, <a target="_blank" href="https://puzzlepotluck.com/">Puzzle Potluck</a>, or <a target="_blank" href="https://reddothunt.sg/2018">REDDOThunt</a>.{% endblocktranslate %}</p>
+    </div>
+    <div class="no-break">
+        <h4 id="Format">{% translate "What is and isn’t allowed?" %}</h4>
+        <ul>
+            <li>You may use any external sources for help, including other people, as long as they aren’t helping other teams and aren’t actively participating in the hunt.</li>
+            <li>You may not stream or post spoilers for the hunt in a place where other teams might see them.</li>
+            <li>You may not create multiple accounts or be on multiple teams.</li>
+        </ul>
+    </div>
+    <div class="no-break">
+        <h4 id="Format">{% translate "What is the format of this hunt?" %}</h4>
+        <p>{% blocktranslate %}A few puzzles will be available at the start, and the primary way to unlock new puzzles is by solving puzzles and progressing through the hunt, although puzzles may also be unlocked over time.{% endblocktranslate %}</p>
+        <p>{% blocktranslate %}Each answer is a string of letters A&ndash;Z. Lowercase letters will be changed into uppercase, and any other characters will be stripped before checking for correctness.{% endblocktranslate %}</p>
+        <p>{% blocktranslate with max_guesses=max_guesses_per_puzzle %}You have <strong>{{ max_guesses }} total guesses</strong> for each puzzle. If you legitimately run out of guesses and need more, feel free to contact us, though we won&rsquo;t grant your request if we see that you were, for example, guessing random thematic answers, or brute-forcing all 10-letter words.{% endblocktranslate %}</p>
+    </div>
+    <div class="no-break">
+        <h4 id="Format">{% translate "How will hints work?" %}</h4>
+        {% format_time hint_time "WEEKDATE_AT_TIME" as hint_start %}
+        <p>{% blocktranslate %}Starting on <strong>{{hint_start}}</strong>, teams will receive one hint every <strong>FIXME</strong> until the end of the hunt.{% endblocktranslate %}</p>
+        {% if intro_hints %}
+        <p>{% blocktranslate count hints=intro_hints %}The first <strong>{{ hints }} hint</strong> your team receives may only be used on the first set of puzzles in the hunt.{% plural %}The first <strong>{{ hints }} hints</strong> your team receives may only be used on the first set of puzzles in the hunt.{% endblocktranslate %}</p>
+        {% endif %}
+        <p>{% blocktranslate %}You can use a hint to get help on a puzzle. This can be something like a nudge in the right direction (i.e. you give us your progress on the puzzle and we&rsquo;ll try to get you unstuck) or an answer to a question (e.g. &ldquo;Which answers to these crossword clues are wrong?&rdquo;).{% endblocktranslate %}</p>
+        {% if one_hint_at_a_time %}
+        <p>{% blocktranslate %}You can request only one hint at a time.{% endblocktranslate %}</p>
+        {% endif %}
+    </div>
+</main>
+
+{% endblock %}

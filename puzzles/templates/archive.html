@@ -3,35 +3,16 @@
 {% block content %}
 
 <style>
-main a {
-    text-decoration: none;
-}
-
 main h4 {
-    color: var(--link-text-color);
-}
-
-main a h4 {
-    color: inherit;
-}
-
-main a h4:after {
-    content: "\2794";
-    float: right;
+    border: none;
 }
 </style>
 
 <h1>{% translate "Hunt Archive" %}</h1>
 
 <main>
-    <h4>
-        <b>FIXME Puzzle Hunt 20XX</b>
-        {% translate "Current Hunt!" %}
-    </h4>
-    <a href="https://FIXME"><h4>
-        <b>FIXME Puzzle Hunt 20XIX</b>
-        {% translate "Link to Archive" %}
-    </h4></a>
+    <h4>FIXME Puzzle Hunt 20XX: <b>{% translate "Current Hunt!" %}</b></h4>
+    <h4>FIXME Puzzle Hunt 20XIX: <a href="https://FIXME">{% translate "Link to Archive" %}</a></h4>
 </main>
 
 {% endblock %}

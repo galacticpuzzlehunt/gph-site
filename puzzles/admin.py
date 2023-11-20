@@ -59,6 +59,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ('team_name', 'creation_time', 'is_prerelease_testsolver_short', 'is_hidden')
     list_filter = ('is_prerelease_testsolver', 'is_hidden')
     search_fields = ('team_name',)
+    readonly_fields = ('id',)
 
 class PuzzleUnlockAdmin(admin.ModelAdmin):
     list_display = ('team', 'puzzle', 'unlock_datetime')

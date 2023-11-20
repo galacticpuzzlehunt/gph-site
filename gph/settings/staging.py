@@ -13,3 +13,11 @@ DOMAIN = 'FIXME'
 ALLOWED_HOSTS = ['FIXME']
 
 EMAIL_SUBJECT_PREFIX = '[\u2708\u2708\u2708STAGING\u2708\u2708\u2708] '
+
+HUNT_START_TIME = timezone.make_aware(datetime.datetime(
+    year=9000,
+    month=1,
+    day=1,
+    hour=0,
+    minute=0,
+))

@@ -106,11 +106,11 @@ window.addEventListener("load", () => {
 
   const clipboardButton = document.querySelector(".clipboard-button");
   if (clipboardButton) {
-    bootstrapClipoardButton(clipboardButton);
+    bootstrapClipboardButton(clipboardButton);
   }
 });
 
-function bootstrapClipoardButton(clipboardButton) {
+function bootstrapClipboardButton(clipboardButton) {
   clipboardButton.classList.add('shown');
 
   const puzzleElement = document.querySelector(".clipboard-container");

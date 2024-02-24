@@ -12,7 +12,7 @@
     <title>{{ hunt_title }}</title>
     {% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=0.5">
-    <meta property="og:title" content="FIXME">
+    <meta property="og:title" content="S&F Potluck">
     <meta property="og:description" content="{% blocktranslate with hunt=hunt_title%}Registration for this year's {{ hunt }} is now open!{% endblocktranslate %}">
     <meta property="og:image" content="{{ domain|slice:'-1' }}FIXME">
     <meta property="twitter:card" content="summary_large_image">
@@ -178,9 +178,9 @@
                         {% translate "Wrap-Up" %}
                     </a>
                     {% endif %}
-                    <a{% if request.path == '/archive' %} class="selected-tab"{% endif %} href="{{ archive_link }}">
+                    <!-- <a{% if request.path == '/archive' %} class="selected-tab"{% endif %} href="{{ archive_link }}">
                         {% translate "Archive" %}
-                    </a>
+                    </a> -->
                 </div>
             </div>
         </span>

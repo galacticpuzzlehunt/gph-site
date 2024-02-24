@@ -1,0 +1,156 @@
+{% extends "puzzle.html" %}
+{% block puzzle-body-md %}
+<style>
+.bigger tr td {
+	font-size: xx-large;
+}
+.tight tr td {
+	border-bottom: none;
+	padding: 1px 10px;
+	text-align: center;
+	font-family: Consolas, monospace;
+}
+.vertical tr td {
+	border-bottom: none;
+	border-right: 1px solid white;
+}
+.vertical tr td:last-child {
+	border-right: none;
+}
+</style>
+
+_Sigh, perhaps I need new glasses, these sound weird..._
+{: .flavor}
+
+<table class="bigger"><tr><td style="padding-left:6px">G</td><td>J</td><td>G</td><td>M</td><td>Z</td><td>P</td><td>W</td><td>J</td><td>G</td><td>C</td><td>Z</td><td>D</td><td>Y</td><td>C</td><td>H</td></tr></table>
+
+<table class="tight">
+<tr><td>E</td><td>Y</td><td>K</td><td>R</td><td>A</td><td>F</td><td>T</td><td>H</td><td>G</td><td>I</td><td>E</td><td>W</td><td>Y</td><td>R</td><td>I</td><td>A</td><td>F</td><td>O</td><td>C</td><td>P</td><td>R</td><td>O</td><td>F</td><td>I</td><td>T</td><td>S</td></tr>
+<tr><td>S</td><td>H</td><td>E</td><td>C</td><td>T</td><td>I</td><td>M</td><td>E</td><td>U</td><td>A</td><td>L</td><td>T</td><td>E</td><td>A</td><td>S</td><td>R</td><td>C</td><td>O</td><td>R</td><td>Q</td><td>W</td><td>R</td><td>I</td><td>T</td><td>E</td><td>E</td></tr>
+<tr><td>O</td><td>O</td><td>S</td><td>A</td><td>A</td><td>M</td><td>E</td><td>D</td><td>D</td><td>L</td><td>E</td><td>E</td><td>R</td><td>O</td><td>Y</td><td>A</td><td>M</td><td>O</td><td>U</td><td>R</td><td>N</td><td>I</td><td>N</td><td>G</td><td>C</td><td>A</td></tr>
+<tr><td>R</td><td>A</td><td>A</td><td>W</td><td>I</td><td>N</td><td>E</td><td>D</td><td>I</td><td>O</td><td>S</td><td>N</td><td>S</td><td>E</td><td>D</td><td>P</td><td>S</td><td>A</td><td>D</td><td>R</td><td>S</td><td>T</td><td>R</td><td>E</td><td>O</td><td>L</td></tr>
+<tr><td>P</td><td>R</td><td>E</td><td>S</td><td>E</td><td>N</td><td>T</td><td>S</td><td>S</td><td>U</td><td>E</td><td>T</td><td>R</td><td>N</td><td>L</td><td>Y</td><td>R</td><td>R</td><td>E</td><td>B</td><td>T</td><td>E</td><td>S</td><td>S</td><td>R</td><td>I</td></tr>
+<tr><td>C</td><td>S</td><td>T</td><td>N</td><td>S</td><td>W</td><td>E</td><td>R</td><td>C</td><td>D</td><td>S</td><td>O</td><td>C</td><td>I</td><td>U</td><td>T</td><td>E</td><td>I</td><td>D</td><td>E</td><td>A</td><td>H</td><td>U</td><td>U</td><td>D</td><td>N</td></tr>
+<tr><td>T</td><td>E</td><td>E</td><td>F</td><td>D</td><td>I</td><td>S</td><td>C</td><td>R</td><td>E</td><td>E</td><td>T</td><td>M</td><td>U</td><td>S</td><td>O</td><td>Y</td><td>O</td><td>A</td><td>Y</td><td>O</td><td>K</td><td>E</td><td>R</td><td>R</td><td>G</td></tr>
+<tr><td>U</td><td>C</td><td>E</td><td>I</td><td>L</td><td>I</td><td>N</td><td>G</td><td>E</td><td>N</td><td>E</td><td>E</td><td>D</td><td>E</td><td>D</td><td>D</td><td>C</td><td>O</td><td>M</td><td>P</td><td>L</td><td>E</td><td>M</td><td>E</td><td>N</td><td>T</td></tr>
+<tr><td>S</td><td>E</td><td>S</td><td>W</td><td>H</td><td>I</td><td>C</td><td>H</td><td>T</td><td>R</td><td>N</td><td>R</td><td>E</td><td>K</td><td>C</td><td>I</td><td>L</td><td>T</td><td>I</td><td>A</td><td>R</td><td>T</td><td>S</td><td>G</td><td>R</td><td>H</td></tr>
+<tr><td>P</td><td>R</td><td>K</td><td>H</td><td>B</td><td>U</td><td>R</td><td>Y</td><td>E</td><td>T</td><td>H</td><td>R</td><td>O</td><td>N</td><td>E</td><td>E</td><td>A</td><td>R</td><td>D</td><td>I</td><td>E</td><td>N</td><td>U</td><td>N</td><td>U</td><td>G</td></tr>
+<tr><td>A</td><td>E</td><td>C</td><td>E</td><td>U</td><td>E</td><td>I</td><td>D</td><td>E</td><td>U</td><td>Q</td><td>I</td><td>P</td><td>E</td><td>Y</td><td>P</td><td>D</td><td>E</td><td>O</td><td>L</td><td>O</td><td>E</td><td>I</td><td>A</td><td>T</td><td>I</td></tr>
+<tr><td>Y</td><td>A</td><td>U</td><td>T</td><td>R</td><td>E</td><td>B</td><td>I</td><td>Z</td><td>A</td><td>R</td><td>R</td><td>E</td><td>N</td><td>I</td><td>M</td><td>M</td><td>A</td><td>I</td><td>W</td><td>E</td><td>A</td><td>T</td><td>H</td><td>E</td><td>R</td></tr>
+<tr><td>E</td><td>L</td><td>D</td><td>H</td><td>R</td><td>Z</td><td>M</td><td>A</td><td>U</td><td>L</td><td>M</td><td>U</td><td>T</td><td>R</td><td>T</td><td>O</td><td>I</td><td>T</td><td>R</td><td>C</td><td>L</td><td>R</td><td>E</td><td>I</td><td>G</td><td>N</td></tr>
+<tr><td>D</td><td>D</td><td>E</td><td>E</td><td>O</td><td>A</td><td>H</td><td>A</td><td>I</td><td>I</td><td>A</td><td>O</td><td>A</td><td>R</td><td>R</td><td>F</td><td>S</td><td>T</td><td>G</td><td>G</td><td>U</td><td>E</td><td>S</td><td>S</td><td>E</td><td>D</td></tr>
+<tr><td>E</td><td>E</td><td>S</td><td>R</td><td>W</td><td>M</td><td>Y</td><td>C</td><td>W</td><td>Q</td><td>I</td><td>L</td><td>L</td><td>N</td><td>U</td><td>L</td><td>S</td><td>L</td><td>A</td><td>E</td><td>O</td><td>D</td><td>I</td><td>T</td><td>B</td><td>L</td></tr>
+<tr><td>N</td><td>R</td><td>C</td><td>O</td><td>L</td><td>O</td><td>N</td><td>E</td><td>L</td><td>U</td><td>Z</td><td>F</td><td>I</td><td>N</td><td>S</td><td>O</td><td>E</td><td>I</td><td>T</td><td>T</td><td>J</td><td>I</td><td>U</td><td>A</td><td>O</td><td>E</td></tr>
+<tr><td>I</td><td>O</td><td>E</td><td>F</td><td>L</td><td>U</td><td>L</td><td>A</td><td>R</td><td>O</td><td>E</td><td>N</td><td>T</td><td>A</td><td>S</td><td>W</td><td>D</td><td>R</td><td>E</td><td>A</td><td>H</td><td>T</td><td>R</td><td>T</td><td>U</td><td>N</td></tr>
+<tr><td>H</td><td>C</td><td>N</td><td>K</td><td>O</td><td>M</td><td>A</td><td>L</td><td>L</td><td>R</td><td>G</td><td>W</td><td>K</td><td>E</td><td>E</td><td>E</td><td>E</td><td>E</td><td>A</td><td>R</td><td>H</td><td>O</td><td>C</td><td>I</td><td>R</td><td>R</td></tr>
+<tr><td>W</td><td>I</td><td>T</td><td>C</td><td>H</td><td>R</td><td>A</td><td>L</td><td>A</td><td>R</td><td>U</td><td>A</td><td>E</td><td>J</td><td>D</td><td>R</td><td>M</td><td>Y</td><td>E</td><td>G</td><td>E</td><td>N</td><td>E</td><td>O</td><td>O</td><td>E</td></tr>
+<tr><td>H</td><td>D</td><td>C</td><td>E</td><td>A</td><td>I</td><td>T</td><td>H</td><td>R</td><td>O</td><td>U</td><td>G</td><td>H</td><td>R</td><td>Y</td><td>Y</td><td>R</td><td>L</td><td>I</td><td>A</td><td>N</td><td>E</td><td>W</td><td>N</td><td>U</td><td>K</td></tr>
+<tr><td>I</td><td>E</td><td>A</td><td>O</td><td>R</td><td>I</td><td>A</td><td>H</td><td>Q</td><td>U</td><td>A</td><td>R</td><td>T</td><td>Z</td><td>H</td><td>R</td><td>Y</td><td>A</td><td>R</td><td>I</td><td>M</td><td>A</td><td>D</td><td>A</td><td>G</td><td>N</td></tr>
+<tr><td>R</td><td>Y</td><td>U</td><td>E</td><td>E</td><td>N</td><td>S</td><td>D</td><td>I</td><td>S</td><td>S</td><td>E</td><td>N</td><td>T</td><td>E</td><td>T</td><td>R</td><td>P</td><td>Y</td><td>T</td><td>I</td><td>D</td><td>H</td><td>R</td><td>H</td><td>E</td></tr>
+<tr><td>L</td><td>A</td><td>S</td><td>T</td><td>E</td><td>H</td><td>P</td><td>O</td><td>R</td><td>P</td><td>G</td><td>W</td><td>S</td><td>F</td><td>S</td><td>T</td><td>A</td><td>T</td><td>I</td><td>O</td><td>N</td><td>E</td><td>R</td><td>Y</td><td>T</td><td>A</td></tr>
+<tr><td>E</td><td>R</td><td>E</td><td>L</td><td>T</td><td>F</td><td>A</td><td>R</td><td>C</td><td>A</td><td>A</td><td>A</td><td>E</td><td>R</td><td>S</td><td>T</td><td>A</td><td>P</td><td>E</td><td>R</td><td>O</td><td>I</td><td>S</td><td>O</td><td>A</td><td>D</td></tr>
+<tr><td>D</td><td>G</td><td>U</td><td>E</td><td>S</td><td>T</td><td>R</td><td>P</td><td>E</td><td>D</td><td>D</td><td>L</td><td>E</td><td>E</td><td>O</td><td>B</td><td>A</td><td>Z</td><td>A</td><td>A</td><td>R</td><td>T</td><td>A</td><td>E</td><td>E</td><td>E</td></tr>
+<tr><td>S</td><td>E</td><td>C</td><td>N</td><td>E</td><td>S</td><td>E</td><td>R</td><td>P</td><td>E</td><td>A</td><td>K</td><td>E</td><td>D</td><td>T</td><td>H</td><td>R</td><td>O</td><td>W</td><td>N</td><td>R</td><td>A</td><td>I</td><td>R</td><td>F</td><td>D</td></tr>
+</table>
+
+<table class="vertical no-copy">
+<tr><td>Plainly permitted</td><td>Franciscan skillet</td><td>Daybreak despair</td><td>Envelope at rest</td></tr>
+<tr><td>Audiology exam</td><td>Trot ...or not</td><td>Required massage</td><td>Rundle type</td></tr>
+<tr><td>Acai plant</td><td>Irritate expert</td><td>Single Korean</td><td>Sound sound</td></tr>
+<tr><td>Peculiar marketplace</td><td>Aged quality</td><td>White bucket</td><td>Awesome room!</td></tr>
+<tr><td>Manhattan quarterback</td><td>This attendee?</td><td>Combination skin</td><td>Narrow herbavore</td></tr>
+<tr><td>Provoke outcries</td><td>Garage hook</td><td>Awoke pallid</td><td>Flung by</td></tr>
+<tr><td>Gorgeous accessory</td><td>Rabbit coat</td><td>Sell flora</td><td>Launched chair</td></tr>
+<tr><td>String Triad</td><td>Mount husky</td><td>Ghost appears</td><td>Deadlocked detergent</td></tr>
+<tr><td>Lawyer group</td><td>Lucky inheritance </td><td>Psychic's income</td><td>Seasons seasoning</td></tr>
+<tr><td>Ship mates</td><td>Pleasant energy</td><td>Major-league writing</td><td>Secured custody</td></tr>
+<tr><td>Family argument</td><td>Center officer</td><td>Crystal cartons</td><td>Flip the bird</td></tr>
+<tr><td>Prudent individual</td><td>Macaroni art</td><td>Shower control</td><td>Storm incoming?</td></tr>
+<tr><td>Avoids pipes</td><td>Whiskey taster</td><td>GOP author</td><td>Heavy pause</td></tr>
+<tr><td>Color cube</td><td>Corn conundrum </td><td>Regrets prank</td><td>Unidentified spellcaster</td></tr>
+<tr><td>Mythical boat</td><td>Ambush galleria</td><td>Securing roof</td><td>Spun globe</td></tr>
+<tr><td>Bases achievement </td><td>Nose award</td><td>Watched movie</td><td>Drank and griped</td></tr>
+<tr><td>Hibiscus powder</td><td>Young golddigger</td><td>Regular Life</td><td>Yellow steering wheel</td></tr>
+<tr><td>On independence day</td><td>Overshot fog</td><td>Sterile suit</td><td>Pronoun, once upon a time</td></tr>
+</table>
+
+<div class="copy-only">
+```
+Plainly permitted
+Audiology exam
+Acai plant
+Peculiar marketplace
+Manhattan quarterback
+Provoke outcries
+Gorgeous accessory
+String Triad
+Lawyer group
+Ship mates
+Family argument
+Prudent individual
+Avoids pipes
+Color cube
+Mythical boat
+Bases achievement 
+Hibiscus powder
+On independence day
+Franciscan skillet
+Trot ...or not
+Irritate expert
+Aged quality
+This attendee?
+Garage hook
+Rabbit coat
+Mount husky
+Lucky inheritance 
+Pleasant energy
+Center officer
+Macaroni art
+Whiskey taster
+Corn conundrum 
+Ambush galleria
+Nose award
+Young golddigger
+Overshot fog
+Daybreak despair
+Required massage
+Single Korean
+White bucket
+Combination skin
+Awoke pallid
+Sell flora
+Ghost appears
+Psychic's income
+Major-league writing
+Crystal cartons
+Shower control
+GOP author
+Regrets prank
+Securing roof
+Watched movie
+Regular Life
+Sterile suit
+Envelope at rest
+Rundle type
+Sound sound
+Awesome room!
+Narrow herbavore
+Flung by
+Launched chair
+Deadlocked detergent
+Seasons seasoning
+Secured custody
+Flip the bird
+Storm incoming?
+Heavy pause
+Unidentified spellcaster
+Spun globe
+Drank and griped
+Yellow steering wheel
+Pronoun, once upon a time
+```
+</div>
+
+<button class="btn clipboard-button"></button>
+
+{% endblock %}

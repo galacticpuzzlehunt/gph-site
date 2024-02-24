@@ -24,7 +24,7 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'FIXME_SECRET_KEY_HERE')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'NOT_SURE_WHAT_THIS_IS_USED_FOR')
 
 RECAPTCHA_SITEKEY = None
 RECAPTCHA_SECRETKEY = None

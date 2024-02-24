@@ -528,12 +528,12 @@ function copyJackInlineStyles(element) {
     // Only copyjack the background color if it isn't transparent. Otherwise, we
     // could clobber an inherited background color.
     ...(isBackgroundColorTransparent ? ["background-color"] : []),
-    "color",
+    // "color",
     'font-family',
     "font-weight",
     "font-size",
     "font-style",
-    "text-align",
+    // "text-align",
   ].map((prop) => `${prop}: ${styles.getPropertyValue(prop)};`);
   element.setAttribute(
     "style",

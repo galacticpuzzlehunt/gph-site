@@ -45,7 +45,7 @@
     <div class="no-break">
         <h4 id="Format">{% translate "How will hints work?" %}</h4>
         {% format_time hint_time "WEEKDATE_AT_TIME" as hint_start %}
-        <p>{% blocktranslate %}Starting on <strong>{{hint_start}}</strong>, teams will receive one hint every <strong>FIXME</strong> until the end of the hunt.{% endblocktranslate %}</p>
+        <p>{% blocktranslate %}Starting on <strong>{{hint_start}}</strong>, teams will receive one hint every <strong>HOUR</strong> until the end of the hunt.{% endblocktranslate %}</p>
         {% if intro_hints %}
         <p>{% blocktranslate count hints=intro_hints %}The first <strong>{{ hints }} hint</strong> your team receives may only be used on the first set of puzzles in the hunt.{% plural %}The first <strong>{{ hints }} hints</strong> your team receives may only be used on the first set of puzzles in the hunt.{% endblocktranslate %}</p>
         {% endif %}

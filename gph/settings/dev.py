@@ -4,16 +4,23 @@ DEBUG = True
 
 IS_TEST = True
 
-DOMAIN = 'http://localhost:8000/'
+DOMAIN = 'http://104.247.79.63:8000/'
 
 ALLOWED_HOSTS = ['*']
 
 EMAIL_SUBJECT_PREFIX = ''
 
 HUNT_START_TIME = timezone.make_aware(datetime.datetime(
-    year=9000,
-    month=1,
-    day=1,
+    year=2024,
+    month=2,
+    day=22,
+    hour=18,
+    minute=0,
+))
+HUNT_END_TIME = timezone.make_aware(datetime.datetime(
+    year=2024,
+    month=2,
+    day=23,
     hour=0,
     minute=0,
 ))

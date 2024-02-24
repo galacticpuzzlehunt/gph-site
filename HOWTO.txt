@@ -1,0 +1,7 @@
+firewall-cmd --add-port=8000/tcp
+source venv/bin/activate
+./manage.py runserver 0.0.0.0:8000
+
+OR
+
+gunicorn gph.wsgi -b 0.0.0.0:8000 -e DJANGO_SETTINGS_MODULE=gph.settings.dev

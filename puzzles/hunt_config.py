@@ -5,15 +5,15 @@ from django.utils import timezone
 
 # included in various templates. NOTE, sometimes appears with a "the" before
 # it, maybe check those are what you want.
-HUNT_TITLE = 'FIXME Puzzle Hunt'
+HUNT_TITLE = 'S&F Potluck Puzzle Hunt'
 # included in various templates and displayed on the static site
-HUNT_ORGANIZERS = 'FIXME Puzzlesetters'
+HUNT_ORGANIZERS = 'Stumped and Furious'
 # included in various templates and set as reply-to for automatic emails
-CONTACT_EMAIL = 'FIXME@example.com'
+CONTACT_EMAIL = 'byronigoe@gmail.com'
 # the sender from which automatic emails are sent; your mail sending service
 # might require you set this to something (check settings/base.py to put your
 # actual mail sending service credentials)
-MESSAGING_SENDER_EMAIL = 'no-reply@FIXME.example.com'
+MESSAGING_SENDER_EMAIL = 'no-reply@nowhere.com'
 
 # Change this to True to reveal the story page to everyone.
 STORY_PAGE_VISIBLE = False
@@ -30,15 +30,15 @@ HUNT_START_TIME = settings.HUNT_START_TIME
 HUNT_END_TIME = settings.HUNT_END_TIME
 HUNT_CLOSE_TIME = settings.HUNT_CLOSE_TIME
 
-MAX_GUESSES_PER_PUZZLE = 20
-MAX_MEMBERS_PER_TEAM = 6
+MAX_GUESSES_PER_PUZZLE = 10
+MAX_MEMBERS_PER_TEAM = 10
 
 # If this is disabled, teams will not get any hints.
 HINTS_ENABLED = True
 # Teams accumulate this many hints each HINT_INTERVAL.
 HINTS_PER_INTERVAL = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 # Teams get hints every HINT_INTERVAL, starting at HINT_TIME.
-HINT_INTERVAL = datetime.timedelta(hours=12)
+HINT_INTERVAL = datetime.timedelta(hours=1)
 # Teams get the first number in HINTS_PER_INTERVAL at this time, and subsequent
 # numbers every HINT_INTERVAL after until the end of HINTS_PER_INTERVAL.
 HINT_TIME = HUNT_START_TIME + HINT_INTERVAL

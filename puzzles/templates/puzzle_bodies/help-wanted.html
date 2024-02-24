@@ -1,0 +1,215 @@
+{% extends "puzzle.html" %}
+{% block puzzle-body-md %}
+<style>
+.row {
+	display: flex;
+}
+.row div {
+	padding: 8px;
+}
+.finger {
+	height: 50px;
+}
+h3 {
+	border-bottom: none;
+}
+.gapped {
+	border-collapse: separate;
+	border-spacing: 4px 4px;
+}
+.gapped tr td {
+	width: 30px;
+	height: 30px;
+	padding: 0px;
+}
+.yellow {
+	background-color: #fbe7a2;
+}
+.green {
+	background-color: #bbd6ab;
+}
+.gray {
+	background-color: #eee;
+}
+.small {
+	font-size: xx-small;
+}
+.grid tr td {
+	width: 26px;
+	height: 26px;
+	padding: 0px;
+}
+.grid tr td:last-child {
+	width: auto;
+	padding-left: 10px;
+}
+.bordered {
+	border: 1px solid black;
+	background-color: white;
+}
+.bomb {
+	background-image: url(/static/puzzle_resources/help-wanted/bomb.png);
+	background-position: right;
+	background-size: 50%;
+	background-repeat: no-repeat;
+}
+</style>
+
+As with any other project, planning a heist requires assembling a team with a diverse set of skills.
+{: .flavor}
+
+<table class="no-copy">
+<tr><td>A STONE</td><td>BRAIN</td><td>DOYEN</td><td>GO</td><td>PE</td><td>TOM-TOM</td></tr>
+<tr><td>AIL</td><td>BRO</td><td>EMCEE</td><td>HOGSHEAD</td><td>PICKY</td><td>TON</td></tr>
+<tr><td>AKA</td><td>CHAPS</td><td>ENTS</td><td>HUMPTY DUMPTY</td><td>RA</td><td>TRIPLE</td></tr>
+<tr><td>ALPHA</td><td>CHIEF</td><td>FAKE</td><td>INGOT</td><td>SOCK</td><td>WELLS FARGO</td></tr>
+<tr><td>ARCH</td><td>CON</td><td>FUD</td><td>KY</td><td>TACO</td><td>WILHELM</td></tr>
+<tr><td>BARON</td><td>DERM</td><td>GEYSER</td><td>MORTON</td><td>TASTE</td><td>ZEN</td></tr>
+</table>
+
+<div class="copy-only">
+```
+A STONE
+AIL
+AKA
+ALPHA
+ARCH
+BARON
+BRAIN
+BRO
+CHAPS
+CHIEF
+CON
+DERM
+DOYEN
+EMCEE
+ENTS
+FAKE
+FUD
+GEYSER
+GO
+HOGSHEAD
+HUMPTY DUMPTY
+INGOT
+KY
+MORTON
+PE
+PICKY
+RA
+SOCK
+TACO	
+TASTE
+TOM-TOM
+TON
+TRIPLE
+WELLS FARGO
+WILHELM
+ZEN
+```
+</div>
+
+---
+
+### 1. FINANCIER
+
+_Funds the operations through money hidden in accounts under false names_
+	
+<div class="row" style="font-size:xx-large">
+<div>£</div>
+<div>R</div>
+<div>֏</div>
+<div>₩</div>
+<div>₫</div>
+<div>fr.</div>
+</div>
+
+<div class="row">
+<div>James</div>
+<div>Johnny</div>
+<div>Mao</div>
+<div>Marlon</div>
+<div>Paula</div>
+<div>Willy</div>
+</div>
+
+---
+
+### 2. PICKPOCKET
+
+_Knows how to get a five-finger discount_
+
+<div class="row">
+<div><img class="finger" src="/static/puzzle_resources/help-wanted/finger1.png"></div>
+<div><img class="finger" src="/static/puzzle_resources/help-wanted/finger2.png"></div>
+<div><img class="finger" src="/static/puzzle_resources/help-wanted/finger3.png"></div>
+<div><img class="finger" src="/static/puzzle_resources/help-wanted/finger4.png"></div>
+<div><img class="finger" src="/static/puzzle_resources/help-wanted/finger5.png"></div>
+<div><img class="finger" src="/static/puzzle_resources/help-wanted/finger6.png"></div>
+<div><img class="finger" src="/static/puzzle_resources/help-wanted/finger7.png"></div>
+</div>
+
+---
+
+### 3. ACTOR
+
+_I hear the actor can play many roles._
+
+<table>
+<tr><td>⭐⭐⭐</td><td>The actor’s first role – a great starter.</td></tr>
+<tr><td>⭐⭐⭐⭐</td><td>Learned how to fly a plane for this role.</td></tr>
+<tr><td>⭐⭐⭐⭐⭐</td><td>The actor’s buns looked great in this movie.</td></tr>
+<tr><td>⭐⭐⭐⭐⭐</td><td>What a sweet performance!</td></tr>
+<tr><td>⭐⭐</td><td>Played a financier in a heist movie.</td></tr>
+<tr><td>⭐⭐⭐⭐⭐</td><td>A fresh take on the actor’s first role.</td></tr>
+<tr><td>⭐</td><td>A widely anticipated hit!</td></tr>
+</table>
+
+---
+
+### 4. MASTERMIND
+
+_a.k.a. the head honcho, the top dog_
+
+<table class="gapped">
+<tr><td class="yellow"></td><td class="green"></td><td class="gray"></td><td class="gray"></td><td class="gray"></td></tr>
+<tr><td class="green"></td><td class="gray"></td><td class="green"></td><td class="gray"></td><td class="gray"></td></tr>
+<tr><td class="yellow"></td><td class="gray"></td><td class="gray"></td><td class="gray"></td><td class="gray"></td></tr>
+<tr><td class="gray"></td><td class="gray"></td><td class="gray"></td><td class="gray"></td><td class="gray"></td></tr>
+<tr><td class="gray"></td><td class="gray"></td><td class="yellow"></td><td class="gray"></td><td class="gray"></td></tr>
+</table>
+
+---
+
+### 5. GREASEMAN
+
+_Folds down to get into tight spaces._
+
+<p class="copy-only">NOTE: The inline font sizes don't copy properly. See the puzzle page</p>
+
+Used <span class="small">to</span> start the car<br>
+1985 <span class="small">Tandy</span> film<br>
+Music festival in <span class="small">next</span> answer<br>
+Where <span class="small">Jennifer</span> is located<br>
+Christ <span class="small">the</span> _______ statue
+
+---
+
+### 6. EXPLOSIVES SPECIALIST
+
+_Loves the sound of things popping in the air!_
+
+<p class="copy-only">NOTE: The bomb icons don't copy properly. See the puzzle page</p>
+
+<table class="grid">
+<tr><td></td><td></td><td></td><td class="bordered"></td><td class="bordered bomb"></td><td class="bordered"></td><td class="bordered"></td><td></td><td></td><td>Not specific</td></tr>
+<tr><td></td><td></td><td></td><td class="bordered"></td><td class="bordered bomb"></td><td class="bordered"></td><td class="bordered"></td><td class="bordered"></td><td class="bordered"></td><td>You don't do this when traveling</td></tr>
+<tr><td></td><td></td><td></td><td></td><td class="bordered bomb"></td><td class="bordered"></td><td class="bordered"></td><td class="bordered"></td><td></td><td>Another name for a pupper</td></tr>
+<tr><td></td><td></td><td></td><td class="bordered"></td><td class="bordered bomb"></td><td class="bordered"></td><td class="bordered"></td><td class="bordered"></td><td></td><td>He was notorious</td></tr>
+<tr><td class="bordered"></td><td class="bordered"></td><td class="bordered"></td><td class="bordered"></td><td class="bordered bomb"></td><td></td><td></td><td></td><td></td><td>Partners of crosses in boxing</td></tr>
+<tr><td></td><td class="bordered"></td><td class="bordered"></td><td class="bordered"></td><td class="bordered bomb"></td><td class="bordered"></td><td></td><td></td><td></td><td>Bewildered</td></tr>
+<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+
+<button class="btn clipboard-button"></button>
+
+{% endblock %}

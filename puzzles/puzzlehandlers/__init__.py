@@ -77,3 +77,6 @@ def error_ratelimit(handler, rate, error, check_response=None, encode_response=N
 # Example usage:
 from . import interactive_demo
 interactive_demo_submit = error_ratelimit(interactive_demo.submit, '2/m', {'error': 'Please limit your attempts to two per minute.'}, lambda response: response['correct'], json.dumps)
+
+from . import chess_puzzle
+chess_puzzle_submit = error_ratelimit(chess_puzzle.submit, '15/m', {'error': 'Please limit your attempts to fifteen per minute.'}, lambda response: response['correct'], json.dumps)

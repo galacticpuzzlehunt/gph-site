@@ -1,0 +1,87 @@
+{% extends "puzzle.html" %}
+{% block puzzle-body-html %}
+
+<em>Everyone Loves a Chess Puzzle!</em>
+<br><br>
+
+<div id="content">
+<p>While you're busy playing this first game, your opponents are making moves on all the other (randomly ordered) boards below. Enter your winning message in the box below, and if you win then you'll find out your opponent's moves in the next game.</p>
+<img src="/static/puzzle_resources/chess-puzzle/chess-puzzle1.png" style="width:100%">
+</div>
+
+<form id="puzzle-form" autocomplete="off" action="javascript:void(0);">
+    {% csrf_token %}
+    <input type="text" name="answer" id="answer" placeholder="Enter your answer">
+    <input type="submit" id="submit" value="Submit">
+    <div id="output"></div>
+</form>
+
+<script type="text/javascript">
+// This demo code uses jQuery and modern JavaScript features flagrantly.
+// You should evaluate your own needs.
+document.addEventListener('DOMContentLoaded', () => {
+    async function submit() {
+        $('#answer').prop("disabled", true);
+        $('#submit').prop("disabled", true);
+
+        let csrftoken = getCookie('csrftoken');
+        try {
+            let result = await fetch("/puzzle/chess-puzzle/submit", {
+                method: 'POST',
+                body: JSON.stringify({
+                    answer: $('#answer').val(),
+                }),
+                headers: { "X-CSRFToken": csrftoken },
+            });
+            if (!result.ok) {
+                // HTTP response code was not 2xx. Maybe introspect more...
+                $('#output').text(`Error: ${result.status} ${result.statusText}`);
+            } else {
+                let res = await result.json();
+                if (res.error) {
+                    $('#output').text(`Error: ${res.error}`);
+                } else {
+                    $('#output').text(res.correct ? "Right!" : "Wrong!");
+					if (res.correct) {
+						$('#content').html(res.content);
+						window.scrollTo(0, 0);
+					}
+                }
+            }
+        } catch (e) {
+            $('#output').text(`Error: ${e}`);
+        }
+        // calls you might make: .val(""), .select(), .focus()
+        $('#answer').prop("disabled", false);
+        $('#submit').prop("disabled", false);
+    }
+
+    // https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $('#puzzle-form').on('submit', submit);
+});
+</script>
+
+<br><br>
+<img src="/static/puzzle_resources/chess-puzzle/chess-puzzle2.png" style="width:100%"><br><br>
+<img src="/static/puzzle_resources/chess-puzzle/chess-puzzle3.png" style="width:100%"><br><br>
+<img src="/static/puzzle_resources/chess-puzzle/chess-puzzle4.png" style="width:100%"><br><br>
+<img src="/static/puzzle_resources/chess-puzzle/chess-puzzle5.png" style="width:100%"><br><br>
+<img src="/static/puzzle_resources/chess-puzzle/chess-puzzle6.png" style="width:100%">
+
+{% endblock %}

@@ -523,11 +523,11 @@ function copyJackInlineStyles(element) {
     return;
   }
 
-  const isBackgroundColorTransparent = styles.getPropertyValue('background-color') !== 'rgba(0, 0, 0, 0)';
+  const isBackgroundColorTransparent = styles.getPropertyValue('background-color') == 'rgba(0, 0, 0, 0)';
   const jackedStyles = [
     // Only copyjack the background color if it isn't transparent. Otherwise, we
     // could clobber an inherited background color.
-    ...(isBackgroundColorTransparent ? ["background-color"] : []),
+    ...(isBackgroundColorTransparent ? [] : ["background-color"]),
     "color",
     'font-family',
     "font-weight",

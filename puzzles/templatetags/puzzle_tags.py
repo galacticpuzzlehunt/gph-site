@@ -42,7 +42,7 @@ def days_between(before, after):
 
 @register.filter
 def unix_time(timestamp):
-    return timestamp.strftime('%s') if timestamp else ''
+    return timestamp.timestamp() if timestamp else ''
 
 @register.simple_tag
 def format_time(timestamp, format='DATE_TIME'):
